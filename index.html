@@ -580,9 +580,17 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 .enterP .bkPage.right{animation:bkEP .26s ease-out}@keyframes bkEP{from{transform:rotateY(-88deg)}}
 @media(max-width:900px){.bkCover{padding:16px}.bkPage{padding:12px}.bkGrid{gap:8px}}
 </style>
-</head><body>
+<style id="v112-final-ui">
+/* V112 — classeur uniquement + argent en haut à droite + sons côte à côte */
+.colHeadStat{display:none!important}
+.soundCtl{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.soundCtl #soundToggle{padding:8px 9px;font-size:12px}
+.soundCtl #volSlider{width:72px;margin:0;flex:0 0 72px}
+.mny{position:fixed!important;top:12px!important;right:18px!important;z-index:9999!important;margin:0!important;padding:8px 12px!important;border-radius:10px;background:#17131fdd;border:1px solid #3a2f4d;backdrop-filter:blur(8px);box-shadow:0 4px 16px #0008}
+@media(max-width:820px){.mny{top:8px!important;right:8px!important}.soundCtl{gap:4px}.soundCtl #volSlider{width:58px;flex-basis:58px}}
+</style></head><body>
 <nav><h1>Wiki<span>Collect</span></h1><button id="t0" class="on">🎁 Boosters</button><button id="t1">🌍 Toutes les cartes</button><button id="t2">📚 Collection</button><button id="t3">🔨 Enchères</button><button id="t4">🎰 Casino</button>
-<button id="t5">🎯 Missions du jour</button><button id="t6">🔥 Événement du jour</button><button id="t7">👤 Profil</button><button id="t8">🏆 Succès</button><button id="hw">❓ Comment ça marche</button><button id="soundToggle" title="Activer / couper les sons">🔊 Sons</button><input id="volSlider" type="range" min="0" max="100" step="5" title="Volume des sons"><div id="mn" class="mny"></div><div class="sp"></div></nav>
+<button id="t5">🎯 Missions du jour</button><button id="t6">🔥 Événement du jour</button><button id="t7">👤 Profil</button><button id="t8">🏆 Succès</button><button id="hw">❓ Comment ça marche</button><div class="soundCtl"><button id="soundToggle" title="Activer / couper les sons">🔊 Sons</button><input id="volSlider" type="range" min="0" max="100" step="5" title="Volume des sons"></div><div id="mn" class="mny"></div><div class="sp"></div></nav>
 <main id="main"></main>
 <div class="modal" id="modal"></div>
 <script>
@@ -2117,7 +2125,7 @@ function fusionHTML(A){
 /* ===== COLLECTION V55 : tags + sélection + suppression + 50 cartes/page ===== */
 const UNTAGGED_FILTER="__NO_TAG__";
 let colPage=1,colTagFilter="",colSearch="",colSort="rar",colSelected=new Set();
-const COL_PAGE_SIZE=50;let colView="binder",bkIdx=0,bkPer=9,bkAnim="";try{const u=JSON.parse(localStorage.getItem("wc_bk")||"null");if(u){colView="binder";bkPer=9;bkIdx=u.i|0}}catch(e){}const saveBk=()=>{try{localStorage.setItem("wc_bk",JSON.stringify({v:colView,p:bkPer,i:bkIdx}))}catch(e){}};
+const COL_PAGE_SIZE=50;let colView="binder",bkIdx=0,bkPer=9,bkAnim="";try{const u=JSON.parse(localStorage.getItem("wc_bk")||"null");if(u){colView="binder";bkPer=9;bkIdx=u.i|0}}catch(e){}const saveBk=()=>{colView="binder";try{localStorage.setItem("wc_bk",JSON.stringify({v:"binder",p:9,i:bkIdx}))}catch(e){}};
 const selKey=v=>String(v);
 const selHas=v=>colSelected.has(selKey(v));
 const selAdd=v=>colSelected.add(selKey(v));
@@ -2164,7 +2172,7 @@ function collection(){
  const bookHTML=`<div class="bkWrap"><div class="bkCover ${single?"single":""}"><div class="bkSpread ${banim?"enter"+banim:""}">${bkPage(bkIdx,"left")}${single?"":`<div class="bkRings">${"<i></i>".repeat(6)}</div>`+bkPage(bkIdx+1,"right")}</div></div>
   <div class="bkNav"><button class="btn g" id="bkPrev" ${bkIdx<=0?"disabled":""}>◀ Page précédente</button><span>${single||bkIdx+1>=np?"Page "+(bkIdx+1):"Pages "+(bkIdx+1)+"–"+Math.min(bkIdx+2,np)} / ${np} · ${L.length} cartes</span><button class="btn g" id="bkNext" ${bkIdx+step>=np?"disabled":""}>Page suivante ▶</button></div>${L.length?"":'<div class="msg">Aucune carte ne correspond à ta recherche ou à tes filtres.</div>'}</div>`;
  const visItems=colView==="binder"?L.slice(bkIdx*per,(bkIdx+step)*per):pageItems,allVis2=visItems.length>0&&visItems.every(c=>selHas(c.id));
- main.innerHTML=`<div class="colHead"><div><h2>📚 Ma collection</h2><div class="sub">${A.length} cartes différentes · ${A.reduce((s,c)=>s+c.n,0)} au total · ${L.length} dans le filtre</div></div><div class="colHeadStat"><button class="btn g" id="viewTgl">${colView==="binder"?"▦ Vue grille":"📖 Vue classeur"}</button></div></div>
+ main.innerHTML=`<div class="colHead"><div><h2>📚 Ma collection</h2><div class="sub">${A.length} cartes différentes · ${A.reduce((s,c)=>s+c.n,0)} au total · ${L.length} dans le filtre</div></div></div>
   ${fusionHTML(A)}
   <div class="colTools">
    <div class="colToolTop"><input id="colSearch" placeholder="🔍 Rechercher dans ma collection…" value="${colSearch.replace(/"/g,"&quot;")}"><select id="colSort"><option value="rar" ${colSort==="rar"?"selected":""}>Plus rares d'abord</option><option value="az" ${colSort==="az"?"selected":""}>A → Z</option><option value="count" ${colSort==="count"?"selected":""}>Plus de doublons</option><option value="recent" ${colSort==="recent"?"selected":""}>Plus récentes</option></select></div>
@@ -2180,7 +2188,6 @@ function collection(){
  main.querySelector("#colSearch").oninput=e=>{colSearch=e.target.value;colPage=1;colSelected.clear();saveCollectionState();};
  main.querySelector("#colSearch").onkeydown=e=>{if(e.key==="Enter")collection()};
  main.querySelector("#colSort").onchange=e=>{colSort=e.target.value;colPage=1;colSelected.clear();collection()};
- const tgl=$("viewTgl");if(tgl)tgl.onclick=()=>{colView=colView==="binder"?"grid":"binder";saveBk();collection()};
  const bkP=$("bkPrev"),bkN=$("bkNext");
  const turn=d=>{const sp=document.querySelector(".bkSpread"),go=()=>{bkIdx=Math.max(0,bkIdx+d*step);bkAnim=d>0?"N":"P";saveBk();collection()};if(!sp){go();return}sp.classList.add(d>0?"leaveN":"leaveP");setTimeout(go,230)};
  if(bkP)bkP.onclick=()=>turn(-1);if(bkN)bkN.onclick=()=>turn(1);
