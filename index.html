@@ -628,22 +628,72 @@ const THR=[0,1000,5000,15000,125000,250000,500000,1000000];
 // Forçages manuels (titre Wikipédia exact → rareté 0-7)
 const OVR={
  "Paris":7,"Tokyo":7,"New York":7,"Londres":7,"Los Angeles":7,"Dubaï":7,
- "Michael Jackson":7,"Marilyn Monroe":7,"Albert Einstein":7,"Stephen Hawking":7,"Cristiano Ronaldo":7,"Lionel Messi":7,
+ "Michael Jackson":7,"Marilyn Monroe":7,"Mia Khalifa":7,"Sophie Rain":7,"Blackpink":7,"BTS":7,"Albert Einstein":7,"Stephen Hawking":7,"Cristiano Ronaldo":7,"Lionel Messi":7,
  "Oussama ben Laden":7,"Jeffrey Dahmer":7,"Charles Manson":7,
  "Attentats du 11 septembre 2001":7,"Attentats de Paris du 13 novembre 2015":7,"Attentat contre Charlie Hebdo":7,"Mort de Diana, princesse de Galles":7,
  "Naufrage du Titanic":7,"Catastrophe nucléaire de Tchernobyl":7,"Accident nucléaire de Fukushima":7,"Incendie de Notre-Dame de Paris":7,"Explosions au port de Beyrouth en 2020":7
 };
 
-/* ===== V98 : catalogue de cartes par catégorie (titres Wikipédia FR + rareté forcée) ===== */
+/* ===== V99 : catalogue de cartes par catégorie (titres Wikipédia FR + rareté forcée) ===== */
 let CG="";
 const nz2=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9]+/g," ").trim().toLowerCase();
 const CATALOG={"foot":{"t7":"Kylian Mbappé|Lionel Messi|Cristiano Ronaldo|Pelé|Diego Maradona|Zinédine Zidane|Neymar|Équipe de France de football|Coupe du monde de football|Paris Saint-Germain Football Club|Real Madrid Club de Fútbol|Futbol Club Barcelona","t6":"Karim Benzema|Antoine Griezmann|Erling Haaland|Robert Lewandowski|Luka Modrić|Ronaldinho|Johan Cruyff|Michel Platini|Thierry Henry|Franz Beckenbauer|Zlatan Ibrahimović|Paul Pogba|N'Golo Kanté|Vinícius Júnior|Jude Bellingham|Lamine Yamal|Mohamed Salah|Kevin De Bruyne|Didier Deschamps|Olympique de Marseille|Olympique lyonnais|Manchester United Football Club|Liverpool Football Club|Juventus Football Club|Football Club Bayern Munich|Ballon d'or|Ligue des champions de l'UEFA|Coupe du monde de football de 2022|Coupe du monde de football de 2018|Coupe du monde de football de 1998|Stade de France|Olivier Giroud|Ousmane Dembélé|Eden Hazard|Sergio Ramos|Andrés Iniesta|Xavi|Iker Casillas|Eric Cantona|Gianluigi Buffon|Paolo Maldini|David Beckham|Roberto Baggio","t5":"Raphaël Varane|Hugo Lloris|Gareth Bale|Harry Kane|Son Heung-min|Sadio Mané|Samuel Eto'o|Didier Drogba|George Weah|Lilian Thuram|Fabien Barthez|Marcel Desailly|Zico|Romário|Rivaldo|Kaká|Andrea Pirlo|Francesco Totti|Alessandro Del Piero|Wayne Rooney|Steven Gerrard|Frank Lampard|Ruud van Nistelrooy|Dennis Bergkamp|Marco van Basten|Gerd Müller|Lev Yachine|Alfredo Di Stéfano|Ferenc Puskás|Bobby Charlton|Eusébio|Garrincha|Hristo Stoitchkov|Gheorghe Hagi|Roger Milla|Just Fontaine|Raymond Kopa|Jean-Pierre Papin|Youri Djorkaeff|Franck Ribéry|Samir Nasri|Dimitri Payet|Alexandre Lacazette|Pep Guardiola|José Mourinho|Carlo Ancelotti|Arsène Wenger|Alex Ferguson|Jürgen Klopp|Diego Simeone|Aimé Jacquet|Pierluigi Collina|Stade Santiago-Bernabéu|Camp Nou|Old Trafford|Parc des Princes|Stade Vélodrome|Allianz Arena|Wendie Renard|Alexia Putellas|Aitana Bonmatí|Marta Vieira da Silva|Megan Rapinoe|Alex Morgan|Mia Hamm|Ada Hegerberg","t4":"Lucas Hernandez|Théo Hernandez|Aurélien Tchouaméni|Eduardo Camavinga|Kingsley Coman|Marcus Thuram|Randal Kolo Muani|Adrien Rabiot|Mike Maignan|Jules Koundé|William Saliba|Dayot Upamecano|Ibrahima Konaté|Bradley Barcola|Warren Zaïre-Emery|Désiré Doué|Michael Olise|Rayan Cherki|Hatem Ben Arfa|Nicolas Anelka|Patrice Evra|Bacary Sagna|Mathieu Valbuena|Blaise Matuidi|Laurent Blanc|Bixente Lizarazu|Emmanuel Petit|Robert Pirès|Christian Karembeu|Claude Makélélé|Eugénie Le Sommer|Amandine Henry|Sandrine Soubeyrand|Marinette Pichon|Corinne Diacre|Sam Kerr|Sarina Wiegman|Thomas Tuchel|Luis Enrique|Antonio Conte|Rudi Garcia|Christophe Galtier|Raymond Domenech|Hervé Renard|Gérard Houllier|Rinus Michels|Arrigo Sacchi|Clément Turpin|Stéphanie Frappart|Howard Webb|Björn Kuipers|Felix Brych|Mark Clattenburg|Szymon Marciniak|Néstor Pitana|Daniele Orsato","t3":"Slavko Vinčić|Anthony Taylor|François Letexier|Benoît Bastien|Jérôme Brisard|Ruddy Buquet|Antony Gautier|Amaury Delerue|Kylian Hazard|Moussa Dembélé|Wissam Ben Yedder|Layvin Kurzawa|Presnel Kimpembe|Marquinhos|Gianluigi Donnarumma|Achraf Hakimi|Warren Bondo|Jonathan Clauss|Alexis Sánchez|Edinson Cavani|Ángel Di María|Mauro Icardi|Javier Pastore|Thiago Silva|Dani Alves|Gerard Piqué|Carles Puyol|Sergio Busquets|Jordi Alba|Pedri|Gavi|Ansu Fati"},"act":{"t7":"Marilyn Monroe|Charlie Chaplin|Leonardo DiCaprio|Brad Pitt|Johnny Depp|Tom Cruise|Bruce Lee|Arnold Schwarzenegger|Louis de Funès|Alain Delon|Jean-Paul Belmondo|Audrey Hepburn|Scarlett Johansson|Angelina Jolie","t6":"Will Smith|Robert De Niro|Al Pacino|Sylvester Stallone|Jackie Chan|Gérard Depardieu|Omar Sy|Jean Dujardin|Marion Cotillard|Brigitte Bardot|Catherine Deneuve|Sophie Marceau|Vincent Cassel|Tom Hanks|Keanu Reeves|Morgan Freeman|Jim Carrey|Robin Williams|Eddie Murphy|Dwayne Johnson|Ryan Reynolds|Chris Hemsworth|Robert Downey Jr.|Margot Robbie|Emma Watson|Daniel Radcliffe|Zendaya|Timothée Chalamet|Tom Holland|Anne Hathaway|Jennifer Lawrence|Natalie Portman|Meryl Streep|Julia Roberts|Nicole Kidman|Sandra Bullock|Kate Winslet|Jack Nicholson|Clint Eastwood|Harrison Ford|Sean Connery|Daniel Craig|Christian Bale|Heath Ledger|Joaquin Phoenix|Anthony Hopkins|Jean Reno|Christian Clavier|Dany Boon|Kad Merad|Jean Gabin|Bourvil|Fernandel|Yves Montand|Lino Ventura|Jean Marais|Michel Serrault|Pierre Richard|Gérard Jugnot|Fabrice Luchini|Vincent Lindon","t5":"Isabelle Adjani|Isabelle Huppert|Juliette Binoche|Audrey Tautou|Léa Seydoux|Eva Green|Louis Garrel|Romain Duris|Gaspard Ulliel|Josiane Balasko|Thierry Lhermitte|Guillaume Canet|Jean-Pierre Cassel|Ken Watanabe|Toshirō Mifune|Takeshi Kitano|Jet Li|Gong Li|Zhang Ziyi|Donnie Yen|Andy Lau|Tony Leung Chiu-wai|Lee Byung-hun|Song Kang-ho|Shah Rukh Khan|Amitabh Bachchan|Aishwarya Rai|Priyanka Chopra|Deepika Padukone|Aamir Khan|Salman Khan|Hugh Grant|Colin Firth|Benedict Cumberbatch|Idris Elba|Emma Thompson|Helen Mirren|Judi Dench|Maggie Smith|Michael Caine|Gary Oldman|Tom Hiddleston|Eddie Redmayne|Ian McKellen|Patrick Stewart|Gal Gadot|Ana de Armas|Florence Pugh|Sydney Sweeney|Millie Bobby Brown|Jenna Ortega|Pedro Pascal|Cillian Murphy|Austin Butler|Andrew Garfield|Robert Pattinson|Kristen Stewart|Megan Fox|Jessica Alba|Eva Mendes|Penélope Cruz|Salma Hayek|Antonio Banderas|Javier Bardem","t4":"Mélanie Laurent|Adèle Exarchopoulos|Léa Drucker|Karin Viard|Sandrine Kiberlain|Virginie Efira|Camille Cottin|Laure Calamy|Noémie Merlant|Bérénice Bejo|Cécile de France|Mélanie Thierry|Emmanuelle Béart|Vanessa Paradis|Charlotte Gainsbourg|Marina Foïs|Alexandra Lamy|Muriel Robin|Anne Parillaud|Mathilde Seigner|Tahar Rahim|Reda Kateb|Roschdy Zem|Jamel Debbouze|Gad Elmaleh|Franck Dubosc|José Garcia|Clovis Cornillac|Benoît Magimel|Pierre Niney|François Civil|Romain Duris|Raphaël Personnaz|Samuel Le Bihan|Lambert Wilson|Mathieu Kassovitz|Eric Judor|Ramzy Bedia|Kev Adams|Elie Semoun|Michaël Youn|Jérôme Commandeur|Alain Chabat|Dominique Pinon|Maurice Barthélémy","t3":"Masami Nagasawa|Satomi Ishihara|Hiroyuki Sanada|Tadanobu Asano|Ayase Haruka|Yui Aragaki|Kasumi Arimura|Park Seo-joon|Song Hye-kyo|Jun Ji-hyun|Lee Min-ho|Gong Yoo|Kim Soo-hyun|Hyun Bin|Son Ye-jin|Ma Dong-seok|Lee Jung-jae|Jung Ho-yeon|Rinko Kikuchi|Yūko Takeuchi"},"adult":{"t5":"Mia Khalifa|Sasha Grey|Jenna Jameson|Sunny Leone|Pornhub","t4":"Ron Jeremy|Stormy Daniels|Linda Lovelace|Rocco Siffredi|Brigitte Lahaie|Clara Morgane|Lana Rhoades|Maria Ozawa|Yua Mikami|Sora Aoi|Playboy|OnlyFans|XVideos|Gorge profonde","t3":"Lisa Ann|Riley Reid|Asa Akira|Nina Hartley|Marilyn Chambers|John Holmes|Katsuni|Ovidie|Nikita Bellucci|Anissa Kate|Jesse Jane|Tori Black|Mia Malkova|Angela White|Dani Daniels|Tera Patrick|Akiho Yoshizawa|Brazzers|YouPorn|Hustler|Penthouse|Derrière la porte verte|Industrie pornographique|Hot d'or|AVN Awards|Pornographie","t2":"Ginger Lynn|Peter North|Nikki Benz|Sophie Dee|Janine Lindemulder|Kimberly Kane|Bree Olson|Kendra Lust|Abella Danger|Alexis Texas|Madison Ivy|Eva Angelina|Lexi Belle|Remy LaCroix|Savanna Samson|Kobe Tai|Christy Canyon|Seka|Briana Banks|Teagan Presley|Ai Uehara|Dolly Golden|Debbie Does Dallas|Dorcel|Marc Dorcel|Jacquie et Michel|Rocco et les mille et une nuits|Cumshot|Gonzo (pornographie)"},"music":{"t7":"Michael Jackson|Elvis Presley|The Beatles|Queen (groupe)|Wolfgang Amadeus Mozart|Ludwig van Beethoven|Taylor Swift|Beyoncé|Johnny Hallyday|Madonna|David Bowie|Bob Marley|BTS|Eminem|Rihanna|Édith Piaf","t6":"Freddie Mercury|Prince|Lady Gaga|Drake|Blackpink|Céline Dion|Daft Punk|Jul (rappeur)|Stromae|Aya Nakamura|Booba|PNL (groupe)|Angèle (chanteuse)|Indochine|Jimi Hendrix|Kurt Cobain|Nirvana|Metallica|AC/DC|Led Zeppelin|Pink Floyd|The Rolling Stones|U2|Coldplay|Adele|Ed Sheeran|Justin Bieber|Billie Eilish|Ariana Grande|The Weeknd|Kanye West|Jay-Z|Tupac Shakur|The Notorious B.I.G.|Dr. Dre|Snoop Dogg|Shakira|Jennifer Lopez|Bruno Mars|Elton John|Frank Sinatra|Louis Armstrong|Claude Debussy|Frédéric Chopin|Jean-Sébastien Bach|Antonio Vivaldi|Richard Wagner|Johannes Brahms|Maître Gims|Soprano (rappeur)|Orelsan|Nekfeu|Damso|Ninho|Thriller (album)|Abbey Road|The Dark Side of the Moon|Bohemian Rhapsody|Gangnam Style|Despacito|Billie Jean|Smells Like Teen Spirit|Hotel California","t5":"Twice (groupe)|EXO (groupe)|Stray Kids|NewJeans|Seventeen (groupe)|Red Velvet|Girls' Generation|Big Bang (groupe)|Psy (chanteur)|Super Junior|Tomorrow X Together|Aespa|Itzy|Ateez|IU (chanteuse)|G-Dragon|Jungkook|Jimin|Jennie|Rosé (chanteuse)|Lisa (chanteuse)|Johnny Cash|Bob Dylan|Jim Morrison|The Doors|Guns N' Roses|Bon Jovi|Scorpions|Iron Maiden|Black Sabbath|Ozzy Osbourne|Kiss (groupe)|Aerosmith|Eagles (groupe)|ABBA|Bee Gees|Bruce Springsteen|Stevie Wonder|Ray Charles|Whitney Houston|Mariah Carey|Britney Spears|Christina Aguilera|Katy Perry|Dua Lipa|Olivia Rodrigo|Sabrina Carpenter|Doja Cat|Nicki Minaj|Cardi B|Travis Scott|Post Malone|Lil Nas X|Kendrick Lamar|50 Cent|Ice Cube|Lil Wayne|Mylène Farmer|Jacques Brel|Charles Aznavour|Serge Gainsbourg|Georges Brassens|Claude François|Dalida|Françoise Hardy|Michel Sardou|Francis Cabrel|Jean-Jacques Goldman|Renaud|Alain Bashung|Vianney|Zaz|Christophe Maé|M. Pokora|Matt Pokora|Louane|Slimane|Amir (chanteur)|Kendji Girac|Black M|MHD|Gazo|Tiakola|Leto (rappeur)|Hamza (rappeur)|Naps|Kaaris|Médine|IAM|NTM (groupe)|Sexion d'Assaut|Fianso|Dadju|Vald|Lomepal|SCH (rappeur)|Koba LaD","t4":"Mozart: la Flûte enchantée|Eine kleine Nachtmusik|Pour Élise|La Marseillaise|Imagine (chanson)|Stairway to Heaven|La Vie en rose|Je t'aime... moi non plus|Alexandrie Alexandra|Nevermind|Back in Black|Rumours|Dangerous (album)|Bad (album)|Off the Wall|Purple Rain|Born in the U.S.A.|Like a Prayer|Lemonade (album)|1989 (album)|Midnights|Folklore (album)|Renaissance (album de Beyoncé)|Utopia (album)|Les Enfoirés|Star Academy|The Voice (France)|Eurovision|Eurovision 2024"},"game":{"t7":"Minecraft|Pokémon|Super Mario Bros.|Fortnite|Grand Theft Auto V|The Legend of Zelda","t6":"Mario (personnage)|Pac-Man|Sonic the Hedgehog|Tetris|Call of Duty|League of Legends|Among Us|Roblox|Pikachu|Nintendo|PlayStation|Xbox|Counter-Strike|Valorant|Elden Ring|The Witcher 3: Wild Hunt|Red Dead Redemption 2|Assassin's Creed|Final Fantasy VII|Street Fighter II|Space Invaders|Donkey Kong|Kirby|Link (Zelda)|Lara Croft|Kratos|Halo (série de jeux vidéo)|Metal Gear Solid|Crash Bandicoot|Animal Crossing|Mortal Kombat|Resident Evil|Dark Souls|God of War|Uncharted|Clash Royale|Clash of Clans|Candy Crush Saga|FIFA 23|EA Sports FC 24|Rocket League|Overwatch|Apex Legends|World of Warcraft|Dofus|Les Sims|Doom (jeu vidéo)|Half-Life|Portal (jeu vidéo)|Bioshock|Skyrim|Fallout|Cyberpunk 2077|Hollow Knight|Undertale|Stardew Valley|Terraria|Hades (jeu vidéo)|Celeste (jeu vidéo)","t5":"Luigi|Princesse Peach|Bowser|Yoshi|Samus Aran|Mewtwo|Dracaufeu|Évoli|Salamèche|Carapuce|Bulbizarre|Ronflex|Lucario|Mimiqui|Pichu|Jigglypuff|Ganondorf|Zelda (personnage)|Sora (Kingdom Hearts)|Cloud Strife|Sephiroth|Tifa Lockhart|Geralt de Riv|Ezio Auditore|Nathan Drake|Master Chief|Solid Snake|Dante (Devil May Cry)|Ryu (Street Fighter)|Chun-Li|Scorpion (Mortal Kombat)|Steve (Minecraft)|Creeper|Enderman|Ender Dragon|Wither|Tracer|Jett|Sage|Yasuo|Jinx (League of Legends)|Ahri|Teemo","t4":"Kingdom Hearts|Devil May Cry|Tekken|Super Smash Bros.|Mario Kart|Splatoon|Animal Crossing: New Horizons|The Last of Us|Horizon Zero Dawn|Bloodborne|Sekiro|Death Stranding|Persona 5|Genshin Impact|Honkai: Star Rail|Fall Guys|Brawl Stars|Subway Surfers|Angry Birds|Flappy Bird|Temple Run|Pong|Pokémon Go|Pokémon Rouge et Bleu|Pokémon Or et Argent|Counter-Strike: Global Offensive|Dota 2|Rainbow Six Siege|Escape from Tarkov|Palworld|Baldur's Gate III|Lethal Company|Helldivers 2"},"film":{"t7":"Star Wars|Harry Potter|Le Seigneur des anneaux|Dragon Ball|Naruto|One Piece|Avatar (film, 2009)|Titanic (film, 1997)|Game of Thrones|Breaking Bad|Stranger Things|Spider-Man|Batman","t6":"Marvel Cinematic Universe|The Walking Dead|Friends|Les Simpson|South Park|Pulp Fiction|Le Parrain (film)|Fight Club|Matrix|Inception|Interstellar|Gladiator (film, 2000)|Jurassic Park|Retour vers le futur|Indiana Jones|Pirates des Caraïbes|Fast and Furious|Mission impossible|James Bond|Toy Story|Le Roi lion|La Reine des neiges|Shrek|Moi, moche et méchant|Astérix|Tintin|Lucky Luke|Death Note|L'Attaque des Titans|Demon Slayer|My Hero Academia|Sailor Moon|Dragon Ball Z|Fullmetal Alchemist|Bleach|Hunter × Hunter|Jujutsu Kaisen|Berserk|Akira|Le Voyage de Chihiro|Mon voisin Totoro|Princesse Mononoké|Le Château ambulant|Squid Game|La Casa de papel|Lupin (série télévisée)|Peaky Blinders|The Big Bang Theory|How I Met Your Mother|Les Tuche|Intouchables|Le Fabuleux Destin d'Amélie Poulain|La Haine|Taxi (film)|Les Visiteurs|Le Dîner de cons|La Grande Vadrouille|Le Corniaud|Oppenheimer (film)|Barbie (film)|Dune (film, 2021)|Joker (film, 2019)|The Dark Knight : Le Chevalier noir|Avengers: Endgame|Spider-Man: No Way Home","t5":"Naruto Uzumaki|Son Goku|Monkey D. Luffy|Light Yagami|Eren Jäger|Tanjirō Kamado|Izuku Midoriya|Sasuke Uchiwa|Vegeta|Gon Freecss|Edward Elric|Saitama (One-Punch Man)|One-Punch Man|Spy × Family|Chainsaw Man|Fairy Tail|Tokyo Ghoul|Sword Art Online|Evangelion|Cowboy Bebop|Code Geass|Steins;Gate|Haikyū!!|Blue Lock|Slam Dunk|Captain Tsubasa|Olive et Tom|Les Chevaliers du Zodiaque|Albator|Goldorak|Candy Candy|Pokémon (série télévisée d'animation)|Bob l'éponge|Rick et Morty|Les Griffin|Futurama|Avatar, le dernier maître de l'air|Gravity Falls|Adventure Time|Ladybug|Miraculous|Totally Spies!|Kaamelott|Plus belle la vie|Scènes de ménages|Les Experts|Dr House|Grey's Anatomy|Prison Break|Lost : Les Disparus|24 Heures chrono|Dexter (série télévisée)|The Mandalorian|The Witcher (série télévisée)|House of the Dragon|Les Anneaux de pouvoir|Wednesday|Euphoria (série télévisée)|Narcos|Black Mirror|The Crown|Bridgerton|You (série télévisée)|Vikings (série télévisée)","t4":"Le Seigneur des anneaux : La Communauté de l'anneau|Le Hobbit|Harry Potter à l'école des sorciers|Les Animaux fantastiques|Twilight (série de films)|Hunger Games|Divergente|Le Labyrinthe|Maze Runner|Percy Jackson|Narnia|Pirates des Caraïbes : La Malédiction du Black Pearl|Mad Max: Fury Road|John Wick|Top Gun: Maverick|Les Gardiens de la Galaxie|Black Panther|Thor|Iron Man|Captain America|Hulk|Doctor Strange|Deadpool|Wolverine|X-Men|Les 4 Fantastiques|Superman|Wonder Woman|Aquaman|The Flash|Justice League|Suicide Squad|Harley Quinn|Joker (personnage)|Venom|Spider-Man: Into the Spider-Verse"},"animal":{"t7":"Chien|Chat|Lion|Loup gris|Dinosaure","t6":"Tigre|Dauphin|Grand requin blanc|Panda géant|Tyrannosaurus|Tricératops|Vélociraptor|Aigle royal|Cheval|Dragon de Komodo|Crocodile du Nil|Ours polaire|Gorille|Chimpanzé|Orque|Baleine bleue|Girafe|Zèbre|Léopard|Guépard|Hippopotame|Rhinocéros blanc|Éléphant d'Afrique|Kangourou roux|Koala|Panthère noire|Renard roux|Ours brun|Loup arctique|Lynx boréal|Pingouin|Manchot empereur|Flamant rose|Paon bleu|Perroquet|Hibou grand-duc|Colibri|Autruche|Requin-marteau|Raie manta|Poisson-clown|Hippocampe|Méduse|Pieuvre commune|Tortue luth|Caméléon|Cobra royal|Python réticulé|Anaconda|Mante religieuse|Scarabée Hercule|Abeille domestique|Papillon monarque","t5":"Veuve noire|Tarentule|Mygale|Scorpion|Moustique|Fourmi|Termite|Libellule|Coccinelle|Luciole|Criquet pèlerin|Cigale|Scarabée rhinocéros|Lucane cerf-volant|Bourdon|Guêpe|Frelon asiatique|Frelon européen|Piranha|Murène|Anguille électrique|Poisson-lune|Poisson-globe|Poisson-lion|Barracuda|Thon rouge|Saumon atlantique|Carpe commune|Brochet|Truite arc-en-ciel|Poisson rouge|Requin-baleine|Requin-tigre|Requin bouledogue|Poulpe|Calmar géant|Crabe royal|Homard européen|Étoile de mer|Oursin|Axolotl|Grenouille rieuse|Dendrobate|Salamandre tachetée|Iguane vert|Gecko|Varan|Tortue géante des Galápagos|Alligator|Gavial|Tuatara|Smilodon|Mammouth laineux|Diplodocus|Stégosaure|Spinosaure|Brachiosaure|Ptéranodon|Mégalodon|Mosasaure|Ankylosaure|Vélociraptor mongoliensis|Giganotosaurus|Carnotaure|Allosaure|Dilophosaure|Compsognathus|Archéoptéryx","t4":"Berger allemand|Labrador retriever|Golden retriever|Bouledogue français|Husky sibérien|Chihuahua|Caniche|Shiba Inu|Corgi|Rottweiler|Dobermann|Beagle|Chat persan|Maine coon|Chat de Bengale|Sphynx (chat)|Chat siamois|Ragdoll|Cheval de Przewalski|Pur-sang|Mustang (cheval)|Âne|Mulet|Vache|Cochon|Mouton|Chèvre|Poule domestique|Canard colvert|Oie cendrée|Dindon|Lapin|Hamster doré|Cochon d'Inde|Furet|Rat brun|Souris domestique|Chauve-souris|Hérisson d'Europe|Écureuil roux|Castor|Loutre|Blaireau|Sanglier|Cerf élaphe|Chevreuil|Élan|Renne|Bison d'Amérique|Yak|Chameau|Dromadaire|Lama|Alpaga|Paresseux|Tamanoir|Tatou|Opossum|Diable de Tasmanie|Ornithorynque|Wombat|Quokka"},"plant":{"t7":"Rose|Cannabis","t6":"Tournesol|Tulipe|Orchidée|Lavande|Chêne|Baobab|Séquoia géant|Bambou|Cactus|Amanite tue-mouches|Cèpe de Bordeaux|Truffe noire|Morille|Aloe vera|Olivier|Palmier dattier|Pissenlit|Coquelicot|Muguet|Lotus|Rafflesia arnoldii|Dionée attrape-mouche|Café|Cacaoyer|Vigne|Tomate|Pomme de terre|Blé|Riz|Maïs","t5":"Marguerite commune|Lys|Iris (plante)|Pivoine|Hortensia|Jasmin|Lilas|Camélia|Magnolia|Cerisier du Japon|Sakura|Bonsaï|Érable du Japon|Hêtre|Bouleau|Pin parasol|Sapin|Épicéa|Mélèze|Cèdre du Liban|Cyprès|Platane|Marronnier|Tilleul|Saule pleureur|Peuplier|Frêne|Orme|Noyer|Châtaignier|Oranger|Citronnier|Pommier|Poirier|Bananier|Manguier|Palmier|Cocotier|Ananas|Fraisier|Framboisier|Myrtille|Basilic|Menthe|Thym|Romarin|Persil|Ciboulette|Gingembre|Curcuma|Safran|Vanille|Poivre|Cannelle|Champignon de Paris|Pleurote|Chanterelle|Girolle|Amanite phalloïde|Psilocybe|Shiitake|Lichen|Mousse|Fougère|Algue|Kelp|Nénuphar|Papyrus|Ginkgo biloba|Sequoia à feuilles d'if|Arbre de Judée|Welwitschia|Plante carnivore|Nepenthes|Sarracénie","t4":"Edelweiss|Gentiane|Arnica|Camomille|Calendula|Capucine|Cosmos|Dahlia|Zinnia|Pensée|Violette|Primevère|Bleuet|Myosotis|Glycine|Bougainvillier|Hibiscus|Frangipanier|Oiseau de paradis|Anthurium|Monstera|Ficus|Yucca|Agave|Mimosa|Eucalyptus|Acacia|Bruyère|Genêt|Ajonc|Houx|Lierre|Gui|Ortie|Ronce|Chardon|Trèfle|Luzerne|Colza|Lin|Chanvre|Coton|Canne à sucre|Betterave|Tabac|Houblon|Orge"},"science":{"t7":"Albert Einstein|Isaac Newton|Stephen Hawking|Marie Curie|Nikola Tesla|Charles Darwin|Galilée (savant)|Louis Pasteur","t6":"Archimède|Pythagore|Aristote|Platon|Thomas Edison|Alexander Graham Bell|Sigmund Freud|Carl Sagan|Neil Armstrong|Youri Gagarine|Richard Feynman|Max Planck|Niels Bohr|Pierre Curie|Blaise Pascal|René Descartes|Évariste Galois|Carl Friedrich Gauss|Leonhard Euler|Alan Turing|Ada Lovelace|Johannes Kepler|Nicolas Copernic|Edwin Hubble|Rosalind Franklin|Alexander Fleming|Hippocrate|Didier Raoult|Soleil|Terre|Lune|Mars (planète)|Jupiter (planète)|Saturne (planète)|Vénus (planète)|Mercure (planète)|Uranus (planète)|Neptune (planète)|Pluton (planète naine)|Trou noir|Big Bang|Système solaire|Voie lactée|ADN|Théorie de la relativité|Tableau périodique des éléments|Apollo 11|Station spatiale internationale","t5":"Katherine Johnson|Edward Jenner|Claude Bernard|Jean-Jacques Cousteau|Hubert Reeves|Étienne Klein|Cédric Villani|Thomas Pesquet|Claudie Haigneré|Buzz Aldrin|Sally Ride|Valentina Terechkova|Elon Musk|Jeff Bezos|Neil deGrasse Tyson|Brian Cox|Jane Goodall|David Attenborough|Gregor Mendel|Jean-Baptiste de Lamarck|Georges Cuvier|Carl von Linné|Alfred Nobel|Dmitri Mendeleïev|Antoine Lavoisier|Robert Boyle|Michael Faraday|James Clerk Maxwell|Ernest Rutherford|Werner Heisenberg|Erwin Schrödinger|Paul Dirac|Enrico Fermi|Robert Oppenheimer|Richard Dawkins|Peter Higgs|Roger Penrose|Kip Thorne|Subrahmanyan Chandrasekhar|Henri Poincaré|Pierre de Fermat|Joseph Fourier|Sophie Germain|Emmy Noether|Srinivasa Ramanujan|Terence Tao|Grigori Perelman|Andrew Wiles|Pierre-Simon de Laplace|Joseph-Louis Lagrange","t4":"Hermann von Helmholtz|Heinrich Hertz|Guglielmo Marconi|Samuel Morse|Alessandro Volta|Luigi Galvani|André-Marie Ampère|Georg Ohm|Hans Christian Ørsted|Christiaan Huygens|Tycho Brahe|Giordano Bruno|Hypatie|Ératosthène|Euclide|Ptolémée|Averroès|Avicenne|Al-Khwarizmi|Ibn al-Haytham|Zhang Heng|Shen Kuo|Rudolf Virchow|Robert Koch|Paul Ehrlich|Jonas Salk|Albert Sabin|Christiaan Barnard|Michael DeBakey|Ambroise Paré|Philippe Pinel|Jean-Martin Charcot|Marie-François Xavier Bichat|Emile Roux|Luc Montagnier|Françoise Barré-Sinoussi|Emmanuelle Charpentier|Jennifer Doudna|Svante Pääbo|Katalin Karikó|Drew Weissman"},"place":{"t7":"Paris|Tokyo|New York|Londres|Los Angeles|Dubaï|France|États-Unis|Chine|Japon|Tour Eiffel|Pyramides de Gizeh|Colisée|Taj Mahal|Grande Muraille de Chine|Statue de la Liberté|Machu Picchu","t6":"Rome|Barcelone|Berlin|Madrid|Moscou|Pékin|Séoul|Sydney|Rio de Janeiro|Istanbul|Le Caire|Venise|Amsterdam|Las Vegas|Miami|Marseille|Lyon|Monaco|Disneyland Paris|Mont-Saint-Michel|Notre-Dame de Paris|Arc de triomphe de l'Étoile|Sacré-Cœur de Montmartre|Burj Khalifa|Big Ben|Sagrada Família|Acropole d'Athènes|Angkor Vat|Pétra|Everest|Forêt amazonienne|Sahara|Chutes du Niagara|Grand Canyon|Antarctique|Islande|Brésil|Allemagne|Italie|Espagne|Royaume-Uni|Russie|Inde|Canada|Mexique|Maroc|Algérie|Sénégal|Côte d'Ivoire|Belgique|Suisse|Musée du Louvre|Château de Versailles|British Museum|Metropolitan Museum of Art|Musée d'Orsay","t5":"Athènes|Lisbonne|Vienne (Autriche)|Prague|Budapest|Varsovie|Stockholm|Oslo|Copenhague|Helsinki|Dublin|Édimbourg|Bruxelles|Genève|Zurich|Milan|Florence|Naples|Nice|Bordeaux|Toulouse|Lille|Strasbourg|Nantes|Montpellier|Rennes|Cannes|Saint-Tropez|Saint-Étienne|Villeurbanne|Boston|Chicago|San Francisco|Washington|Houston|Seattle|Toronto|Montréal|Vancouver|Mexico|Buenos Aires|Lima|Bogota|Santiago du Chili|Casablanca|Marrakech|Alger|Tunis|Dakar|Abidjan|Lagos|Johannesbourg|Le Cap|Nairobi|Dubaï (émirat)|Abou Dabi|Doha|Riyad|Jérusalem|Tel Aviv|Bagdad|Téhéran|Bombay|New Delhi|Bangkok|Singapour|Hong Kong|Shanghai|Osaka|Kyoto|Manille|Jakarta|Bali|Melbourne|Auckland|Hawaï|Tahiti|Maldives|Seychelles|Santorin|Mykonos|Malte|Sicile|Corse|Toscane|Provence|Côte d'Azur|Alpes|Mont Blanc|Pyrénées|Alsace|Bretagne|Normandie|Louvre|Tour Montparnasse|Champs-Élysées|Place de la Concorde|Panthéon (Paris)|Château de Chambord|Château de Chenonceau|Palais de l'Élysée|Palais de Buckingham|Kremlin|Place Rouge|Cathédrale Saint-Basile de Moscou|Sagrada Família|Alhambra|Parthénon|Stonehenge|Pise|Tour de Pise|Fontaine de Trevi|Vatican|Basilique Saint-Pierre de Rome|Venise (Italie)|Gondole|Opéra de Sydney|Golden Gate Bridge|Empire State Building|Times Square|Central Park|Hollywood|Disney World|Niagara Falls|Mont Rushmore|Table Mountain|Kilimandjaro|Victoria Falls|Désert de Gobi|Mer Morte|Grand Barrière de corail|Galápagos|Île de Pâques|Atlantide","t4":"Stade de Wembley|Maracanã|Stade San Siro|Anfield|Stade Louis-II|Stade Geoffroy-Guichard|Groupama Stadium|Roazhon Park|Stade de la Beaujoire|Stade Pierre-Mauroy|Allianz Riviera|Stade Bollaert-Delelis|Musée Guggenheim Bilbao|Musée du Prado|Galerie des Offices|Musée de l'Ermitage|Rijksmuseum|Musée Grévin|Centre Pompidou|Musée de l'Orangerie|Palais de Tokyo|Fondation Louis-Vuitton|Opéra Garnier|Château de Fontainebleau|Château de Vincennes|Château de Blois|Château d'Amboise|Château de Chantilly|Château d'If|Château de Carcassonne|Pont du Gard|Pont d'Avignon|Palais des Papes|Gorges du Verdon|Dune du Pilat|Étretat|Biarritz|Saint-Malo|La Rochelle|Colmar|Annecy|Chamonix|Grenoble|Clermont-Ferrand|Dijon|Reims|Metz|Nancy|Rouen|Le Havre|Caen|Brest|Angers|Tours|Orléans|Limoges|Poitiers|Perpignan|Toulon|Avignon|Ajaccio|Bastia|Fort-de-France|Saint-Denis (La Réunion)|Nouméa|Papeete"},"vehicle":{"t7":"Ferrari|Lamborghini|Porsche 911|Tesla Model S|Concorde (avion)|Titanic","t6":"Bugatti Veyron|Ford Mustang|Renault 4|Citroën 2 CV|Peugeot 205|Volkswagen Coccinelle|Mini (automobile)|Rolls-Royce|Mercedes-Benz Classe G|Harley-Davidson|TGV|Orient-Express|Shinkansen|Boeing 747|Airbus A380|Supermarine Spitfire|Lockheed Martin F-22 Raptor|Dassault Rafale|Queen Mary 2|Cutty Sark|Falcon 9|Spoutnik 1|Delorean DMC-12|Batmobile|Tesla Cybertruck|McLaren F1|Ferrari F40|Ferrari Testarossa|Porsche 911 GT3|Nissan GT-R|Toyota Supra|Mazda MX-5|Honda NSX|Lamborghini Countach|Lamborghini Aventador|Bugatti Chiron|Aston Martin DB5|Jaguar E-Type|Ford GT40|Chevrolet Corvette","t5":"Renault Clio|Renault Twingo|Renault Espace|Peugeot 206|Peugeot 308|Citroën DS|Citroën C3|Citroën Traction Avant|Volkswagen Golf|Volkswagen Combi|BMW M3|BMW Série 3|Mercedes-Benz Classe S|Audi R8|Audi TT|Opel Corsa|Fiat 500|Alfa Romeo Giulia|Maserati|Bentley|Lotus Elise|Dacia Duster|Toyota Prius|Toyota Corolla|Honda Civic|Subaru Impreza|Mitsubishi Lancer Evolution|Jeep Wrangler|Land Rover Defender|Hummer H1|Ford Model T|Ford F-150|Cadillac Eldorado|Honda CB750|Yamaha YZF-R1|Ducati Panigale|Kawasaki Ninja|Vespa|Lambretta|Triumph Bonneville|Royal Enfield|Mobylette|Solex|BMX|Vélo de course|Locomotive à vapeur|TER|Thalys|Eurostar|Métro de Paris|Tramway|Hyperloop|Boeing 737|Airbus A320|Boeing 787 Dreamliner|Cessna 172|Zeppelin|Montgolfière|Hélicoptère|Hovercraft|Paquebot|Porte-avions Charles de Gaulle|Sous-marin nucléaire|Yacht|Voilier|Caravelle|Galion|Drakkar|Radeau","t4":"Messerschmitt Bf 109|Tiger I|Char T-34|Char Leclerc|Abrams M1|Jeep Willys|Hummer H2|Quad|Motoneige|Karting|Kart|Tracteur|Camion|Autobus|Bus à impériale|Taxi de New York|Fiacre|Calèche|Rickshaw|Tuk-tuk|Trottinette|Skateboard|Roller|Hoverboard|Segway|Monocycle|Tandem|Vélo électrique"},"book":{"t7":"Victor Hugo|William Shakespeare|Léonard de Vinci|Vincent van Gogh|Pablo Picasso|La Joconde|Le Petit Prince","t6":"Molière|Jules Verne|Alexandre Dumas|Albert Camus|Marcel Proust|Antoine de Saint-Exupéry|J. R. R. Tolkien|J. K. Rowling|Stephen King|Agatha Christie|George Orwell|Franz Kafka|Fiodor Dostoïevski|Léon Tolstoï|Ernest Hemingway|Mark Twain|Charles Dickens|Edgar Allan Poe|Homère|Dante Alighieri|Miguel de Cervantes|Johann Wolfgang von Goethe|Friedrich Nietzsche|Voltaire|Jean-Jacques Rousseau|Honoré de Balzac|Émile Zola|Gustave Flaubert|Charles Baudelaire|Arthur Rimbaud|Jean-Paul Sartre|Simone de Beauvoir|Michel Houellebecq|Hergé|René Goscinny|Albert Uderzo|Hayao Miyazaki|Akira Toriyama|Eiichirō Oda|Claude Monet|Salvador Dalí|Michel-Ange|Rembrandt|Frida Kahlo|Andy Warhol|Banksy|Auguste Rodin|Henri Matisse|Paul Cézanne|Edvard Munch|La Nuit étoilée|Guernica (Picasso)|Le Cri|La Naissance de Vénus|La Cène (Léonard de Vinci)|La Liberté guidant le peuple|Les Misérables|Le Comte de Monte-Cristo|Les Trois Mousquetaires|Notre-Dame de Paris (roman)|L'Étranger|Madame Bovary|Germinal|Le Rouge et le Noir|Vingt mille lieues sous les mers|Harry Potter à l'école des sorciers (roman)|1984 (roman)|La Ferme des animaux|Don Quichotte|Roméo et Juliette|Hamlet|La Divine Comédie|L'Iliade|L'Odyssée|La Bible|Le Coran|Tintin au Tibet|Astérix le Gaulois|Lucky Luke (bande dessinée)|Les Schtroumpfs|Spirou et Fantasio|Gaston Lagaffe|Blake et Mortimer|Largo Winch|Titeuf|Boule et Bill|Marsupilami","t5":"Guy de Maupassant|Stendhal|Alphonse Daudet|Paul Verlaine|Stéphane Mallarmé|Guillaume Apollinaire|Louis Aragon|Paul Éluard|Jacques Prévert|Boris Vian|Marguerite Duras|Annie Ernaux|Patrick Modiano|J. M. G. Le Clézio|Amélie Nothomb|Guillaume Musso|Marc Levy|Joël Dicker|Bernard Werber|Frank Thilliez|Franck Thilliez|Maxime Chattam|Mélissa Da Costa|Aurélie Valognes|Muriel Barbery|Anna Gavalda|Stieg Larsson|Dan Brown|Paulo Coelho|Gabriel García Márquez|Jorge Luis Borges|Pablo Neruda|Umberto Eco|Italo Calvino|Haruki Murakami|Yasunari Kawabata|Kōbō Abe|Lu Xun|Rabindranath Tagore|Naguib Mahfouz|Chinua Achebe|Toni Morrison|Maya Angelou|Harper Lee|F. Scott Fitzgerald|John Steinbeck|William Faulkner|Jack London|Herman Melville|Jack Kerouac|Truman Capote|J. D. Salinger|Kurt Vonnegut|Isaac Asimov|Arthur C. Clarke|Philip K. Dick|Frank Herbert|Ray Bradbury|H. P. Lovecraft|Jules Renard|Colette|Georges Simenon|Maurice Leblanc|Gaston Leroux|Arsène Lupin|Sherlock Holmes|Arthur Conan Doyle|Oscar Wilde|Jane Austen|Charlotte Brontë|Emily Brontë|Virginia Woolf|Lewis Carroll|Alice au pays des merveilles|Peter Pan|Pinocchio|Le Livre de la jungle|Cendrillon|Blanche-Neige|La Belle au bois dormant|Le Petit Chaperon rouge|Hansel et Gretel|Les Contes de Perrault|Frères Grimm|Hans Christian Andersen|Jean de La Fontaine|La Cigale et la Fourmi","t4":"Johannes Vermeer|La Jeune Fille à la perle|Diego Vélasquez|Les Ménines|Francisco de Goya|Caravage|Raphaël (peintre)|Sandro Botticelli|Titien|Jérôme Bosch|Pieter Brueghel l'Ancien|Albrecht Dürer|Caspar David Friedrich|William Turner|John Constable|Eugène Delacroix|Théodore Géricault|Jean-Auguste-Dominique Ingres|Jacques-Louis David|François Boucher|Jean-Honoré Fragonard|Antoine Watteau|Édouard Manet|Edgar Degas|Pierre-Auguste Renoir|Camille Pissarro|Alfred Sisley|Paul Gauguin|Georges Seurat|Henri de Toulouse-Lautrec|Henri Rousseau|Marc Chagall|Wassily Kandinsky|Piet Mondrian|Kazimir Malevitch|Joan Miró|René Magritte|Max Ernst|Marcel Duchamp|Jackson Pollock|Mark Rothko|Roy Lichtenstein|Jean-Michel Basquiat|Keith Haring|Yayoi Kusama|Takashi Murakami|Jeff Koons|Damien Hirst|Ai Weiwei|Christo|Niki de Saint Phalle|Camille Claudel|Alberto Giacometti|Constantin Brâncuși|Henry Moore|Louise Bourgeois"},"hist":{"t7":"Napoléon Ier|Adolf Hitler|Jésus de Nazareth|Donald Trump|Emmanuel Macron|Oussama ben Laden|Elon Musk|Steve Jobs|Seconde Guerre mondiale|Attentats du 11 septembre 2001","t6":"Louis XIV|Jeanne d'Arc|Cléopâtre VII|Alexandre le Grand|Jules César|Charlemagne|Gengis Khan|Attila|Joseph Staline|Lénine|Benito Mussolini|Winston Churchill|Charles de Gaulle|Mahomet|Bouddha|Mahatma Gandhi|Nelson Mandela|Martin Luther King|Che Guevara|Fidel Castro|Abraham Lincoln|George Washington|John F. Kennedy|Barack Obama|Vladimir Poutine|Xi Jinping|Élisabeth II|Charles III|Diana Spencer|Marie-Antoinette|Louis XVI|Maximilien de Robespierre|Mère Teresa|François (pape)|Jean-Paul II|Bill Gates|Mark Zuckerberg|Jeff Bezos|Première Guerre mondiale|Révolution française|Débarquement de Normandie|Bataille de Waterloo|Guerre froide|Guerre du Viêt Nam|Chute du mur de Berlin|Pandémie de Covid-19|Shoah|Hiroshima|Auschwitz-Birkenau","t5":"Louis XV|Louis XIII|Henri IV|François Ier|Philippe le Bel|Saint Louis|Clovis Ier|Vercingétorix|Jules Ferry|Georges Clemenceau|Léon Blum|François Mitterrand|Jacques Chirac|Nicolas Sarkozy|François Hollande|Marine Le Pen|Jean-Luc Mélenchon|Éric Zemmour|Jordan Bardella|Édouard Philippe|Gabriel Attal|Élisabeth Borne|Brigitte Macron|Valéry Giscard d'Estaing|Georges Pompidou|Joe Biden|Kamala Harris|Ronald Reagan|Richard Nixon|Franklin Delano Roosevelt|Theodore Roosevelt|Margaret Thatcher|Tony Blair|Boris Johnson|Angela Merkel|Olaf Scholz|Volodymyr Zelensky|Recep Tayyip Erdoğan|Kim Jong-un|Saddam Hussein|Mouammar Kadhafi|Bachar el-Assad|Benyamin Netanyahou|Yasser Arafat|Ayatollah Khomeini|Mao Zedong|Deng Xiaoping|Hô Chi Minh|Pol Pot|Francisco Franco|Augusto Pinochet|Simón Bolívar|Napoléon III|Catherine II de Russie|Pierre le Grand|Ivan le Terrible|Nicolas II de Russie|Raspoutine|Marie Ire d'Angleterre|Henri VIII|Élisabeth Ire|Victoria (reine)|Guillaume le Conquérant|Richard Cœur de Lion|Saladin|Soliman le Magnifique|Tamerlan|Hannibal Barca|Spartacus|Léonidas Ier|Périclès|Socrate|Confucius|Lao Tseu|Sun Tzu|Marco Polo|Christophe Colomb|Vasco de Gama|Magellan|James Cook|Amerigo Vespucci|Néron|Caligula|Auguste|Marc Aurèle|Constantin Ier|Ramsès II|Toutânkhamon|Nefertiti|Khéops|Hatchepsout|Akhenaton","t4":"Ben Laden|Jeffrey Dahmer|Charles Manson|Ted Bundy|Jack l'Éventreur|Al Capone|Pablo Escobar|El Chapo|Mesrine|Jacques Mesrine|Marc Dutroux|Michel Fourniret|Guy Georges|Émile Louis|Francis Heaulme|Landru|Henri Désiré Landru|Dominique Strauss-Kahn|Jérôme Cahuzac|Bernard Madoff|Harvey Weinstein|Jeffrey Epstein|Édouard Philippe|Gérald Darmanin|Bruno Le Maire|Rachida Dati|Nadine Morano|Christiane Taubira|Simone Veil|Ségolène Royal|Anne Hidalgo|Valérie Pécresse|Éric Ciotti|Laurent Wauquiez|Xavier Bertrand|Yannick Jadot|Fabien Roussel|Philippe Poutou|Nathalie Arthaud|Jean Lassalle|Nicolas Dupont-Aignan|François Bayrou|Jean-Marie Le Pen|Philippe de Villiers|Robert Badinter|Jacques Delors|Michel Rocard|Lionel Jospin|Laurent Fabius|Dominique de Villepin|Alain Juppé|Raymond Barre|Pierre Mendès France|Léon Gambetta|Victor Schœlcher|Toussaint Louverture|Thomas Sankara|Patrice Lumumba|Haïlé Sélassié Ier|Kwame Nkrumah|Léopold Sédar Senghor|Félix Houphouët-Boigny|Mobutu Sese Seko|Idi Amin Dada|Robert Mugabe|Mouammar Khadhafi"},"sport":{"t7":"Michael Jordan|LeBron James|Roger Federer|Rafael Nadal|Novak Djokovic|Muhammad Ali|Usain Bolt|Jeux olympiques|Tour de France","t6":"Kobe Bryant|Stephen Curry|Serena Williams|Mike Tyson|Tony Parker|Victor Wembanyama|Teddy Riner|Léon Marchand|Michael Schumacher|Lewis Hamilton|Ayrton Senna|Max Verstappen|Sébastien Loeb|Valentino Rossi|Tadej Pogačar|Eddy Merckx|Bernard Hinault|Jonah Lomu|Antoine Dupont|Tiger Woods|Michael Phelps|Simone Biles|Conor McGregor|Khabib Nurmagomedov|Francis Ngannou|Floyd Mayweather Jr.|Manny Pacquiao|Roland-Garros|Formule 1|National Basketball Association|Super Bowl|Coupe du monde de rugby|Tournoi des Six Nations|Jeux olympiques d'été de 2024|Jeux olympiques d'été de 2024 à Paris|Wimbledon|US Open de tennis|Open d'Australie|Ligue 1|Premier League|Liga|Serie A|Bundesliga","t5":"Shaquille O'Neal|Magic Johnson|Larry Bird|Kareem Abdul-Jabbar|Dirk Nowitzki|Kevin Durant|Giannis Antetokounmpo|Nikola Jokić|Luka Dončić|Rudy Gobert|Boris Diaw|Nicolas Batum|Evan Fournier|Tom Brady|Patrick Mahomes|Lamar Jackson|Aaron Rodgers|Peyton Manning|Pete Sampras|Andre Agassi|Björn Borg|John McEnroe|Jimmy Connors|Ivan Lendl|Boris Becker|Andy Murray|Stan Wawrinka|Carlos Alcaraz|Jannik Sinner|Daniil Medvedev|Alexander Zverev|Gaël Monfils|Jo-Wilfried Tsonga|Richard Gasquet|Yannick Noah|Henri Leconte|Amélie Mauresmo|Marion Bartoli|Justine Henin|Kim Clijsters|Venus Williams|Maria Sharapova|Steffi Graf|Martina Navratilova|Chris Evert|Naomi Osaka|Iga Świątek|Aryna Sabalenka|Coco Gauff|Emma Raducanu|Mike Tyson (boxeur)|Joe Frazier|George Foreman|Sugar Ray Leonard|Marvin Hagler|Canelo Álvarez|Tyson Fury|Anthony Joshua|Oleksandr Usyk|Jon Jones|Georges St-Pierre|Anderson Silva|Jose Aldo|Alex Pereira|Islam Makhachev|Ilia Topuria|Sébastien Vettel|Kimi Räikkönen|Fernando Alonso|Alain Prost|Niki Lauda|Juan Manuel Fangio|Jackie Stewart|Jim Clark|Nigel Mansell|Damon Hill|Jenson Button|Charles Leclerc|Lando Norris|Carlos Sainz Jr.|Pierre Gasly|Esteban Ocon|Isack Hadjar|Marc Márquez|Jorge Lorenzo|Casey Stoner|Fabio Quartararo|Francesco Bagnaia|Lance Armstrong|Miguel Induráin|Jacques Anquetil|Raymond Poulidor|Laurent Fignon|Greg LeMond|Chris Froome|Julian Alaphilippe|Romain Bardet|Thibaut Pinot|Jonas Vingegaard|Wout van Aert|Mathieu van der Poel|Remco Evenepoel","t4":"Emil Zátopek|Carl Lewis|Jesse Owens|Michael Johnson|Florence Griffith-Joyner|Marie-José Pérec|Christine Arron|Renaud Lavillenie|Mondo Duplantis|Sergueï Bubka|Armand Duplantis|Kylian Mbappé (athlétisme)|Yohan Blake|Justin Gatlin|Tyson Gay|Asafa Powell|Allyson Felix|Shelly-Ann Fraser-Pryce|Elaine Thompson-Herah|Eliud Kipchoge|Haile Gebrselassie|Mo Farah|Kenenisa Bekele|Paavo Nurmi|Ian Thorpe|Mark Spitz|Alain Bernard|Florent Manaudou|Laure Manaudou|Camille Muffat|Yannick Agnel|Michael Schumacher (pilote)|Alexander Popov|Katie Ledecky|Caeleb Dressel|Ryan Lochte|Sun Yang|Ariarne Titmus|Summer McIntosh"},"myth":{"t7":"Dieu|Zeus|Satan","t6":"Poséidon|Hadès|Athéna|Apollon|Aphrodite|Hermès|Arès|Héraclès|Achille|Ulysse|Thor|Odin|Loki|Anubis|Râ|Osiris|Isis|Allah|Bouddha|Ange|Dragon|Licorne|Vampire|Loup-garou|Père Noël|Méduse (mythologie)|Minotaure|Hydre de Lerne|Cerbère|Pégase|Phénix (mythologie)|Sirène (mythologie)|Centaure|Cyclope|Titan (mythologie)|Prométhée|Orphée|Persée|Thésée|Jason (mythologie)|Hercule|Perséphone|Déméter|Dionysos|Héra|Artémis|Hestia|Éros|Psyché|Nyx|Gaïa|Chronos|Ouranos","t5":"Freya|Baldr|Heimdall|Fenrir|Jörmungandr|Sleipnir|Yggdrasil|Valhalla|Ragnarök|Walkyrie|Horus|Seth (mythologie)|Bastet|Sekhmet|Thot|Ptah|Sobek|Hathor|Amon|Atoum|Ma'at|Quetzalcoatl|Huitzilopochtli|Tezcatlipoca|Kukulkan|Inti|Pachamama|Amaterasu|Susanoo|Izanagi|Izanami|Tsukuyomi|Raijin|Fūjin|Kitsune|Tengu|Oni|Kappa|Yōkai|Shiva|Vishnou|Brahma|Ganesh|Hanuman|Krishna|Rama|Lakshmi|Durga|Kali|Saraswati|Jésus-Christ|Marie (mère de Jésus)|Joseph de Nazareth|Moïse|Abraham|Noé|David (roi)|Salomon|Goliath|Jean le Baptiste|Pierre (apôtre)|Paul de Tarse|Judas Iscariote|Marie-Madeleine|Archange Michel|Gabriel (archange)|Lucifer|Belzébuth|Diable|Enfer|Paradis|Purgatoire|Apocalypse|Armageddon|Arche de Noé|Tour de Babel|Déluge|Éden","t4":"Lilith|Asmodée|Mammon|Léviathan|Béhémoth|Baal|Moloch|Dagon|Ishtar|Tiamat|Marduk|Gilgamesh|Enkidu|Utnapishtim|Anunnaki|Ereshkigal|Inanna|Enlil|Enki|Nergal|Shamash|Sin (divinité)|Ninurta|Ea|Anu|Dumuzi"},"food":{"t7":"Pizza|Hamburger|Sushi|Chocolat|McDonald's|Coca-Cola","t6":"Baguette|Croissant|Fromage|Vin|Champagne|Café|Thé|Bière|Whisky|Vodka|Tequila|Rhum|Cocktail|Mojito|Pâtes|Riz|Frites|Kebab|Tacos|Burrito|Ramen|Curry|Couscous|Paella|Lasagnes|Raclette|Fondue savoyarde|Crêpe|Macaron|Tiramisu|Glace|Gâteau|Pain|Pomme|Banane|Fraise","t5":"Camembert|Brie|Roquefort|Comté|Reblochon|Mozzarella|Parmesan|Gorgonzola|Feta|Cheddar|Gruyère|Emmental|Mimolette|Saint-Nectaire|Cantal|Beaufort|Munster|Époisses|Maroilles|Boursin|La vache qui rit|Nutella|Kinder Bueno|Oreo|Haribo|M&M's|Snickers|Mars (barre chocolatée)|Twix|KitKat|Toblerone|Milka|Lindt|Ferrero Rocher|Pringles|Doritos|Cheetos|Lay's|Burger King|KFC|Subway|Starbucks|Domino's Pizza|Pizza Hut|Quick|Five Guys|Tacos Bell|Taco Bell|Chipotle|Red Bull|Monster Energy|Fanta|Sprite|Pepsi|Orangina|Schweppes|Perrier|Evian|Volvic|Badoit|Heineken|Guinness|Corona (bière)|Budweiser|Kronenbourg|1664|Jack Daniel's|Jägermeister|Absolut Vodka|Bacardi|Martini|Ricard|Pastis|Cognac|Armagnac|Calvados|Chartreuse|Get 27|Cidre|Vin rouge|Vin blanc|Rosé|Bordeaux (vin)|Bourgogne (vin)|Beaujolais|Côtes-du-Rhône|Châteauneuf-du-Pape","t4":"Foie gras|Escargot|Cuisses de grenouille|Bouillabaisse|Cassoulet|Choucroute|Pot-au-feu|Blanquette de veau|Boeuf bourguignon|Ratatouille|Quiche lorraine|Tarte tatin|Clafoutis|Madeleine|Éclair|Mille-feuille|Paris-Brest|Religieuse|Profiterole|Crème brûlée|Île flottante|Mousse au chocolat|Tarte au citron|Kouign-amann|Far breton|Galette des rois|Brioche|Pain au chocolat|Chausson aux pommes|Palmier (pâtisserie)|Canelé|Financier|Sablé|Cookie|Brownie|Cupcake|Donut|Pancake|Waffle|Gaufre|Churros|Tortilla|Gaspacho|Tapas|Jamón ibérico|Chorizo|Saucisson|Rillettes|Pâté|Andouillette|Boudin noir|Merguez|Couscous royal|Tajine|Tabbouleh|Houmous|Falafel|Shawarma|Baklava|Loukoum|Pho|Pad thaï|Nem|Dim sum|Canard laqué|Tempura|Okonomiyaki|Takoyaki|Yakitori|Mochi|Kimchi|Bibimbap|Bulgogi|Tteokbokki|Poutine|Hot-dog|Barbecue|Steak|Entrecôte|Côte de bœuf|Poulet rôti|Dinde de Noël|Bûche de Noël|Chapon|Foie gras de canard"},"tech":{"t7":"Apple|Google|Microsoft|Amazon|Tesla|Facebook|Instagram|TikTok|YouTube|Netflix|Disney|Wikipédia|iPhone|ChatGPT|Intelligence artificielle|Bitcoin|Internet","t6":"Twitch|WhatsApp|Snapchat|X (réseau social)|Twitter|LinkedIn|Reddit|Pinterest|Discord|Telegram|Spotify|Deezer|Uber|Airbnb|PayPal|Samsung|Sony|Nintendo (entreprise)|Nike|Adidas|Louis Vuitton|Chanel|Gucci|Rolex|IKEA|Lego|Barbie|Linux|Windows|Android|Mac|PlayStation 5|Xbox Series|Nintendo Switch|Starlink|SpaceX|OpenAI|Nvidia|Intel|AMD|Meta Platforms|Alphabet|Oracle|IBM|Huawei|Xiaomi|Alibaba|Tencent|TikTok (entreprise)|ByteDance|Shein|Temu|Zara|H&M|Hermès (maison)|Dior|Yves Saint Laurent|Prada|Balenciaga|Cartier|Tiffany & Co.|Lacoste|Le Coq sportif|Puma|Reebok|New Balance|Converse|Vans|Supreme|Off-White|Jordan Brand|Ferrari (entreprise)|Renault|Peugeot|Citroën|Toyota|Volkswagen|BMW|Mercedes-Benz|Audi|Total|Carrefour|Leclerc|Auchan|Lidl|Decathlon|Fnac|Cdiscount|Leboncoin|Vinted","t5":"Ethereum|Dogecoin|NFT|Blockchain|Métavers|Réalité virtuelle|Réalité augmentée|Robot|Drone|Voiture autonome|Fusée|Satellite|Téléphone mobile|Smartphone|Ordinateur|Ordinateur portable|Tablette tactile|Clavier|Souris d'ordinateur|Écran|Casque audio|AirPods|Apple Watch|MacBook|iPad|iMac|iOS|macOS|Windows 11|Windows 10|Windows XP|Chrome|Firefox|Safari|Opera|Bing|DuckDuckGo|Gmail|Google Maps|Google Drive|Excel|Word|PowerPoint|Photoshop|Illustrator|Premiere Pro|Final Cut Pro|Blender|Unity|Unreal Engine|Python (langage)|JavaScript|Java (langage)|C (langage)|C++|C sharp|PHP|HTML|CSS|SQL|Rust|Go (langage)|Swift (langage)|Kotlin|Git|GitHub|Docker|Kubernetes|Raspberry Pi|Arduino|Wi-Fi|Bluetooth|5G|Fibre optique|Câble sous-marin|Serveur informatique|Cloud computing|Cybersécurité|Piratage informatique|Virus informatique|Ransomware|Phishing|VPN|Tor (réseau)|Dark web|Deep web"},"event":{"t7":"Attentats du 11 septembre 2001|Attentats du 13 novembre 2015 en France|Attentat contre Charlie Hebdo|Naufrage du Titanic|Catastrophe nucléaire de Tchernobyl|Accident nucléaire de Fukushima|Incendie de Notre-Dame de Paris|Explosions au port de Beyrouth en 2020|Mort de Diana Spencer","t6":"Attentat de Nice du 14 juillet 2016|Attentats de Madrid du 11 mars 2004|Attentats de Londres du 7 juillet 2005|Attentats de Bruxelles du 22 mars 2016|Attentats de Bombay de 2008|Attentat du marathon de Boston|Attentat d'Oklahoma City|Attentats de Bali de 2002|Attentat du Bataclan|Prise d'otages de Beslan|Prise d'otages du théâtre de Moscou|Génocide des Tutsi au Rwanda|Génocide arménien|Génocide des Juifs|Holodomor|Massacre de Srebrenica|Massacre de Nankin|Bombardement de Dresde|Bombardement de Guernica|Bombardement atomique de Nagasaki|Bombardement atomique d'Hiroshima|Catastrophe de Seveso|Catastrophe de Bhopal|Catastrophe de Three Mile Island|Explosion de la navette spatiale Challenger|Accident de la navette spatiale Columbia|Incendie du Bazar de la Charité|Incendie de Londres de 1666|Grand incendie de Chicago|Éruption du Vésuve en 79|Éruption de la montagne Pelée en 1902|Séisme de 2010 à Haïti|Séisme et tsunami de 2011 au Japon|Séisme de 2004 dans l'océan Indien|Ouragan Katrina|Tempête Xynthia|Canicule européenne de 2003|Marée noire de l'Erika|Marée noire de l'Exxon Valdez|Naufrage du Lusitania|Naufrage du Costa Concordia|Naufrage du Wilhelm Gustloff|Naufrage de l'Estonia|Naufrage du MS Herald of Free Enterprise|Accident du Concorde|Vol Rio-Paris 447|Vol Malaysia Airlines 370|Vol Malaysia Airlines 17|Catastrophe aérienne de Tenerife|Accident du Boeing 737 MAX|Hindenburg (dirigeable)|Catastrophe de Courrières|Catastrophe du Heysel|Catastrophe de Hillsborough|Drame du Bosphore","t5":"Affaire Dreyfus|Affaire Grégory|Affaire Dominici|Affaire Outreau|Affaire Clearstream|Affaire Bettencourt|Affaire Cahuzac|Affaire Benalla|Affaire Fillon|Affaire des écoutes de l'Élysée|Affaire du sang contaminé|Affaire Mérieux|Affaire Elf|Affaire Urba|Affaire Boulin|Affaire Markovic|Affaire Ben Barka|Affaire Seznec|Affaire Troppmann|Affaire Marie Besnard|Affaire Violette Nozière|Affaire Landru|Affaire Weidmann|Affaire Papin|Affaire Jean-Claude Romand|Affaire Xavier Dupont de Ligonnès|Affaire Agnès Marin|Affaire Lola|Affaire Maddie McCann|Affaire Natascha Kampusch|Affaire JonBenét Ramsey|Affaire O. J. Simpson|Watergate|Scandale des Panama Papers|Scandale Dieselgate|Scandale du Médiator|Scandale du Mediator|Scandale Volkswagen|Scandale Enron|Scandale Lehman Brothers|Faillite de Lehman Brothers|Krach de 1929|Crise de 2008|Crise de 1973|Grande Dépression|Peste noire|Grippe espagnole|Variole|Choléra|Tuberculose|Poliomyélite|Sida|Ebola|Covid long|Grippe aviaire|Fièvre jaune|Paludisme|Rage|Lèpre","t4":"Mai 68|Prise de la Bastille|Fête de la Fédération|Terreur|Commune de Paris|Débarquement de Provence|Libération de Paris|Bataille de Stalingrad|Bataille de Verdun|Bataille de la Somme|Bataille d'Angleterre|Bataille de Midway|Bataille d'Iwo Jima|Bataille des Ardennes|Opération Barbarossa|Opération Overlord|Opération Market Garden|Opération Valkyrie|Nuit de Cristal|Pogrom|Rafle du Vel' d'Hiv|Appel du 18 Juin|Régime de Vichy|Résistance française|Maquis du Vercors|Massacre d'Oradour-sur-Glane|Procès de Nuremberg|Procès de Tokyo|Plan Marshall|Blocus de Berlin|Crise des missiles de Cuba|Mur de Berlin|Printemps de Prague|Révolution russe|Révolution culturelle|Grand Bond en avant|Guerre de Corée|Guerre d'Algérie|Guerre d'Indochine|Guerre du Golfe|Guerre d'Irak|Guerre d'Afghanistan|Guerre de Sécession|Guerre de Cent Ans|Guerre de Trente Ans|Guerres napoléoniennes|Croisades|Inquisition|Chasse aux sorcières de Salem|Colonisation|Traite négrière|Esclavage|Apartheid|Mouvement des droits civiques|Marche sur Washington|Assassinat de John F. Kennedy|Assassinat de Martin Luther King|Assassinat de Gandhi|Assassinat de Rafiq Hariri|Assassinat d'Itzhak Rabin|Assassinat de Benazir Bhutto|Assassinat de Olof Palme"}};
 const CATGROUPS={"foot":{"l":"⚽ Football","n":0,"c":["Footballeur français","Footballeuse française","Footballeur brésilien","Footballeur espagnol","Footballeur italien","Footballeur anglais","Footballeur allemand","Footballeur argentin","Footballeur portugais","Footballeur néerlandais","Footballeur belge","Footballeur sénégalais","Footballeur marocain","Footballeur algérien","Footballeur ivoirien","Footballeur camerounais","Footballeur japonais","Footballeur américain","Footballeuse américaine","Footballeuse allemande","Footballeuse brésilienne","Entraîneur français de football","Entraîneur espagnol de football","Entraîneur italien de football","Arbitre français de football","Arbitre italien de football","Arbitre de football","Stade de football en France","Club de football en France","Club de football en Espagne","Club de football en Italie","Club de football en Angleterre","Club de football en Allemagne","Gardien de but de football"]},"act":{"l":"🎬 Acteurs & actrices","n":0,"c":["Acteur français de cinéma","Actrice française de cinéma","Acteur américain de cinéma","Actrice américaine de cinéma","Acteur britannique de cinéma","Actrice britannique de cinéma","Acteur japonais","Actrice japonaise","Acteur italien de cinéma","Actrice italienne de cinéma","Acteur espagnol de cinéma","Actrice espagnole de cinéma","Acteur sud-coréen","Actrice sud-coréenne","Acteur indien de cinéma","Actrice indienne de cinéma","Acteur allemand de cinéma","Actrice allemande de cinéma","Acteur chinois","Actrice chinoise","Acteur canadien","Actrice canadienne","Acteur australien","Actrice australienne","Acteur de télévision","Réalisateur français","Réalisateur américain"]},"adult":{"l":"🔞 Adultes (contenu sensible)","n":1,"c":["Actrice pornographique américaine","Acteur pornographique américain","Actrice pornographique française","Acteur pornographique français","Actrice pornographique britannique","Actrice pornographique japonaise","Actrice pornographique allemande","Actrice pornographique tchèque","Actrice pornographique hongroise","Actrice pornographique brésilienne","Actrice pornographique italienne","Actrice pornographique espagnole","Actrice pornographique canadienne","Actrice pornographique russe","Actrice pornographique roumaine","Actrice pornographique colombienne","Film pornographique américain","Film pornographique français","Film pornographique","Réalisateur de films pornographiques"]},"music":{"l":"🎵 Musique & K-pop","n":0,"c":["Groupe de K-pop","Chanteur sud-coréen","Chanteuse sud-coréenne","Chanteur français","Chanteuse française","Chanteur américain","Chanteuse américaine","Chanteur britannique","Chanteuse britannique","Chanteur japonais","Chanteuse japonaise","Rappeur français","Rappeur américain","Rappeuse américaine","Groupe de rock britannique","Groupe de rock américain","Groupe de hard rock","Groupe de heavy metal","Groupe musical français","Groupe de pop","Groupe de hip-hop","Compositeur français","Compositeur allemand","Compositeur italien","Pianiste français","Guitariste américain","Batteur américain","Album musical sorti en {1970-2024}","Chanson de {1970-2024}"]},"game":{"l":"🎮 Jeux vidéo & personnages","n":0,"c":["Jeu vidéo sorti en {1980-2024}","Personnage de jeu vidéo","Personnage de Mario","Personnage de Final Fantasy","Personnage de The Legend of Zelda","Personnage de Street Fighter","Personnage de Pokémon","Série de jeux vidéo","Jeu vidéo de combat","Jeu vidéo de rôle","Jeu vidéo de course","Jeu vidéo de sport","Jeu vidéo de tir à la première personne"]},"film":{"l":"🎥 Films, séries, anime, manga","n":0,"c":["Film américain sorti en {1960-2024}","Film français sorti en {1960-2024}","Film britannique sorti en {1980-2024}","Film japonais sorti en {1980-2024}","Film d'animation japonais","Série télévisée américaine","Série télévisée française","Série télévisée britannique","Série d'animation japonaise","Manga","Personnage de manga","Personnage de fiction","Film d'horreur américain","Film de science-fiction américain","Série télévisée d'animation américaine"]},"animal":{"l":"🐺 Animaux","n":0,"c":["Mammifère (nom vernaculaire)","Oiseau (nom vernaculaire)","Poisson (nom vernaculaire)","Reptile (nom vernaculaire)","Insecte (nom vernaculaire)","Araignée (nom vernaculaire)","Amphibien (nom vernaculaire)","Crustacé (nom vernaculaire)","Mollusque (nom vernaculaire)","Requin","Dinosaure","Genre de dinosaures","Race de chiens","Race de chats","Race de chevaux","Lépidoptère (nom vernaculaire)","Coléoptère (nom vernaculaire)","Serpent (nom vernaculaire)","Primate (nom vernaculaire)"]},"plant":{"l":"🌱 Plantes & champignons","n":0,"c":["Plante (nom vernaculaire)","Champignon (nom vernaculaire)","Arbre","Plante ornementale","Arbre fruitier","Plante médicinale","Plante condimentaire","Plante potagère","Fleur","Conifère","Orchidée","Palmier"]},"science":{"l":"🧪 Sciences & médecine","n":0,"c":["Physicien français","Physicien allemand","Physicien américain","Physicien britannique","Mathématicien français","Mathématicien allemand","Mathématicien américain","Astronome français","Astronome américain","Astrophysicien français","Chimiste français","Chimiste allemand","Biologiste français","Médecin français","Médecin américain","Inventeur","Ingénieur français","Prix Nobel de physique","Prix Nobel de médecine","Prix Nobel de chimie","Exoplanète","Constellation","Galaxie"]},"place":{"l":"🏙️ Lieux, villes, monuments","n":0,"c":["Capitale en Europe","Capitale en Asie","Capitale en Afrique","Capitale en Amérique","Pays en Europe","Pays en Afrique","Pays en Asie","Pays en Amérique","Château en France","Musée en France","Stade en France","Cathédrale en France","Pont en France","Gratte-ciel","Île","Volcan","Lac","Montagne","Parc national","Commune du Rhône","Commune de la Loire","Commune de la Gironde","Commune de la Haute-Garonne","Commune du Nord","Commune des Bouches-du-Rhône"]},"vehicle":{"l":"🚗 Voitures, motos, avions, bateaux","n":0,"c":["Automobile Renault","Automobile Peugeot","Automobile Citroën","Automobile Ferrari","Automobile Porsche","Automobile Lamborghini","Automobile BMW","Automobile Mercedes-Benz","Automobile Audi","Automobile Volkswagen","Automobile Ford","Automobile Toyota","Automobile Honda","Automobile Nissan","Automobile Tesla","Automobile Bugatti","Automobile Aston Martin","Motocyclette Honda","Motocyclette Yamaha","Motocyclette Harley-Davidson","Avion de ligne","Avion de chasse","Hélicoptère","Locomotive","Paquebot","Porte-avions","Sous-marin","Voilier","Sonde spatiale","Char de combat"]},"book":{"l":"📚 Livres, écrivains, artistes","n":0,"c":["Écrivain français","Écrivain américain","Écrivain britannique","Écrivain allemand","Écrivain russe","Écrivain japonais","Romancier français","Poète français","Dramaturge français","Auteur de bande dessinée","Dessinateur français de bande dessinée","Mangaka","Roman paru en {1850-2024}","Roman de science-fiction américain","Roman fantastique","Bande dessinée franco-belge","Peintre français","Peintre néerlandais","Peintre italien","Peintre espagnol","Peintre américain","Sculpteur français","Photographe français","Architecte français","Philosophe français","Philosophe allemand","Historien français"]},"hist":{"l":"🏛️ Histoire & personnalités","n":0,"c":["Roi de France","Empereur romain","Pharaon","Président de la République française","Premier ministre français","Personnalité politique française","Personnalité politique américaine","Président des États-Unis","Militaire français","Général français","Résistant français","Explorateur","Pape","Reine de France","Monarque britannique","Dictateur","Tueur en série américain","Tueur en série français","Criminel français","Pirate"]},"sport":{"l":"🏅 Autres sports","n":0,"c":["Basketteur français","Basketteur américain","Joueur de tennis français","Joueur de tennis américain","Joueuse de tennis","Pilote de Formule 1","Pilote de moto","Pilote automobile français","Joueur français de rugby à XV","Cycliste français","Cycliste belge","Boxeur français","Boxeur américain","Judoka français","Nageur français","Athlète français","Athlète américain","Handballeur français","Joueur de baseball","Joueur de hockey sur glace","Joueur de football américain","Golfeur","Skieur alpin","Gymnaste","Escrimeur français","Médaillé olympique"]},"myth":{"l":"🔱 Mythologie & religions","n":0,"c":["Divinité grecque","Divinité romaine","Divinité égyptienne","Divinité nordique","Divinité hindoue","Personnage de la mythologie grecque","Créature fantastique","Créature de la mythologie grecque","Ange","Démon","Saint catholique","Prophète","Personnage biblique","Héros mythologique"]},"food":{"l":"🍔 Cuisine & boissons","n":0,"c":["Fromage","Fromage français","Fromage italien","Cuisine française","Dessert","Pâtisserie","Viennoiserie","Boisson","Cocktail","Vin","Bière","Spiritueux","Confiserie","Fruit","Légume","Épice","Soupe","Sauce","Cuisine japonaise","Cuisine italienne","Cuisine marocaine","Chaîne de restauration rapide"]},"tech":{"l":"💻 Marques, tech & internet","n":0,"c":["Entreprise française","Entreprise américaine","Entreprise japonaise","Marque de vêtements","Marque de luxe","Marque de sport","Réseau social","Site web","Logiciel","Langage de programmation","Système d'exploitation","Console de jeux vidéo","Application mobile","Entreprise de jeux vidéo","Fabricant de téléphones mobiles"]},"creator":{"l":"📺 Créateurs (YouTube / Twitch)","n":0,"c":["Vidéaste web français","Vidéaste web américain","Streameur","Youtubeur"]},"event":{"l":"💥 Événements & drames","n":0,"c":["Attentat en France","Catastrophe naturelle","Catastrophe aérienne","Accident ferroviaire","Naufrage","Séisme","Éruption volcanique","Affaire criminelle française","Affaire criminelle américaine","Bataille de la Seconde Guerre mondiale","Bataille de la Première Guerre mondiale","Massacre","Génocide","Épidémie","Incendie","Scandale politique français"]}};
+/* V108 — chaque grand univers possède des cartes sur toute l'échelle de rareté.
+   Les noms ci-dessous servent d'ancrages de notoriété ; le moteur conserve les overrides
+   individuels et les cartes Wikipédia sans image ne sont jamais ajoutées. */
+const CATEGORY_TIERS={
+ foot:{0:"joueur de football|footballeur amateur",1:"joueur de football|footballeur",2:"joueur de football français",3:"joueur de football international",4:"star du football",5:"légende du football"},
+ act:{0:"acteur de second rôle|actrice de second rôle",1:"acteur français|actrice française",2:"acteur américain|actrice américaine",3:"acteur britannique|actrice britannique",4:"acteur oscarisé|actrice oscarisée",5:"acteur de renommée mondiale|actrice de renommée mondiale"},
+ adult:{0:"acteur pornographique|actrice pornographique",1:"acteur pornographique américain|actrice pornographique américaine",2:"acteur pornographique célèbre|actrice pornographique célèbre",3:"star du divertissement pour adultes",4:"star pornographique internationale",5:"figure emblématique de l'industrie pornographique"},
+ music:{0:"chanteur|chanteuse",1:"chanteur français|chanteuse française",2:"chanteur américain|chanteuse américaine",3:"artiste musical international",4:"star mondiale de la musique",5:"icône musicale"},
+ game:{0:"jeu vidéo indépendant",1:"jeu vidéo populaire",2:"jeu vidéo à succès",3:"jeu vidéo culte",4:"franchise vidéoludique majeure",5:"jeu vidéo phénomène mondial"},
+ film:{0:"film|série télévisée",1:"film populaire|série populaire",2:"film à succès|série à succès",3:"film culte|série culte",4:"blockbuster|série phénomène",5:"film phénomène mondial|série phénomène mondial"},
+ animal:{0:"animal commun",1:"espèce connue",2:"animal populaire",3:"animal emblématique",4:"espèce mondialement connue",5:"animal iconique"},
+ plant:{0:"plante commune",1:"fleur connue",2:"plante populaire",3:"plante emblématique",4:"plante mondialement connue",5:"plante iconique"},
+ science:{0:"scientifique|concept scientifique",1:"scientifique connu",2:"scientifique célèbre",3:"scientifique majeur",4:"grand scientifique",5:"figure scientifique historique"},
+ place:{0:"commune|ville",1:"ville connue",2:"grande ville",3:"capitale",4:"métropole mondiale",5:"ville mondialement célèbre"},
+ vehicle:{0:"modèle automobile",1:"voiture connue",2:"voiture populaire",3:"voiture culte",4:"voiture mythique",5:"modèle automobile iconique"},
+ book:{0:"écrivain|roman",1:"auteur connu|livre connu",2:"écrivain célèbre|livre célèbre",3:"auteur majeur|œuvre majeure",4:"grand classique",5:"œuvre littéraire iconique"},
+ hist:{0:"personnalité historique",1:"personnage historique connu",2:"personnalité historique célèbre",3:"figure historique majeure",4:"figure historique mondiale",5:"icône historique"},
+ sport:{0:"sportif|sportive",1:"sportif français|sportive française",2:"sportif célèbre|sportive célèbre",3:"champion international|championne internationale",4:"star mondiale du sport",5:"légende du sport"},
+ myth:{0:"créature mythologique",1:"personnage mythologique connu",2:"divinité connue",3:"divinité célèbre",4:"figure mythologique majeure",5:"icône mythologique"},
+ food:{0:"plat|aliment",1:"plat connu|aliment connu",2:"plat populaire|aliment populaire",3:"spécialité emblématique",4:"aliment mondialement connu",5:"icône culinaire"},
+ tech:{0:"logiciel|entreprise",1:"service numérique connu|entreprise connue",2:"marque connue|technologie connue",3:"entreprise majeure|technologie majeure",4:"géant mondial de la tech",5:"icône technologique"},
+ creator:{0:"créateur de contenu",1:"youtubeur|streameur",2:"créateur populaire",3:"créateur très connu",4:"star mondiale du web",5:"icône d'internet"},
+ event:{0:"événement historique",1:"événement connu",2:"événement majeur",3:"événement historique majeur",4:"événement mondial",5:"événement historique iconique"}
+};
+const TIER_ANCHORS={
+ adult:{
+  7:"Mia Khalifa|Sophie Rain",
+  6:"Sasha Grey|Jenna Jameson|Sunny Leone|Lana Rhoades",
+  5:"Angela White|Riley Reid|Lisa Ann|Stormy Daniels",
+  4:"Abella Danger|Kendra Lust|Alexis Texas",
+  3:"Mia Malkova|Dani Daniels|Tori Black",
+  2:"Bree Olson|Sophie Dee|Nikki Benz",
+  1:"Teagan Presley|Lexi Belle"
+ },
+ music:{
+  7:"BTS|Blackpink|Michael Jackson|Taylor Swift|The Beatles|Queen (groupe)",
+  6:"TWICE (groupe)|Stray Kids|NewJeans|Ariana Grande|Billie Eilish|The Weeknd",
+  5:"EXO (groupe)|Seventeen (groupe)|Red Velvet|Aespa|Dua Lipa|Olivia Rodrigo",
+  4:"Itzy|Ateez|Super Junior|Katy Perry|Doja Cat|Nicki Minaj",
+  3:"Mylène Farmer|Stromae|Soprano|Vitaa|Gims|Christine and the Queens"
+ },
+ foot:{
+  7:"Kylian Mbappé|Lionel Messi|Cristiano Ronaldo|Pelé|Diego Maradona|Zinédine Zidane",
+  6:"Karim Benzema|Neymar|Erling Haaland|Robert Lewandowski|Ronaldinho",
+  5:"Antoine Griezmann|Luka Modrić|Thierry Henry|Zlatan Ibrahimović",
+  4:"Olivier Giroud|Ousmane Dembélé|Rayan Cherki|Pedri|Gavi"
+ }
+};
 const OVRN={};Object.keys(OVR).forEach(t=>OVRN[nz2(t)]=OVR[t]);
 const VIPT=[],VIPR={},ADULT=new Set();
 (()=>{const seen=new Set(),gs=Object.keys(CATALOG);let n=0;
- for(const t of [7,6,5,4,3,2,1]){const L=gs.map(g=>[g,(CATALOG[g]["t"+t]||"").split("|").filter(Boolean)]);
+ for(const t of [7,6,5,4,3,2,1,0]){const L=gs.map(g=>[g,(CATALOG[g]["t"+t]||"").split("|").filter(Boolean)]);
   for(let j=0;L.some(x=>j<x[1].length);j++)L.forEach(([g,a])=>{const x=a[j];if(!x)return;const k=nz2(x);if(!k||seen.has(k))return;seen.add(k);VIPR[k]=OVRN[k]??t;VIPT.push({t:x,r:VIPR[k],g,o:1e6-(n++)});if(g==="adult")ADULT.add(k)})}})();
+/* Ancrages de catégorie : ils garantissent qu'une catégorie ne se retrouve pas bloquée dans une seule rareté. */
+Object.entries(TIER_ANCHORS).forEach(([g,tiers])=>Object.entries(tiers).forEach(([rr,names])=>String(names).split("|").forEach(x=>{const k=nz2(x);if(!k)return;VIPR[k]=OVRN[k]??+rr;if(!VIPT.some(v=>nz2(v.t)===k))VIPT.push({t:x,r:OVRN[k]??+rr,g,o:900000-(VIPT.length)});}));
 function withVip(L){const idx=new Map();L.forEach(e=>{if(e.t)idx.set(nz2(e.t),e);if(e.cr&&!e.g)e.g="creator";if(e.src==="film"&&!e.g)e.g="film"});
  VIPT.forEach(v=>{const e=idx.get(nz2(v.t));if(e){if(!e.cr&&e.src!=="film"){e.r=v.r;e.g=v.g;e.o=v.o}}else{const x={t:v.t,r:v.r,v:0,src:"wiki",g:v.g,o:v.o};L.push(x);idx.set(nz2(v.t),x)}});
  return L}
@@ -905,7 +955,16 @@ function sync(){if(stock<MAXB){if(!t0)t0=Date.now();const n=Math.floor((Date.now
 const p2=v=>String(v).padStart(2,"0");
 const fmt=ms=>{const s=Math.max(0,Math.ceil(ms/1000)),hh=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return hh?`${hh}h ${p2(m)}min ${p2(x)}s`:`${p2(m)}:${p2(x)}`};
 const ok=p=>p.thumbnail&&!/homonymie/i.test(p.description||"")&&!isRemovedTitle(p.title);
-function rp(p){if(OVR[p.title]!=null)return OVR[p.title];{const k=nz2(p.title);if(OVRN[k]!=null)return OVRN[k];if(VIPR[k]!=null)return VIPR[k]}const s=Object.values(p.pageviews||{}).reduce((a,b)=>a+(b||0),0);return boost(p.title,rarOf(s))}
+function rp(p){
+ if(OVR[p.title]!=null)return OVR[p.title];
+ const k=nz2(p.title);
+ if(OVRN[k]!=null)return OVRN[k];
+ if(VIPR[k]!=null)return VIPR[k];
+ const s=Object.values(p.pageviews||{}).reduce((a,b)=>a+(b||0),0);
+ const g=inferCardCategory(p);
+ const cr=categoryRankRarity(p.title,s,g);
+ return boost(p.title,cr==null?rarOf(s):cr);
+}
 function mk(p,rf,vf){const r=rf??rp(p),pv=p.pageviews?Object.values(p.pageviews).reduce((a,b)=>a+(b||0),0):vf,c={v:pv,id:p.pageid+"-"+r,pid:"w"+p.pageid,t:p.title,d:p.description||"",img:p.thumbnail.source,r,src:"wiki",nsfw:SEX.test(p.title)||ADULT.has(nz2(p.title))||/pornograph|érotique|hentai|sexuel/i.test(p.description||"")};store[c.id]=c;return c}
 function card(c){const [n,cl]=R[c.r];
 return `<div class="card r${c.r} ${c.nsfw?"nsfw":""} ${c.src=="film"?"film-art":""}" style="--c:${cl}" data-id="${c.id}"><div class="in"><span class="bd">${SYM[c.r]}</span>${c.n>1?`<span class="cnt">×${c.n}</span>`:""}<img class="${c.src=="cr"?"creator-art":c.src=="film"?"film-art":""}" src="${c.img}" referrerpolicy="no-referrer" alt="${(c.t||"").replace(/"/g,"&quot;")}"><div class="nm"><span class="t">${c.t}</span><small>${SYM[c.r]} ${n}${c.src=="film"?`<span class="film-badge">🎬 FILM</span>`:""}</small></div></div><i class="foil"></i><i class="tex"></i><i class="glare"></i><i class="spk"></i><i class="gl a"></i><i class="gl b"></i></div>`}
@@ -1221,10 +1280,110 @@ async function totalOf(){
  }
  if(totalArticles==null){const j=await(await fetch(BASE+"meta=siteinfo&siprop=statistics")).json();totalArticles=j.query.statistics.articles}
  return totalArticles+FILMS.length}
+
+/* V2 CATEGORY RARITY ENGINE
+   - categories are inferred from existing real card titles/metadata
+   - rarity is ranked inside the category, not only globally
+   - explicit OVR/TIER_ANCHORS always win
+   - no synthetic category-name cards are created
+*/
+const CAT_RARITY_META={
+ foot:["football","footballeur","footballeuse","joueur de football","joueuse de football","ligue 1","champions league","coupe du monde"],
+ act:["acteur","actrice","cinéma","film","réalisateur","réalisatrice"],
+ music:["chanteur","chanteuse","musicien","musicienne","groupe musical","k-pop","rappeur","rappeuse","album","musique"],
+ game:["jeu vidéo","jeu vidéo","gaming","esport","playstation","xbox","nintendo"],
+ film:["film","long métrage","court métrage","cinéma"],
+ animal:["mammifère","oiseau","poisson","reptile","amphibien","insecte","araignée","animal","espèce animale","dinosaure"],
+ plant:["plante","fleur","arbre","arbuste","botanique","champignon"],
+ science:["scientifique","physicien","physicienne","mathématicien","mathématicienne","astronome","astronomie","science"],
+ place:["ville","commune","capitale","pays","métropole","géographie","monument","quartier","lieu"],
+ vehicle:["automobile","voiture","constructeur automobile","formule 1","pilote automobile","avion","aéronef","navire","bateau","train","moto"],
+ book:["roman","livre","écrivain","écrivaine","auteur","autrice","œuvre littéraire"],
+ hist:["histoire","historique","personnalité historique","guerre","révolution"],
+ sport:["sportif","sportive","athlète","tennis","basket-ball","boxe","mma","cyclisme","natation","athlétisme"],
+ myth:["mythologie","mythologique","dieu","déesse","divinité","légende"],
+ food:["cuisine","aliment","plat","recette","fromage","dessert","boisson"],
+ tech:["technologie","informatique","logiciel","entreprise","smartphone","ordinateur","internet"],
+ event:["attentat","catastrophe","événement","incendie","naufrage","tremblement de terre","pandémie"],
+ creator:["youtubeur","youtubeuse","streameur","streameuse","créateur de contenu","créatrice de contenu","influenceur","influenceuse"],
+ adult:["pornographique","pornographie","actrice de films pornographiques","acteur de films pornographiques","star du porno","modèle érotique"],
+ anime:["anime","animé","manga","shōnen","shoujo"],
+ space:["astronomie","planète","étoile","galaxie","constellation","satellite","astéroïde","espace"]
+};
+const CAT_STATS={};
+const CAT_TITLE_MAP={};
+const _catNorm=x=>nz2(x);
+function inferCardCategory(e){
+  if(e?.g && CAT_RARITY_META[e.g]) return e.g;
+  if(e?.cr) return "creator";
+  if(e?.src==="film") return "film";
+  const t=String(e?.t||"").toLowerCase();
+  const d=String(e?.d||"").toLowerCase();
+  const hay=t+" "+d;
+  // Prefer explicit CATALOG membership: it is curated with real Wikipedia titles.
+  for(const [g,z] of Object.entries(CATALOG||{})){
+    for(const k of [7,6,5,4,3,2,1,0]){
+      const a=String(z["t"+k]||"").split("|").filter(Boolean);
+      if(a.some(x=>_catNorm(x)===_catNorm(e.t))) return g;
+    }
+  }
+  // Stronger/specific domains first.
+  const order=["adult","creator","anime","space","foot","sport","vehicle","game","film","music","animal","plant","science","place","book","hist","myth","food","tech","event","act"];
+  for(const g of order){
+    if((CAT_RARITY_META[g]||[]).some(k=>hay.includes(k))) return g;
+  }
+  return null;
+}
+function buildCategoryStats(list){
+  for(const k of Object.keys(CAT_STATS)) delete CAT_STATS[k];
+  (list||[]).forEach(e=>{
+    const g=inferCardCategory(e);
+    if(!g || !Number.isFinite(+e.v)) return;
+    (CAT_STATS[g]||(CAT_STATS[g]=[])).push({t:e.t,v:+e.v,r:e.r});
+  });
+  Object.keys(CAT_STATS).forEach(g=>{
+    const a=CAT_STATS[g].sort((x,y)=>y.v-x.v);
+    // Keep a compact rank lookup for fast rarity decisions.
+    CAT_STATS[g]=a;
+  });
+}
+function categoryRankRarity(title,views,g){
+  const a=CAT_STATS[g];
+  if(!a || a.length<12 || !Number.isFinite(+views)) return null;
+  const v=+views;
+  let pos=a.findIndex(x=>x.v<=v);
+  if(pos<0) pos=a.length-1;
+  const q=a.length<=1?0:pos/(a.length-1);
+  // Deliberately top-heavy: the biggest names in each domain rise much faster.
+  if(q<=0.015) return 7;
+  if(q<=0.045) return 6;
+  if(q<=0.10) return 5;
+  if(q<=0.20) return 4;
+  if(q<=0.36) return 3;
+  if(q<=0.58) return 2;
+  if(q<=0.80) return 1;
+  return 0;
+}
+
 const APIB=BASE+"prop=pageimages|description&piprop=thumbnail&pithumbsize=400&pilimit=50&";
 let RANK=[],RANKSET=new Set(),FL=[];
 // lot complet : suit les continuations des propriétés (sinon certaines pages perdent leur image)
-const J=async u=>{for(let i=0;i<3;i++){try{const r=await fetch(u);if(r.ok)return await r.json()}catch(e){}await new Promise(r=>setTimeout(r,400*(i+1)))}throw new Error("Wikipédia ne répond pas")};
+const J=async u=>{
+ const makeUrl=raw=>{try{const x=new URL(raw);if(!x.searchParams.has("origin"))x.searchParams.set("origin","*");return x.toString()}catch(e){return raw}};
+ let last=null;
+ for(let i=0;i<4;i++){
+  const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),15000);
+  try{
+   const r=await fetch(makeUrl(u),{method:"GET",mode:"cors",credentials:"omit",cache:"no-store",headers:{"Accept":"application/json"},signal:ac.signal});
+   if(!r.ok)throw new Error("HTTP "+r.status);
+   const ct=(r.headers.get("content-type")||"").toLowerCase();
+   if(ct&&!ct.includes("json"))throw new Error("Réponse Wikipédia non-JSON");
+   return await r.json();
+  }catch(e){last=e}finally{clearTimeout(tm)}
+  await new Promise(r=>setTimeout(r,700*(i+1)));
+ }
+ throw new Error("Wikipédia inaccessible : "+(last?.message||"connexion refusée"));
+};
 async function wq(u){const pages={},rd={};let cont={},gen=null;
  for(let i=0;i<8;i++){const j=await J(u+"&"+new URLSearchParams(cont));
   (j.query?.normalized||[]).concat(j.query?.redirects||[]).forEach(x=>rd[x.from]=x.to);
@@ -1254,6 +1413,15 @@ EXTRA.forEach(t=>{sum[t]=Math.max(sum[t]||0,2e5)});
  const films=await filmPromise;
  const cn=new Set(CRE.map(c=>c.t));
  RANK=withVip([...W.filter(x=>!cn.has(x[0])).map(x=>({t:x[0],r:x[1],v:x[2],src:"wiki"})),...CRE.map(c=>({t:c.t,r:c.r,v:1e11,cr:c})),...films]).sort((a,b)=>b.r-a.r||(b.o||0)-(a.o||0)||b.v-a.v||String(a.t).localeCompare(String(b.t)));
+ buildCategoryStats(RANK);
+ // Re-evaluate non-forced cards using their category's internal popularity rank.
+ RANK.forEach(e=>{
+   const k=nz2(e.t);
+   if(OVRN[k]!=null || OVR[e.t]!=null || VIPR[k]!=null || e.cr || e.src==="film") return;
+   const rr=categoryRankRarity(e.t,e.v,inferCardCategory(e));
+   if(rr!=null)e.r=boost(e.t,rr);
+ });
+ RANK.sort((a,b)=>b.r-a.r||(b.o||0)-(a.o||0)||b.v-a.v||String(a.t).localeCompare(String(b.t)));
  RANKSET=new Set(RANK.map(e=>e.t))}
 // curseur : "r:i" = classement, "a:Titre" = reste de Wikipédia A→Z, "s:n" = recherche
 async function collect(cur){let mode=cur[0],val=cur.slice(2),out=[];
@@ -1277,6 +1445,28 @@ async function collect(cur){let mode=cur[0],val=cur.slice(2),out=[];
    else{if(next===null||next===undefined)return{out,next:null};val=next}}}
  if(mode=="r"&&fr.size&&!fr.has(0)&&+val>=FL.length)return{out,next:null};
  return{out,next:mode+":"+val}}
+
+async function localCatalogFallback(){
+ const out=[],seen=new Set(),add=c=>{
+  if(!c||!c.id||seen.has(c.id)||!c.img||typeof c.img!=="string")return;
+  if(fr.size&&!fr.has(+c.r))return;
+  if(q&&!String(c.t||"").toLowerCase().includes(q.toLowerCase()))return;
+  seen.add(c.id);out.push(c);
+ };
+ try{
+  const db=await new Promise((resolve,reject)=>{const req=indexedDB.open("WikiCollectCatalogV41");req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});
+  if(db.objectStoreNames.contains("cards")){
+   const rows=await new Promise((resolve,reject)=>{
+    const a=[],tx=db.transaction("cards","readonly"),s=tx.objectStore("cards"),rq=s.openCursor();
+    rq.onsuccess=()=>{const c=rq.result;if(!c)return resolve(a);a.push(c.value);c.continue()};rq.onerror=()=>reject(rq.error);
+   });
+   rows.sort((a,b)=>(b.r||0)-(a.r||0)||(a.t||"").localeCompare(b.t||"")).forEach(add);
+  }
+  db.close();
+ }catch(e){}
+ CRE.forEach(add);
+ return out.slice((page-1)*PS,page*PS);
+}
 async function all(){
  main.innerHTML=`<h2>Toutes les cartes</h2><div class="sub" id="cnt">Chargement…</div>
  <div class="bar"><input id="q" placeholder="Rechercher un article…" value="${q}"><select id="so" style="background:var(--sf2);border:1px solid #3a2f4d;color:var(--fg);border-radius:9px;padding:0 12px;font:inherit"><option value="rare" ${SO=="rare"?"selected":""}>Du plus rare au plus commun</option><option value="az" ${SO=="az"?"selected":""}>A → Z (toutes les raretés, communes comprises)</option></select>${groupSelectHTML()}</div>
@@ -1294,7 +1484,16 @@ async function all(){
   $("pn").textContent=`Page ${page.toLocaleString("fr-FR")} / ~${tp.toLocaleString("fr-FR")}`;if(CG)$("pn").textContent="Page "+page.toLocaleString("fr-FR")+" · "+CATGROUPS[CG].l;
   $("cnt").textContent=`${tot.toLocaleString("fr-FR")} cartes au catalogue · dont ${FILMS.length.toLocaleString("fr-FR")} films avec affiche · ${PS} cartes par page · ${SO=="az"?"ordre alphabétique · toutes les raretés":"classées de la plus rare à la plus commune"}${SO=="rare"&&fr.size?" · "+(fr.has(0)?"filtre actif":FL.length.toLocaleString("fr-FR")+" cartes dans ce filtre"):""}`;
   $("nx").disabled=r.next===null}
- catch(e){console.error(e);$("g").innerHTML='<div class="msg">Impossible de joindre Wikipédia ('+(e&&e.message||e)+'). Ouvre ce fichier directement dans ton navigateur, avec internet. <button class="btn g" id="rt">Réessayer</button></div>';$("rt").onclick=all}}
+ catch(e){
+ console.error("Wikipédia indisponible, bascule sur le catalogue local.",e);
+ const local=await localCatalogFallback();
+ $("g").innerHTML=local.length?local.map(card).join(""):'<div class="msg">Wikipédia est momentanément inaccessible. Aucun catalogue local disponible. <button class="btn g" id="rt">Réessayer</button></div>';
+ bind($("g"));
+ $("cnt").textContent=local.length?`${local.length.toLocaleString("fr-FR")} cartes locales disponibles · Wikipédia sera réessayé au prochain chargement.`:"Wikipédia indisponible";
+ $("pn").textContent=`Page ${page}`;
+ $("nx").disabled=true;
+ $("rt")?.addEventListener("click",all);
+}}
 /* ===== ARGENT · MARCHÉ (IA) · CASINO ===== */
 const PRICE=[10,30,80,180,400,2000,5000,15000,35000,80000],price=c=>{
  const base=PRICE[Math.max(0,Math.min(R.length-1,c.r))];
@@ -2075,16 +2274,22 @@ async function fusionSame(c){
  if(!c||c.n<3||c.r>=7)return;
  SFX.fusionStart();
  const source={...c};
+ const targetR=Math.min(7,source.r+1);
  c.n-=3;
  if(c.n<=0)delete col[c.id];
  save();
 
- const poolPromise=loadCasePool().catch(()=>[]);
+ const result={...source,r:targetR,n:1};
+ result.id=source.id;
+ result.pid=source.pid||source.id;
+ result.t=source.t;
+ store[result.id]=result;
+
  const overlay=document.createElement("div");
  overlay.id="fusionOverlay";
  overlay.innerHTML=`<div class="fusionStage" id="fusionStage">
   <div class="fusionTitle">⚗️ FUSION</div>
-  <div class="fusionSub">Les 3 cartes tournent autour du noyau et convergent vers le centre…</div>
+  <div class="fusionSub">Les 3 cartes se combinent pour créer une version de rareté supérieure.</div>
   <div class="fusionSlots">
    <div class="fusionSlot">${card({...source,n:1})}</div><div class="fusionPlus">+</div>
    <div class="fusionSlot">${card({...source,n:1})}</div><div class="fusionPlus">+</div>
@@ -2093,33 +2298,14 @@ async function fusionSame(c){
   <div class="fusionCore"></div>
   <div class="fusionBurst"></div>
   <div class="fusionResultWrap" id="fusionResultWrap"></div>
-  <div class="fusionChance">Même rareté 70 % · +1 rareté 25 % · +2 raretés 5 %</div>
+  <div class="fusionChance">3 × ${esc(rarityName(source.r))} → 1 × ${esc(rarityName(targetR))}</div>
   <div class="fusionDone" id="fusionDone"></div>
  </div>`;
  document.body.appendChild(overlay);
  const stage=$("fusionStage");
  requestAnimationFrame(()=>stage.classList.add("active"));
 
- const pickFusionRarity=(base)=>{
-  const x=Math.random();
-  const add=x<.70?0:x<.95?1:2;
-  const r0=Math.min(7,base+add);return r0;
- };
- const getResult=async()=>{
-  let pool=await poolPromise;
-  pool=Array.isArray(pool)?pool.filter(x=>x&&x.img):[];
-  const rr=pickFusionRarity(source.r);
-  let candidates=pool.filter(x=>x.r===rr && x.id!==source.id);
-  if(!candidates.length)candidates=pool.filter(x=>x.r===rr);
-  if(!candidates.length)candidates=pool.filter(x=>x.r===source.r);
-  if(!candidates.length)candidates=[source];
-  const result={...candidates[Math.floor(Math.random()*candidates.length)],n:1};
-  store[result.id]=result;
-  return result;
- };
-
  try{
-  const result=await getResult();
   await new Promise(res=>setTimeout(res,2350));
   $("fusionResultWrap").innerHTML=`<div class="fusionResult">${card(result)}<div class="fusionResultTag">${SYM[result.r]} ${rarityName(result.r)}</div></div>`;
   addCard(result);
@@ -2127,21 +2313,22 @@ async function fusionSame(c){
   save();
   stage.classList.remove("active");
   stage.classList.add("reveal");
-  $("fusionDone").innerHTML=`Tu as obtenu <b>${result.t}</b> · ${rarityName(result.r)}`;
-
-  // Fin automatique : aucun bouton « Continuer » à cliquer.
+  $("fusionDone").innerHTML=`<b>${source.t}</b> passe de ${rarityName(source.r)} à <b>${rarityName(targetR)}</b>.`;
   setTimeout(()=>{
    overlay.remove();
    collection();
-   SFX.fusionSuccess(result.r);toast("✨ Fusion : "+source.t+" ×3 → "+result.t+" ("+rarityName(result.r)+")");
+   SFX.fusionSuccess(result.r);
+   toast("✨ Fusion : 3 × "+rarityName(source.r)+" → 1 × "+rarityName(targetR));
   },3600);
  }catch(e){
   SFX.fusionFail();
-  const result={...source,id:source.id,n:1};
-  addCard(result);save();overlay.remove();collection();toast("Fusion terminée : carte rendue.");
+  addCard({...source,n:1});
+  save();
+  overlay.remove();
+  collection();
+  toast("Fusion annulée : les cartes ont été rendues.");
  }
 }
-
 /* V99 : ancienne version de fusionHTML() supprimée (elle était écrasée par la suivante) */
 
 /* ===== COLLECTION ===== */
@@ -2832,7 +3019,7 @@ document.addEventListener("keydown",e=>{if(/INPUT|TEXTAREA|SELECT/.test((e.targe
 
 
 <style id="v97-real-binder">
-/* V97 — vrai classeur : pages rigides, pochettes transparentes et cartes plus grandes */
+/* V99 — vrai classeur : pages rigides, pochettes transparentes et cartes plus grandes */
 main{padding:14px 16px 26px!important}
 .binder{
   width:100%;
@@ -3232,7 +3419,22 @@ main{padding:14px 16px 26px!important}
     };
     next();
   }));
-  async function api(params){const u=API+'&'+new URLSearchParams(params);for(let n=0;n<4;n++){try{const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}catch(e){if(n===3)throw e;await sleep(500*(n+1))}}}
+  async function api(params){
+   const u=new URL(API);Object.entries(params||{}).forEach(([k,v])=>u.searchParams.set(k,v));u.searchParams.set("origin","*");
+   let last=null;
+   for(let n=0;n<4;n++){
+    const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),15000);
+    try{
+     const r=await fetch(u.toString(),{method:"GET",mode:"cors",credentials:"omit",cache:"no-store",headers:{"Accept":"application/json"},signal:ac.signal});
+     if(!r.ok)throw Error("HTTP "+r.status);
+     const ct=(r.headers.get("content-type")||"").toLowerCase();
+     if(ct&&!ct.includes("json"))throw Error("Réponse non-JSON");
+     return await r.json();
+    }catch(e){last=e}finally{clearTimeout(tm)}
+    if(n<3)await sleep(800*(n+1));
+   }
+   throw last||Error("Wikipédia inaccessible");
+  }
   /*
    * Rareté V4.2 : notoriété réelle avant catégorie.
    * Les vues sont mesurées sur 30 jours. La portée internationale et
@@ -3476,7 +3678,10 @@ main{padding:14px 16px 26px!important}
   /* 10 — Laboratoire de cartes + bouton Découvrir dans le classeur */
   const appendLab=()=>{
     const A=Object.values(col).filter(c=>c&&c.n>0),ready=A.filter(c=>c.n>=3&&c.r<7).length;
-    const el=document.createElement('div');el.className='wc-feature-panel';el.innerHTML=`<h3>🧪 Laboratoire de cartes</h3><div class="sub">Un espace central pour transformer, améliorer et explorer tes cartes.</div><div class="wc-lab-grid"><div class="wc-lab-card"><b>⚗️ Fusion</b><p class="mut">3 exemplaires identiques → 1 carte améliorée. ${ready} carte(s) sont actuellement prêtes.</p><button class="btn" id="wcLabFusion">⚗️ Ouvrir la fusion</button></div><div class="wc-lab-card"><b>🎲 Découverte</b><p class="mut">Pioche une carte aléatoire parmi les cartes réellement disponibles avec une image.</p></div></div>`;main.insertBefore(el,main.firstChild);el.querySelector('#wcLabFusion').onclick=()=>openFusionPicker();el.querySelector('#wcLabDiscover').onclick=discover;
+    const el=document.createElement('div');el.className='wc-feature-panel';
+    el.innerHTML=`<h3>🧪 Laboratoire de cartes</h3><div class="sub">Transforme tes doublons en cartes de rareté supérieure.</div><div class="wc-lab-grid"><div class="wc-lab-card"><b>⚗️ Fusion par rareté</b><p class="mut">3 exemplaires de la même carte → 1 exemplaire de cette carte avec la rareté supérieure.</p><div class="wc-rarity-bars" style="margin-top:10px">${R.slice(0,7).map((r,i)=>`<div class="rb" style="--rc:${r[1]};--rw:100%"><b>${esc(r[0])}</b><span>3 → ${esc(rarityName(i+1))}</span><i></i></div>`).join('')}</div><button class="btn" id="wcLabFusion" style="margin-top:12px">⚗️ Ouvrir le laboratoire</button></div><div class="wc-lab-card"><b>📦 Cartes prêtes</b><p class="mut">Tu as actuellement <strong>${ready}</strong> carte(s) différente(s) avec au moins 3 exemplaires et pouvant être améliorées.</p><p class="mut">Les cartes <strong>Légendaire holo full art</strong> ne peuvent pas être améliorées davantage.</p></div></div>`;
+    main.insertBefore(el,main.firstChild);
+    el.querySelector('#wcLabFusion').onclick=()=>openFusionPicker();
   };
   const _collection=collection;
   collection=function(){main.classList.remove('wc-no-scroll-page');_collection();appendLab()};
@@ -3488,6 +3693,193 @@ main{padding:14px 16px 26px!important}
   /* Les missions/succès doivent revenir à leur comportement normal sur les autres onglets. */
   const clearPageClass=()=>{if(tab!==5&&tab!==8)main.classList.remove('wc-no-scroll-page')};
   setInterval(clearPageClass,500);
+})();
+</script>
+
+<script id="wc-login-milestones-lab-v1">
+(()=>{
+  if(window.__WCLOGINMILESTONES)return;
+  window.__WCLOGINMILESTONES=true;
+
+  const esc2=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  // ---------- Daily login ----------
+  const LOGIN_KEY="wc_login_rewards_v1";
+  const loginRewards=[
+    {d:1,icon:"🪙",title:"Bienvenue",desc:"Récompense de connexion",money:75},
+    {d:2,icon:"🎁",title:"Deuxième jour",desc:"Un booster offert",booster:1},
+    {d:3,icon:"💎",title:"Troisième jour",desc:"Un booster avec au moins une carte Rare",rare:1},
+    {d:4,icon:"🪙",title:"Quatrième jour",desc:"Récompense de connexion",money:150},
+    {d:5,icon:"🎁",title:"Cinquième jour",desc:"Un booster offert",booster:1},
+    {d:6,icon:"🪙",title:"Sixième jour",desc:"Récompense de connexion",money:300},
+    {d:7,icon:"🔥",title:"Semaine complète",desc:"Gros booster spécial + 500 WikiCo",booster:2,money:500}
+  ];
+
+  const loginDate=()=>new Date().toISOString().slice(0,10);
+  const prevDate=d=>{const x=new Date(d+"T00:00:00Z");x.setUTCDate(x.getUTCDate()-1);return x.toISOString().slice(0,10)};
+
+  function loginState(){
+    try{
+      const s=JSON.parse(localStorage.getItem(LOGIN_KEY)||"null");
+      return s&&typeof s==="object"?s:{last:"",streak:0,pendingRare:0};
+    }catch(e){return {last:"",streak:0,pendingRare:0}}
+  }
+  function saveLogin(s){try{localStorage.setItem(LOGIN_KEY,JSON.stringify(s))}catch(e){}}
+
+  function grantBooster(){
+    // A ready slot is made immediately available without touching existing cooldowns negatively.
+    try{
+      const now=Date.now();
+      let idx=boosterCooldowns.findIndex(x=>x>now);
+      if(idx<0) idx=0;
+      boosterCooldowns[idx]=0;
+      saveBoosterCooldowns();
+      return true;
+    }catch(e){return false}
+  }
+
+  function claimLoginIfNeeded(){
+    const today=loginDate(),s=loginState();
+    if(s.last===today)return {s,reward:null};
+    if(s.last===prevDate(today))s.streak=Math.min(7,(+s.streak||0)+1);
+    else s.streak=1;
+    const day=s.streak;
+    const reward=loginRewards[day-1]||loginRewards[0];
+    if(reward.money)gain(reward.money);
+    for(let i=0;i<(reward.booster||0);i++)grantBooster();
+    if(reward.rare)s.pendingRare=1;
+    s.last=today;
+    saveLogin(s);
+    save();
+    return {s,reward};
+  }
+
+  function loginHTML(){
+    const s=loginState();
+    const today=loginDate();
+    const claimed=s.last===today;
+    const current=claimed?Math.max(1,Math.min(7,+s.streak||1)):Math.min(7,(s.last===prevDate(today)?(+s.streak||0)+1:1));
+    return `<div class="wc-feature-panel"><h3>🎁 Récompense de connexion</h3>
+      <div class="sub">${claimed?"Récompense d’aujourd’hui récupérée. Reviens demain pour continuer la série.":"Connecte-toi chaque jour pour avancer dans la série et obtenir de meilleures récompenses."}</div>
+      <div class="wc-login-days">${loginRewards.map((r,i)=>`<div class="wc-login-day ${i+1<current?'done':''} ${i+1===current?'current':''} ${i+1<=current&&claimed?'claimed':''}">
+        <div class="wc-login-num">J${i+1}</div><div class="wc-login-icon">${r.icon}</div><b>${esc2(r.title)}</b><small>${esc2(r.desc)}</small>
+      </div>`).join('')}</div>
+      <div class="mut" style="margin-top:10px;font-size:12px">Série actuelle : <strong>${current}/7 jours</strong> · La série se réinitialise si tu manques une journée.</div>
+    </div>`;
+  }
+
+  // ---------- Collection milestones ----------
+  const MILESTONES=[
+    [100,250,"🪙","Premier cap"],
+    [500,500,"🎁","Collectionneur"],
+    [1000,1000,"💎","Grand collectionneur"],
+    [5000,2500,"🏆","Archiviste"],
+    [10000,5000,"🔥","Maître de collection"],
+    [25000,15000,"👑","Légende de WikiCollect"]
+  ];
+  const MKEY="wc_collection_milestones_v1";
+
+  function milestoneState(){
+    try{return JSON.parse(localStorage.getItem(MKEY)||"{}")||{}}catch(e){return {}}
+  }
+  function saveMilestones(s){try{localStorage.setItem(MKEY,JSON.stringify(s))}catch(e){}}
+
+  function claimMilestones(){
+    const state=milestoneState();
+    const unique=Object.values(col).filter(c=>c&&c.n>0).length;
+    let changed=false;
+    for(const [goal,reward] of MILESTONES){
+      if(unique>=goal&&!state[goal]){
+        state[goal]=Date.now();
+        gain(reward);
+        changed=true;
+        toast(`🏆 Palier ${goal.toLocaleString("fr-FR")} cartes atteint : +${reward} 🪙`);
+      }
+    }
+    if(changed){saveMilestones(state);save()}
+    return {state,unique};
+  }
+
+  function milestonesHTML(){
+    const {state,unique}=claimMilestones();
+    return `<div class="wc-feature-panel"><h3>🏆 Paliers de collection</h3>
+      <div class="sub">Chaque palier compte les <strong>cartes différentes</strong> de ta collection.</div>
+      <div class="wc-milestones">${MILESTONES.map(([goal,reward,icon,name])=>{
+        const done=!!state[goal],pct=Math.min(100,Math.round(unique/goal*100));
+        return `<div class="wc-milestone ${done?'done':''}">
+          <div class="wc-milestone-top"><span>${icon} <b>${name}</b></span><strong>${goal.toLocaleString("fr-FR")}</strong></div>
+          <div class="dbar"><i style="width:${pct}%"></i></div>
+          <div class="wc-milestone-bottom"><span>${Math.min(unique,goal).toLocaleString("fr-FR")} / ${goal.toLocaleString("fr-FR")}</span><span>${done?'✅ Réclamé':'🎁 +'+reward+' 🪙'}</span></div>
+        </div>`;
+      }).join('')}</div>
+    </div>`;
+  }
+
+  // Make the rare-guaranteed login reward affect the next normal booster.
+  const oldBuildPack=buildPack;
+  buildPack=async function(minRarity=null){
+    const s=loginState();
+    let forced=false;
+    if(minRarity==null&&s.pendingRare){minRarity=2;forced=true}
+    const res=await oldBuildPack(minRarity);
+    if(forced){
+      s.pendingRare=0;
+      saveLogin(s);
+      try{save()}catch(e){}
+    }
+    return res;
+  };
+
+  // Enrich profile with login + milestones.
+  const oldProfile=profilePage;
+  profilePage=function(){
+    oldProfile();
+    try{
+      claimLoginIfNeeded();
+      const wrap=document.createElement("div");
+      wrap.id="wcLoginMilestones";
+      wrap.innerHTML=loginHTML()+milestonesHTML();
+      main.appendChild(wrap);
+    }catch(e){}
+  };
+
+  // Also check milestone rewards after collection changes.
+  const oldCollection=collection;
+  collection=function(){
+    oldCollection();
+    try{
+      claimMilestones();
+      const holder=document.createElement("div");
+      holder.id="wcMilestonesCollection";
+      holder.innerHTML=milestonesHTML();
+      main.appendChild(holder);
+    }catch(e){}
+  };
+
+  // Claim today's login reward as soon as the game loads, while keeping the visual on Profile.
+  try{claimLoginIfNeeded()}catch(e){}
+
+})();
+</script>
+<style id="wc-login-milestones-css">
+.wc-login-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-top:12px}
+.wc-login-day{padding:9px 6px;border:1px solid #292331;border-radius:10px;background:#12101a;text-align:center;min-width:0}
+.wc-login-day.current{border-color:#7c5cff;box-shadow:0 0 0 1px rgba(124,92,255,.18)}
+.wc-login-day.done{opacity:.72}
+.wc-login-day.claimed{border-color:#4b8d69}
+.wc-login-num{font-size:10px;color:#8d8799;font-weight:900}.wc-login-icon{font-size:21px;margin:4px 0}
+.wc-login-day b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wc-login-day small{display:block;color:#8d8799;font-size:9px;line-height:1.25;margin-top:3px}
+.wc-milestones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
+.wc-milestone{padding:11px;border:1px solid #292331;border-radius:10px;background:#12101a}.wc-milestone.done{border-color:#4b8d69}
+.wc-milestone-top,.wc-milestone-bottom{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:11px}.wc-milestone-bottom{color:#8d8799;margin-top:6px;font-size:10px}
+.wc-milestone .dbar{margin:7px 0 0!important}
+@media(max-width:760px){.wc-login-days{grid-template-columns:repeat(4,minmax(0,1fr))}.wc-milestones{grid-template-columns:1fr}}
+</style>
+
+
+<script id="wc-wikipedia-diagnostic-v2">
+(()=>{if(window.__WCDiagV2)return;window.__WCDiagV2=true;
+window.wikiDiagnostics=async()=>{try{const j=await J("https://fr.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=general&format=json&origin=*");const ok=!!j?.query?.general?.sitename;console.log(ok?"✅ Wikipédia accessible":"❌ Wikipédia inaccessible",j);return ok}catch(e){console.error("❌ Wikipédia inaccessible",e);return false}};
 })();
 </script>
 </body></html>
