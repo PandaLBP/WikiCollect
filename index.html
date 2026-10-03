@@ -621,7 +621,8 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 })();
 </script>
 <style>
-.colTag,.tagFilter,.multiTagItem,.tagMgrBadge{transition:background .15s,border-color .15s,color .15s}.colTag{border:1px solid var(--tag-color,#a855f7);border-radius:999px;padding:3px 8px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:3px}.tagFilter{border:1px solid var(--tag-color,#a855f7)}.tagMgrRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tagMgrColor{width:42px;height:38px;padding:2px;border-radius:9px;border:1px solid #555;background:transparent}.tagMgrBadge{border:1px solid;border-radius:9px;padding:6px 9px}.multiTagItem{border:1px solid;border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:7px}.multiTagItem input{accent-color:var(--tag-color,#a855f7)}
+.colTag,.tagFilter,.multiTagItem,.tagMgrBadge{transition:background .15s,border-color .15s,color .15s}.colTag{border:1px solid var(--tag-color,#a855f7);border-radius:999px;padding:3px 8px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:3px}.tagFilter{border:1px solid var(--tag-color,#a855f7)}.tagMgrRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tagMgrColorWrap{display:flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid var(--line,#3a3048);border-radius:10px;background:rgba(255,255,255,.03);cursor:pointer}.tagMgrColorWrap span{font-size:16px}.tagMgrColorWrap input{width:34px;height:34px;padding:0;border:0;background:transparent;cursor:pointer}.tagMgrColorWrap input::-webkit-color-swatch-wrapper{padding:0}.tagMgrColorWrap input::-webkit-color-swatch{border:0;border-radius:7px}.tagMgrColorWrap input::-moz-color-swatch{border:0;border-radius:7px}
+.tagMgrColor{width:42px;height:38px;padding:2px;border-radius:9px;border:1px solid #555;background:transparent}.tagMgrBadge{border:1px solid;border-radius:9px;padding:6px 9px}.multiTagItem{border:1px solid;border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:7px}.multiTagItem input{accent-color:var(--tag-color,#a855f7)}
 </style>
 <script>
 // Raretés : [nom, couleur, poids de tirage par carte].
@@ -1025,7 +1026,7 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
  const url=c.src=="wiki"?"https://fr.wikipedia.org/wiki/"+encodeURIComponent(c.t.replace(/ /g,"_")):c.src=="film"?(c.url||null):(c.url||(CRE.find(x=>x.pid==c.pid)||{}).url);
  const link=url?`<a class="lnk" target="_blank" rel="noopener" href="${url}">${c.src=="wiki"?"Voir l'article sur Wikipédia":c.src=="film"?"Voir la fiche IMDb":"Voir la chaîne "+c.plat} →</a>`:"",own=col[c.id];
  const draw=()=>{
-  const det=`<p style="line-height:1.55;margin:0 0 6px">${desc}</p><label class="lab">ÉTIQUETTES</label><div class="tgs">${(own&&own.tags||[]).map(t=>`<span class="tg">${t}<i data-t="${t}">×</i></span>`).join("")}</div>${own?`<input id="tin" class="tin" placeholder="Ajouter une étiquette…">`:""}
+  const det=`<p style="line-height:1.55;margin:0 0 6px">${desc}</p><label class="lab">ÉTIQUETTES</label><div class="tgs">${(own&&own.tags||[]).map(t=>`<span class="tg">${t}<i data-t="${t}">×</i></span>`).join("")}</div>${own?`<div class="tagAddRow"><input id="tin" class="tin" placeholder="Ajouter une étiquette…" autocomplete="off" list="tagSuggestions"><button class="btn g" id="tinAdd" type="button">＋ Ajouter</button><datalist id="tagSuggestions">${colTags().map(t=>`<option value="${String(t).replace(/&/g,"&amp;").replace(/"/g,"&quot;")}"></option>`).join("")}</datalist></div>`:""}
    <div class="sb2"><div><b>🪙 ${fair(c)}</b><span>Valeur estimée</span></div><div><b>👁 ${c.v!=null?Math.round(c.v).toLocaleString("fr-FR"):"—"}</b><span>${c.src=="film"?"Votes IMDb":"Vues / mois"}</span></div></div>
    <div class="sub">Exemplaires : ${own?own.n:0}${c.src=="cr"?" · "+c.plat:""}</div><div style="margin-top:10px">${link}</div>${c.src=="wiki"?`<div class="sub" style="margin-top:8px">Texte de l'article : CC BY-SA 4.0 — crédits sur la page Wikipédia.</div>`:""}`;
   const hist=MK.H.filter(x=>x.r==c.r).slice(0,6),act=MK.A.filter(a=>!a.done&&a.c.pid==c.pid).length;
@@ -1035,7 +1036,10 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
   if($("wl"))$("wl").onclick=()=>{toggleW(c);if(tab==3&&!AV.d)paintMk(true);draw()};
   if($("au"))$("au").onclick=()=>openAuction(c.id);
   if($("ds"))$("ds").onclick=()=>{if(!confirm("Défausser « "+c.t+" » pour "+dsc(c)+" 🪙 ?"))return;const e=col[c.id];e.n>1?e.n--:delete col[c.id];gain(dsc(c));closeModal();render()};
-  const ti=$("tin");if(ti)ti.onkeydown=e=>{if(e.key=="Enter"&&ti.value.trim()){own.tags=[...(own.tags||[]),ti.value.trim().slice(0,20)];save();draw()}};
+  const ti=$("tin"),ta=$("tinAdd");
+  const addModalTag=()=>{if(!own||!ti)return;const t=cleanTag(ti.value);if(!t)return toast("Écris le nom de l’étiquette.");own.tags=own.tags||[];if(own.tags.includes(t)){ti.value="";return toast("Cette étiquette est déjà sur la carte.")};if(own.tags.length>=8)return toast("Maximum 8 étiquettes par carte.");own.tags.push(t);const names=[...colTags(),t];try{localStorage.setItem("wc_col_tags",JSON.stringify([...new Set(names.map(cleanTag).filter(Boolean))]))}catch(e){};save();toast(`🏷 « ${t} » ajoutée à « ${c.t} ».`);draw()};
+  if(ta)ta.onclick=addModalTag;
+  if(ti)ti.onkeydown=e=>{if(e.key=="Enter"){e.preventDefault();addModalTag()}};
   M.querySelectorAll(".tg i").forEach(i=>i.onclick=()=>{own.tags=own.tags.filter(x=>x!=i.dataset.t);save();draw()});
   const im=M.querySelector("img");if(im)im.onerror=()=>{im.src=ph(c.t)}};
  draw();
@@ -2356,13 +2360,25 @@ const selHas=v=>colSelected.has(selKey(v));
 const selAdd=v=>colSelected.add(selKey(v));
 const selDel=v=>colSelected.delete(selKey(v));
 const selClear=()=>colSelected.clear();
+const cleanTag=t=>(t||"").trim().replace(/\s+/g," ").slice(0,24);
+const colTagOrder=()=>{
+ try{const saved=JSON.parse(localStorage.getItem("wc_col_tag_order")||"[]");if(Array.isArray(saved))return saved.map(cleanTag).filter(Boolean)}catch(e){}
+ return [];
+};
+const saveColTagOrder=order=>{try{localStorage.setItem("wc_col_tag_order",JSON.stringify([...new Set(order.map(cleanTag).filter(Boolean))]))}catch(e){}};
+const orderedColTags=tags=>{
+ const clean=[...new Set(tags.map(cleanTag).filter(Boolean))],set=new Set(clean),order=colTagOrder().filter(t=>set.has(t));
+ const rest=clean.filter(t=>!order.includes(t)).sort((a,b)=>a.localeCompare(b,"fr"));
+ const out=[...order,...rest];
+ if(out.length!==colTagOrder().length || rest.length)saveColTagOrder(out);
+ return out;
+};
 const colTags=()=>{
  const s=new Set();
  try{const saved=JSON.parse(localStorage.getItem("wc_col_tags")||"[]");if(Array.isArray(saved))saved.forEach(t=>{t=cleanTag(t);if(t)s.add(t)})}catch(e){}
- Object.values(col).forEach(c=>(c.tags||[]).forEach(t=>s.add(t)));
- return [...s].sort((a,b)=>a.localeCompare(b,"fr"));
+ Object.values(col).forEach(c=>(c.tags||[]).forEach(t=>{t=cleanTag(t);if(t)s.add(t)}));
+ return orderedColTags([...s]);
 };
-const cleanTag=t=>(t||"").trim().replace(/\s+/g," ").slice(0,24);
 const TAG_COLORS=["#a855f7","#3b82f6","#22c55e","#f59e0b","#ef4444","#ec4899","#14b8a6","#8b5cf6","#06b6d4","#f97316"];
 const validTagColor=c=>/^#[0-9a-fA-F]{6}$/.test(c||"")?c:"#a855f7";
 const tagMeta=()=>{try{const x=JSON.parse(localStorage.getItem("wc_col_tag_meta")||"{}");return x&&typeof x==="object"?x:{}}catch(e){return {}}};
@@ -2429,24 +2445,45 @@ function collection(){
  main.querySelectorAll("[data-pick]").forEach(b=>b.onclick=e=>{e.stopPropagation();const id=selKey(b.dataset.pick);selHas(id)?selDel(id):selAdd(id);collection()});
  main.querySelectorAll("[data-tag-filter]").forEach(b=>b.onclick=()=>{colTagFilter=b.dataset.tagFilter||"";colPage=1;colSelected.clear();saveCollectionState();collection()});
  const tagTarget=()=>colSelected.size?[...colSelected]:visItems.map(c=>c.id);
- const persistTagNames=names=>{try{localStorage.setItem("wc_col_tags",JSON.stringify([...new Set(names.map(cleanTag).filter(Boolean))]))}catch(e){}};
- const addTag=()=>{const inp=$("newTag"),t=cleanTag(inp&&inp.value),ci=$("newTagColor"),tc=validTagColor(ci&&ci.value);if(!t)return;const target=tagTarget();if(!target.length)return toast("Aucune carte sélectionnée.");target.forEach(id=>{const c=col[id];if(c){c.tags=c.tags||[];if(!c.tags.includes(t))c.tags.push(t);c.tags=c.tags.slice(0,8)}});setTagColor(t,tc);persistTagNames([...colTags(),t]);save();toast(`🏷 Étiquette « ${t} » ajoutée à ${target.length} carte(s).`);collection()};
+ const persistTagNames=names=>{const clean=[...new Set(names.map(cleanTag).filter(Boolean))];try{localStorage.setItem("wc_col_tags",JSON.stringify(clean))}catch(e){};saveColTagOrder([...colTagOrder().filter(t=>clean.includes(t)),...clean.filter(t=>!colTagOrder().includes(t))])};
+ const addTag=()=>{const inp=$("newTag"),t=cleanTag(inp&&inp.value),ci=$("newTagColor"),tc=validTagColor(ci&&ci.value);if(!t)return;if(colTags().includes(t))return toast(`L’étiquette « ${t} » existe déjà.`);const target=tagTarget();setTagColor(t,tc);persistTagNames([...colTags(),t]);if(!target.length){save();if(inp)inp.value="";toast(`🏷 Étiquette « ${t} » créée. Sélectionne ensuite une carte pour l’appliquer.`);return}target.forEach(id=>{const c=col[id];if(c){c.tags=c.tags||[];if(!c.tags.includes(t)&&c.tags.length<8)c.tags.push(t)}});save();if(inp)inp.value="";toast(`🏷 Étiquette « ${t} » ajoutée à ${target.length} carte(s).`);collection()};
  main.querySelector("#addTag").onclick=addTag;main.querySelector("#newTag").onkeydown=e=>{if(e.key==="Enter")addTag()};
  main.querySelector("#manageTags").onclick=()=>{
   const cur=colTags();
-  const rows=cur.map((t,i)=>{const tc=tagColor(t,i);return `<div class="tagMgrRow"><span class="tagMgrBadge" style="color:${tc};background:${tc}22;border-color:${tc}">🏷</span><input class="tagMgrInput" data-old="${escAttr(t)}" value="${escAttr(t)}" maxlength="24"><input class="tagMgrColor" type="color" data-old="${escAttr(t)}" value="${tc}" title="Couleur de ${escAttr(t)}" aria-label="Couleur de ${escAttr(t)}"><button class="btn g" data-rename-tag="${i}">Enregistrer</button><button class="btn g danger" data-delete-tag="${i}">Supprimer</button></div>`}).join("");
+  const rows=cur.map((t,i)=>{const tc=tagColor(t,i);return `<div class="tagMgrRow" data-tag-index="${i}"><span class="tagMgrBadge" style="color:${tc};background:${tc}22;border-color:${tc}">🏷</span><input class="tagMgrInput" data-old="${escAttr(t)}" value="${escAttr(t)}" maxlength="24"><label class="tagMgrColorWrap" title="Modifier la couleur de ${escAttr(t)}"><span>🎨</span><input class="tagMgrColor" type="color" data-old="${escAttr(t)}" value="${tc}" aria-label="Modifier la couleur de ${escAttr(t)}"></label><div class="tagMgrOrder"><button class="btn g" type="button" data-move-tag="up" ${i===0?"disabled":""}>↑</button><button class="btn g" type="button" data-move-tag="down" ${i===cur.length-1?"disabled":""}>↓</button></div><button class="btn g" data-rename-tag="${i}">Enregistrer</button><button class="btn g danger" data-delete-tag="${i}">Supprimer</button></div>`}).join("");
   M.style.display="flex";
-  M.innerHTML=`<div class="mbox tagManager"><button class="btn g x" id="tagMgrClose">✕</button><h2>⚙️ Gérer les étiquettes</h2><div class="sub">Renomme ou supprime tes étiquettes. Le changement s’applique à toutes les cartes concernées.</div><div id="tagMgrList" class="tagMgrList">${rows||'<div class="sub">Aucune étiquette créée.</div>'}</div></div>`;
+  M.innerHTML=`<div class="mbox tagManager"><button class="btn g x" id="tagMgrClose">✕</button><h2>⚙️ Gérer les étiquettes</h2><div class="sub">Renomme, recolore, supprime et choisis l’ordre de tes étiquettes. Cet ordre sera utilisé dans les filtres et sur les cartes.</div><div id="tagMgrList" class="tagMgrList">${rows||'<div class="sub">Aucune étiquette créée.</div>'}</div></div>`;
   const close=()=>{M.style.display="none";M.innerHTML=""};
   $("tagMgrClose").onclick=close;
+  M.querySelectorAll("[data-move-tag]").forEach(b=>b.onclick=()=>{
+    const row=b.closest(".tagMgrRow"),idx=+row.dataset.tagIndex,dir=b.dataset.moveTag,next=dir==="up"?idx-1:idx+1;
+    if(next<0||next>=cur.length)return;
+    const order=[...cur],[tmp]=order.splice(idx,1);order.splice(next,0,tmp);saveColTagOrder(order);
+    toast(`↕ « ${tmp} » est maintenant ${next<idx?"plus haut":"plus bas"}.`);close();collection();
+  });
+  M.querySelectorAll(".tagMgrColor").forEach(ci=>ci.addEventListener("input",()=>{
+    const row=ci.closest(".tagMgrRow"),inp=row&&row.querySelector(".tagMgrInput"),old=inp&&inp.dataset.old,tc=validTagColor(ci.value);
+    if(!old)return;
+    setTagColor(old,tc);
+    const badge=row.querySelector(".tagMgrBadge");
+    if(badge){badge.style.color=tc;badge.style.background=tc+"22";badge.style.borderColor=tc}
+    save();
+  }));
+  M.querySelectorAll(".tagMgrColor").forEach(ci=>ci.addEventListener("change",()=>{
+    const row=ci.closest(".tagMgrRow"),inp=row&&row.querySelector(".tagMgrInput"),old=inp&&inp.dataset.old,tc=validTagColor(ci.value);
+    if(!old)return;
+    setTagColor(old,tc); save(); toast(`🎨 Couleur de « ${old} » enregistrée.`);
+  }));
   M.querySelectorAll("[data-rename-tag]").forEach(b=>b.onclick=()=>{
     const row=b.closest(".tagMgrRow"),inp=row.querySelector(".tagMgrInput"),ci=row.querySelector(".tagMgrColor"),old=inp.dataset.old,nu=cleanTag(inp.value),tc=validTagColor(ci&&ci.value);
     if(!nu)return toast("Le nom est vide.");
-    if(old===nu)return toast("Aucun changement.");
+    if(old===nu){setTagColor(old,tc);save();toast(`🎨 Couleur de « ${old} » mise à jour.`);close();collection();return}
     if(cur.includes(nu)&&nu!==old)return toast("Cette étiquette existe déjà.");
     Object.values(col).forEach(c=>{if(Array.isArray(c.tags))c.tags=c.tags.map(x=>x===old?nu:x)});
     const meta=tagMeta();delete meta[old];meta[nu]=tc;saveTagMeta(meta);
-    persistTagNames(colTags().map(x=>x===old?nu:x));save();toast(`🏷 « ${old} » renommée en « ${nu} ».`);close();collection();
+    persistTagNames(colTags().map(x=>x===old?nu:x));
+    const order=colTagOrder().map(x=>x===old?nu:x);saveColTagOrder(order);
+    save();toast(`🏷 « ${old} » renommée en « ${nu} ».`);close();collection();
   });
   M.querySelectorAll("[data-delete-tag]").forEach(b=>b.onclick=()=>{
     const t=cur[+b.dataset.deleteTag];
@@ -2454,6 +2491,7 @@ function collection(){
     Object.values(col).forEach(c=>{if(Array.isArray(c.tags))c.tags=c.tags.filter(x=>x!==t)});
     const meta=tagMeta();delete meta[t];saveTagMeta(meta);
     persistTagNames(colTags().filter(x=>x!==t));
+    saveColTagOrder(colTagOrder().filter(x=>x!==t));
     if(colTagFilter===t)colTagFilter="";
     saveCollectionState();save();toast(`🗑 Étiquette « ${t} » supprimée.`);close();collection();
   });
@@ -2786,7 +2824,7 @@ document.addEventListener("keydown",e=>{if(/INPUT|TEXTAREA|SELECT/.test((e.targe
 .colTools{background:linear-gradient(180deg,#17121f,#0f0c15);border:1px solid #352847;border-radius:16px;padding:14px;margin:14px 0 16px;box-shadow:0 12px 26px #0004}
 .colToolTop{display:flex;gap:10px;align-items:center}.colToolTop input{flex:1}.colToolTop select,.colTagCreate select,.colActions select{background:var(--sf2);border:1px solid #3a2f4d;color:var(--fg);border-radius:9px;padding:9px 11px;font:inherit}
 .colTagCreate{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #2b2238}
-.tagManager{max-width:900px;width:min(900px,94vw);max-height:82vh;overflow:auto}.tagMgrList,.multiTagList{display:grid;gap:8px;margin-top:16px}.tagMgrRow{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #2b2238;border-radius:10px;background:var(--sf2)}.tagMgrInput{flex:1;min-width:0;background:#0d0a12;border:1px solid #3a2f4d;color:var(--fg);border-radius:8px;padding:9px 10px;font:inherit}.tagMgrBadge{font-size:18px}.tagMgrRow .danger{border-color:#7f1d1d}.multiTagItem{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid #2b2238;border-radius:10px;background:var(--sf2);cursor:pointer}.multiTagItem input{width:18px;height:18px}@media(max-width:560px){.tagMgrRow{flex-wrap:wrap}.tagMgrInput{flex-basis:100%}.tagMgrRow button{flex:1}}.colTagCreate input{width:210px;flex:0 0 210px}.tagFilter{border:1px solid #3a2f4d;background:#0d0a12;color:#d9d1e2;border-radius:999px;padding:7px 10px;cursor:pointer;font-size:11px;font-weight:800}.tagFilter.on{border-color:#a855f7;background:#a855f733;color:#fff}
+.tagAddRow{display:flex;gap:8px;align-items:center;margin:8px 0 14px}.tagAddRow .tin{flex:1;min-width:0}.tagAddRow .btn{min-height:44px;white-space:nowrap}.tagAddRow datalist{display:none}.tagManager{max-width:900px;width:min(900px,94vw);max-height:82vh;overflow:auto}.tagMgrList,.multiTagList{display:grid;gap:8px;margin-top:16px}.tagMgrRow{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #2b2238;border-radius:10px;background:var(--sf2)}.tagMgrInput{flex:1;min-width:0;background:#0d0a12;border:1px solid #3a2f4d;color:var(--fg);border-radius:8px;padding:9px 10px;font:inherit}.tagMgrBadge{font-size:18px}.tagMgrRow .danger{border-color:#7f1d1d}.tagMgrOrder{display:flex;gap:4px}.tagMgrOrder .btn{min-width:38px;padding:8px 10px}.tagMgrOrder .btn:disabled{opacity:.35;cursor:not-allowed}.multiTagItem{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid #2b2238;border-radius:10px;background:var(--sf2);cursor:pointer}.multiTagItem input{width:18px;height:18px}@media(max-width:560px){.tagMgrRow{flex-wrap:wrap}.tagMgrInput{flex-basis:100%}.tagMgrRow button{flex:1}}.colTagCreate input{width:210px;flex:0 0 210px}.tagFilter{border:1px solid #3a2f4d;background:#0d0a12;color:#d9d1e2;border-radius:999px;padding:7px 10px;cursor:pointer;font-size:11px;font-weight:800}.tagFilter.on{border-color:#a855f7;background:#a855f733;color:#fff}
 .colActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}.colActions .btn,.colActions select{font-size:12px}.colHint{color:#81798e;font-size:11px;margin-top:9px}
 .colGrid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:18px!important}.colTile{position:relative;min-width:0;border-radius:16px;padding-top:4px}.colTile.selected .card{outline:2px solid #a855f7;outline-offset:3px;box-shadow:0 0 0 4px #a855f71c,0 16px 34px #0008}.colTile .card{width:100%}.colPick{position:absolute;top:7px;left:7px;z-index:20;width:30px;height:30px;border-radius:9px;border:1px solid #ffffff44;background:#0d0a12cc;color:#fff;font-size:17px;font-weight:950;cursor:pointer;display:grid;place-items:center;backdrop-filter:blur(5px);box-shadow:0 3px 10px #0007}.colPick:hover{border-color:#a855f7;background:#1c1430}.colPick.on{background:#a855f7;color:#fff;border-color:#d8b4fe}.colTags{display:flex;flex-wrap:wrap;gap:4px;margin:7px 2px 0;min-height:20px}.colTag{display:inline-flex;max-width:100%;align-items:center;background:#22182e;border:1px solid #463457;color:#d8b4fe;padding:3px 7px;border-radius:999px;font-size:9px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:1200px){.colGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}@media(max-width:850px){.colGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.colToolTop{flex-direction:column;align-items:stretch}.colTagCreate input{flex:1;width:auto}.colActions{align-items:stretch}}@media(max-width:560px){.colGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}.colActions>*{width:100%}.colHeadStat{width:100%}}
