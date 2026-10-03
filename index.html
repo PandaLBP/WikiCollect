@@ -2405,7 +2405,7 @@ function fusionHTML(A){
 /* ===== COLLECTION V55 : tags + sélection + suppression + 50 cartes/page ===== */
 const UNTAGGED_FILTER="__NO_TAG__";
 let colPage=1,colTagFilter="",colSearch="",colSort="rar",colSelected=new Set();
-const COL_PAGE_SIZE=50;let colView="binder",bkIdx=0,bkPer=9,bkAnim="";try{const u=JSON.parse(localStorage.getItem("wc_bk")||"null");if(u){bkPer=[4,9,12].includes(u.p)?u.p:9;bkIdx=u.i|0}}catch(e){}const saveBk=()=>{try{localStorage.setItem("wc_bk",JSON.stringify({v:"binder",p:bkPer,i:bkIdx}))}catch(e){};colView="binder"};
+const COL_PAGE_SIZE=50;let colView="binder",bkIdx=0,bkPer=9,bkAnim="";try{const u=JSON.parse(localStorage.getItem("wc_bk")||"null");if(u){bkPer=9;bkIdx=u.i|0}}catch(e){}const saveBk=()=>{try{localStorage.setItem("wc_bk",JSON.stringify({v:"binder",p:bkPer,i:bkIdx}))}catch(e){};colView="binder"};
 const selKey=v=>String(v);
 const selHas=v=>colSelected.has(selKey(v));
 const selAdd=v=>colSelected.add(selKey(v));
@@ -2413,6 +2413,7 @@ const selDel=v=>colSelected.delete(selKey(v));
 const selClear=()=>colSelected.clear();
 const colTags=()=>{
  const s=new Set();
+ try{const saved=JSON.parse(localStorage.getItem("wc_col_tags")||"[]");if(Array.isArray(saved))saved.forEach(t=>{t=cleanTag(t);if(t)s.add(t)})}catch(e){}
  Object.values(col).forEach(c=>(c.tags||[]).forEach(t=>s.add(t)));
  return [...s].sort((a,b)=>a.localeCompare(b,"fr"));
 };
@@ -2450,9 +2451,9 @@ function collection(){
  const bkPage=(p,side)=>p>=np?`<div class="bkPage ${side} blank"></div>`:`<div class="bkPage ${side}"><div class="bkHead"><span>${escAttr(blab)}</span><b>${p+1}</b></div><div class="bkGrid" style="--cols:${bcols}">${Array.from({length:per},(_,i)=>pocket(L[p*per+i])).join("")}</div></div>`;
  const banim=bkAnim;bkAnim="";
  const bookHTML=`<div class="bkWrap"><div class="bkCover ${single?"single":""}"><div class="bkSpread ${banim?"enter"+banim:""}">${bkPage(bkIdx,"left")}${single?"":`<div class="bkRings">${"<i></i>".repeat(6)}</div>`+bkPage(bkIdx+1,"right")}</div></div>
-  <div class="bkNav"><button class="btn g" id="bkPrev" ${bkIdx<=0?"disabled":""}>◀ Page précédente</button><span>${single||bkIdx+1>=np?"Page "+(bkIdx+1):"Pages "+(bkIdx+1)+"–"+Math.min(bkIdx+2,np)} / ${np} · ${L.length} cartes</span><button class="btn g" id="bkNext" ${bkIdx+step>=np?"disabled":""}>Page suivante ▶</button><select id="bkPer">${[4,9,12].map(v=>`<option value="${v}" ${per==v?"selected":""}>${v} pochettes par page</option>`).join("")}</select></div>${L.length?"":'<div class="msg">Aucune carte ne correspond à ta recherche ou à tes filtres.</div>'}</div>`;
+  <div class="bkNav"><button class="btn g" id="bkPrev" ${bkIdx<=0?"disabled":""}>◀ Page précédente</button><span>${single||bkIdx+1>=np?"Page "+(bkIdx+1):"Pages "+(bkIdx+1)+"–"+Math.min(bkIdx+2,np)} / ${np} · ${L.length} cartes</span><button class="btn g" id="bkNext" ${bkIdx+step>=np?"disabled":""}>Page suivante ▶</button><select id="bkPer">${[9].map(v=>`<option value="${v}" selected>${v} pochettes par page</option>`).join("")}</select></div>${L.length?"":'<div class="msg">Aucune carte ne correspond à ta recherche ou à tes filtres.</div>'}</div>`;
  const visItems=colView==="binder"?L.slice(bkIdx*per,(bkIdx+step)*per):pageItems,allVis2=visItems.length>0&&visItems.every(c=>selHas(c.id));
- main.innerHTML=`<div class="colHead"><div><h2>📚 Ma collection</h2><div class="sub">${A.length} cartes différentes · ${A.reduce((s,c)=>s+c.n,0)} au total · ${L.length} dans le filtre</div></div><div class="colHeadStat">📖 Vue classeur · Sélection : <b id="selCount">${colSelected.size}</b></div></div>
+ main.innerHTML=`<div class="colHead"><div><h2>📚 Ma collection</h2><div class="sub">${A.length} cartes différentes · ${A.reduce((s,c)=>s+c.n,0)} au total · ${L.length} dans le filtre</div></div><div class="colHeadStat">📖 Vue classeur</div></div>
   ${fusionHTML(A)}
   <div class="colTools">
    <div class="colToolTop"><input id="colSearch" placeholder="🔍 Rechercher dans ma collection…" value="${colSearch.replace(/"/g,"&quot;")}"><select id="colSort"><option value="rar" ${colSort==="rar"?"selected":""}>Plus rares d'abord</option><option value="az" ${colSort==="az"?"selected":""}>A → Z</option><option value="count" ${colSort==="count"?"selected":""}>Plus de doublons</option><option value="recent" ${colSort==="recent"?"selected":""}>Plus récentes</option></select></div>
@@ -2477,7 +2478,15 @@ function collection(){
  main.querySelector("#clearSel").onclick=()=>{selClear();collection()};
  main.querySelectorAll("[data-pick]").forEach(b=>b.onclick=e=>{e.stopPropagation();const id=selKey(b.dataset.pick);selHas(id)?selDel(id):selAdd(id);collection()});
  main.querySelectorAll("[data-tag-filter]").forEach(b=>b.onclick=()=>{colTagFilter=b.dataset.tagFilter||"";colPage=1;colSelected.clear();saveCollectionState();collection()});
- const addTag=()=>{const inp=$("newTag"),t=cleanTag(inp&&inp.value);if(!t)return;const target=colSelected.size?[...colSelected]:visItems.map(c=>c.id);if(!target.length)return toast("Aucune carte sélectionnée.");target.forEach(id=>{const c=col[id];if(c){c.tags=c.tags||[];if(!c.tags.includes(t))c.tags.push(t);c.tags=c.tags.slice(0,8)}});save();toast(`🏷 Étiquette « ${t} » ajoutée à ${target.length} carte(s).`);collection()};
+ const addTag=()=>{const inp=$("newTag"),t=cleanTag(inp&&inp.value);if(!t)return;
+  let savedTags=[];try{savedTags=JSON.parse(localStorage.getItem("wc_col_tags")||"[]")}catch(e){}
+  if(!Array.isArray(savedTags))savedTags=[];
+  if(!savedTags.some(x=>cleanTag(x)===t))savedTags.push(t);
+  savedTags=[...new Set(savedTags.map(cleanTag).filter(Boolean))].slice(0,100);
+  try{localStorage.setItem("wc_col_tags",JSON.stringify(savedTags))}catch(e){}
+  const target=colSelected.size?[...colSelected]:visItems.map(c=>c.id);
+  let applied=0;target.forEach(id=>{const c=col[id];if(c){c.tags=c.tags||[];if(!c.tags.includes(t)){c.tags.push(t);c.tags=c.tags.slice(0,8);applied++}}});
+  save();inp.value="";toast(applied?`🏷 Étiquette « ${t} » créée et ajoutée à ${applied} carte(s).`:`🏷 Étiquette « ${t} » créée.`);collection()};
  main.querySelector("#addTag").onclick=addTag;main.querySelector("#newTag").onkeydown=e=>{if(e.key==="Enter")addTag()};
  const at=$("applyTag");if(at)at.onchange=e=>{const t=cleanTag(e.target.value);if(!t||!colSelected.size)return;let tagged=0;[...colSelected].forEach(id=>{const c=col[id];if(c){c.tags=c.tags||[];if(!c.tags.includes(t)){c.tags.push(t);c.tags=c.tags.slice(0,8);tagged++}}});if(tagged)wcCount("tag",tagged);save();toast(`🏷 Étiquette « ${t} » ajoutée à la sélection.`);collection()};
  main.querySelector("#delSelected").onclick=()=>{const ids=[...colSelected].map(selKey).filter(id=>Object.prototype.hasOwnProperty.call(col,id));if(!ids.length){toast("Aucune carte sélectionnée.");return;}ids.forEach(id=>{delete col[id];delete store[id]});selClear();save();colPage=1;toast(`🗑 ${ids.length} carte(s) supprimée(s).`);collection()};
