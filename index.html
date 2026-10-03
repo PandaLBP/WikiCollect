@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WikiCollect · V100</title>
+<title>WikiCollect</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <style>
 :root{--bg:#0d0b12;--sf:#17131f;--sf2:#241d31;--fg:#f1eef7;--mut:#9d94b0;--ac:#a855f7;color-scheme:dark}
 *{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}html,body{height:100%;margin:0}
@@ -693,7 +695,7 @@ const VIPT=[],VIPR={},ADULT=new Set();
  for(const t of [7,6,5,4,3,2,1,0]){const L=gs.map(g=>[g,(CATALOG[g]["t"+t]||"").split("|").filter(Boolean)]);
   for(let j=0;L.some(x=>j<x[1].length);j++)L.forEach(([g,a])=>{const x=a[j];if(!x)return;const k=nz2(x);if(!k||seen.has(k))return;seen.add(k);VIPR[k]=OVRN[k]??t;VIPT.push({t:x,r:VIPR[k],g,o:1e6-(n++)});if(g==="adult")ADULT.add(k)})}})();
 /* Ancrages de catégorie : ils garantissent qu'une catégorie ne se retrouve pas bloquée dans une seule rareté. */
-Object.entries(TIER_ANCHORS).forEach(([g,tiers])=>Object.entries(tiers).forEach(([rr,names])=>String(names).split("|").forEach(x=>{const k=nz2(x);if(!k)return;VIPR[k]=OVRN[k]??+rr;if(!VIPT.some(v=>nz2(v.t)===k))VIPT.push({t:x,r:OVRN[k]??+rr,g,o:900000-(VIPT.length)});}));
+Object.entries(TIER_ANCHORS).forEach(([g,tiers])=>Object.entries(tiers).forEach(([rr,names])=>String(names).split("|").forEach(x=>{const k=nz2(x);if(!k)return;VIPR[k]=OVRN[k]??+rr;if(!VIPT.some(v=>nz2(v.t)===k))VIPT.push({t:x,r:OVRN[k]??+rr,g,o:900000-(VIPT.length)});})));
 function withVip(L){const idx=new Map();L.forEach(e=>{if(e.t)idx.set(nz2(e.t),e);if(e.cr&&!e.g)e.g="creator";if(e.src==="film"&&!e.g)e.g="film"});
  VIPT.forEach(v=>{const e=idx.get(nz2(v.t));if(e){if(!e.cr&&e.src!=="film"){e.r=v.r;e.g=v.g;e.o=v.o}}else{const x={t:v.t,r:v.r,v:0,src:"wiki",g:v.g,o:v.o};L.push(x);idx.set(nz2(v.t),x)}});
  return L}
