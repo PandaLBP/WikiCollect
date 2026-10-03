@@ -3153,6 +3153,236 @@ main{padding:14px 16px 26px!important}
  #ah .bar .btn{flex:0 0 auto}
 }
 </style>
+
+<script>
+/* ===== WIKICOLLECT CATALOG V3 — catalogue persistant et reprenable =====
+   Ajouté automatiquement dans la version fichier.
+   - IndexedDB : ne remplit PAS localStorage.
+   - Ne modifie jamais wc_col / wc_money.
+   - Les cartes sans image sont ignorées.
+   - Les cartes enrichies sont injectées dans store pour Card Case / Upgrade.
+*/
+(()=>{
+  if(window.__WCV3Installed)return;
+  window.__WCV3Installed=true;
+
+  const DBN="WikiCollectCatalogV3", DBV=1, STORE="cards", META="meta";
+  const API="https://fr.wikipedia.org/w/api.php?format=json&origin=*";
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const norm=s=>String(s||"").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  const safeTitle=s=>String(s||"").replace(/_/g," ").trim();
+  const RAR=[
+    ["Commun",50.735],["Peu commune",27.988],["Rare",12.439],["Holo",6.219],
+    ["Ultra rare",1.555],["Full art",.777],["Légendaire",.207],["Légendaire holo full art",.080]
+  ];
+  const OV={};
+  [
+    ["Pelé",7],["Cristiano Ronaldo",7],["Lionel Messi",7],["Karim Benzema",7],
+    ["Kylian Mbappé",7],["Michael Jackson",7],["Paris",7],["Tokyo",7],
+    ["New York",7],["Londres",7],["Los Angeles",7],["Albert Einstein",7],
+    ["Stephen Hawking",7],["Rayan Cherki",6]
+  ].forEach(([t,r])=>OV[norm(t)]=r);
+
+  const SEEDS=[
+    "Catégorie:Footballeur","Catégorie:Footballeuse","Catégorie:Entraîneur de football",
+    "Catégorie:Joueur de basket-ball","Catégorie:Joueur de tennis","Catégorie:Pilote automobile",
+    "Catégorie:Boxeur","Catégorie:Acteur français","Catégorie:Actrice française",
+    "Catégorie:Acteur américain","Catégorie:Actrice américaine","Catégorie:Chanteur français",
+    "Catégorie:Chanteuse française","Catégorie:Chanteur américain","Catégorie:Groupe musical",
+    "Catégorie:K-pop","Catégorie:Film français","Catégorie:Film américain","Catégorie:Série télévisée française",
+    "Catégorie:Série télévisée américaine","Catégorie:Anime","Catégorie:Jeu vidéo",
+    "Catégorie:Animal","Catégorie:Insecte","Catégorie:Plante","Catégorie:Fleur",
+    "Catégorie:Champignon","Catégorie:Dinosaure","Catégorie:Astronomie","Catégorie:Physicien",
+    "Catégorie:Scientifique","Catégorie:Entreprise","Catégorie:Marque automobile",
+    "Catégorie:Automobile","Catégorie:Train","Catégorie:Avion","Catégorie:Monument historique",
+    "Catégorie:Architecture","Catégorie:Ville","Catégorie:Capitale","Catégorie:Écrivain français",
+    "Catégorie:Personnalité historique","Catégorie:Chef d'État","Catégorie:Artiste"
+  ];
+
+  let dbPromise=null;
+  const db=()=>dbPromise||(dbPromise=new Promise((resolve,reject)=>{
+    const q=indexedDB.open(DBN,DBV);
+    q.onupgradeneeded=()=>{
+      const d=q.result;
+      if(!d.objectStoreNames.contains(STORE)){
+        const st=d.createObjectStore(STORE,{keyPath:"k"});
+        st.createIndex("title","title",{unique:false});
+        st.createIndex("r","r",{unique:false});
+      }
+      if(!d.objectStoreNames.contains(META))d.createObjectStore(META,{keyPath:"k"});
+    };
+    q.onsuccess=()=>resolve(q.result);
+    q.onerror=()=>reject(q.error);
+  }));
+
+  const tx=(store,mode,fn)=>db().then(d=>new Promise((resolve,reject)=>{
+    const t=d.transaction(store,mode),s=t.objectStore(store);
+    let out;try{out=fn(s)}catch(e){reject(e);return}
+    t.oncomplete=()=>resolve(out);
+    t.onerror=()=>reject(t.error);
+  }));
+  const get=k=>tx(STORE,"readonly",s=>new Promise((res,rej)=>{
+    const q=s.get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>rej(q.error)
+  }));
+  const putMany=rows=>rows.length?tx(STORE,"readwrite",s=>{rows.forEach(x=>s.put(x))}):Promise.resolve();
+  const getMeta=k=>tx(META,"readonly",s=>new Promise((res,rej)=>{
+    const q=s.get(k);q.onsuccess=()=>res(q.result?.v);q.onerror=()=>rej(q.error)
+  }));
+  const setMeta=(k,v)=>tx(META,"readwrite",s=>s.put({k,v}));
+  const count=()=>tx(STORE,"readonly",s=>new Promise((res,rej)=>{
+    const q=s.count();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)
+  }));
+  const allCards=()=>tx(STORE,"readonly",s=>new Promise((res,rej)=>{
+    const a=[],q=s.openCursor();q.onsuccess=()=>{const c=q.result;if(!c)return res(a);a.push(c.value);c.continue()};q.onerror=()=>rej(q.error)
+  }));
+
+  const api=async params=>{
+    const u=API+"&"+new URLSearchParams(params);
+    for(let n=0;n<3;n++){
+      try{const r=await fetch(u);if(!r.ok)throw Error("HTTP "+r.status);return await r.json()}catch(e){if(n===2)throw e;await sleep(800*(n+1))}
+    }
+  };
+
+  const rarity=(title,pv,cats)=>{
+    const o=OV[norm(title)];if(o!=null)return o;
+    const v=Number(pv)||0;
+    let r=v>=2000000?6:v>=1000000?5:v>=500000?5:v>=200000?4:v>=100000?3:v>=25000?2:v>=5000?1:0;
+    const c=(cats||[]).join(" ").toLowerCase();
+    let b=0;
+    if(/foot|basket|tennis|sport|pilote|boxe|football/.test(c))b++;
+    if(/acteur|actrice|chanteur|chanteuse|musique|film|serie|anime|k-pop/.test(c))b++;
+    if(/histor|chef d.?etat|monarque|guerre|empereur/.test(c))b++;
+    if(/science|physicien|math|astronomie/.test(c))b++;
+    if(/ville|capitale|monument|architecture/.test(c))b++;
+    return Math.min(6,r+Math.min(2,b));
+  };
+
+  const hydrate=async()=>{
+    try{
+      const arr=await allCards();
+      if(!Array.isArray(arr))return;
+      let n=0;
+      for(const c of arr){
+        if(!c||!c.img)continue;
+        try{
+          if(window.store&&c.id&&!store[c.id]){store[c.id]={
+            id:c.id,t:c.title,r:c.r,v:c.v||0,img:c.img,src:"wiki",
+            desc:c.desc||"",url:c.url||("https://fr.wikipedia.org/wiki/"+encodeURIComponent(c.title.replace(/ /g,"_")))
+          };n++}
+        }catch{}
+      }
+      window.__wcV3Hydrated=n;
+    }catch(e){console.warn("WCV3 hydrate",e)}
+  };
+
+  const fetchCategory=async(seed)=>{
+    const base=seed.replace(/^Catégorie:/,"");
+    const found=[];
+    let cmcontinue="";
+    for(let page=0;page<4;page++){
+      const j=await api({
+        action:"query",list:"categorymembers",cmtitle:"Catégorie:"+base,
+        cmtype:"page|subcat",cmlimit:"500",...(cmcontinue?{cmcontinue}:{})
+      });
+      for(const x of Object.values(j.query?.categorymembers||{})){
+        if(x.ns===0)found.push(x.title);
+      }
+      if(!j.continue?.cmcontinue)break;
+      cmcontinue=j.continue.cmcontinue;
+      await sleep(100);
+    }
+    return [...new Set(found)];
+  };
+
+  const fetchPages=titles=>{
+    if(!titles.length)return Promise.resolve([]);
+    return api({
+      action:"query",prop:"pageimages|description|info",
+      inprop:"url",piprop:"thumbnail",pithumbsize:"500",
+      pilicense:"free",titles:titles.join("|"),formatversion:"2"
+    }).then(j=>(j.query?.pages||[]).filter(p=>p.thumbnail?.source).map(p=>p));
+  };
+
+  const ingest=async(pages,cat)=>{
+    const rows=[];
+    for(const p of pages){
+      const title=safeTitle(p.title),k=norm(title);
+      if(!k||/^(liste|portail|homonymie|catégorie|modèle|annexe|fichier|aide|projet):/i.test(title))continue;
+      const id="wiki-v3-"+String(p.pageid);
+      const old=await get(k);
+      if(old?.img)continue;
+      const r=rarity(title,0,[cat]);
+      rows.push({
+        k,title,id,r,v:0,img:p.thumbnail.source,
+        desc:p.description||"",url:p.fullurl||("https://fr.wikipedia.org/wiki/"+encodeURIComponent(title.replace(/ /g,"_"))),
+        src:"wiki",cats:[cat],updatedAt:Date.now()
+      });
+    }
+    if(rows.length){await putMany(rows);await hydrate()}
+    return rows.length;
+  };
+
+  let running=false;
+  const run=async()=>{
+    if(running)return;
+    running=true;
+    try{
+      await db();
+      let state=await getMeta("state")||{seed:0,done:0,found:0,added:0};
+      const beforeCol=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem("wc_col")||"{}")).length}catch{return -1}})();
+      const beforeMoney=localStorage.getItem("wc_money");
+      console.log("🎴 WikiCollect V3 — catalogue persistant");
+      console.log("🛡️ Collection protégée :",beforeCol," | WikiCo protégé :",beforeMoney);
+
+      for(;state.seed<SEEDS.length;state.seed++){
+        const seed=SEEDS[state.seed];
+        console.log(`📚 [${state.seed+1}/${SEEDS.length}] ${seed}`);
+        let titles=[];
+        try{titles=await fetchCategory(seed)}catch(e){console.warn("Catégorie ignorée",seed,e)}
+        state.found+=titles.length;
+        for(let i=0;i<titles.length;i+=50){
+          const batch=titles.slice(i,i+50);
+          try{
+            const pages=await fetchPages(batch);
+            state.added+=await ingest(pages,seed.replace(/^Catégorie:/,""));
+          }catch(e){console.warn("Batch ignoré",e)}
+          await setMeta("state",state);
+          await sleep(250);
+        }
+        state.done++;
+        await setMeta("state",state);
+        console.log(`   → trouvées ${titles.length} · catalogue ${await count()}`);
+      }
+
+      await hydrate();
+      const afterCol=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem("wc_col")||"{}")).length}catch{return -1}})();
+      const afterMoney=localStorage.getItem("wc_money");
+      console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      console.log("✅ CATALOGUE V3 TERMINÉ / REPRENABLE");
+      console.log("🎴 Cartes catalogue :",await count());
+      console.log("➕ Nouvelles cartes :",state.added);
+      console.log("🖼️ Règle : aucune carte sans image");
+      console.log("🛡️ Collection :",beforeCol,"→",afterCol);
+      console.log("🛡️ WikiCo :",beforeMoney,"→",afterMoney);
+      console.log("🔄 Tu peux recharger : la progression reste dans IndexedDB.");
+    }catch(e){console.error("❌ WCV3",e)}
+    running=false;
+  };
+
+  window.wcCatalogV3={
+    start:run,
+    count,
+    cards:allCards,
+    hydrate,
+    resetProgress:async()=>{await setMeta("state",{seed:0,done:0,found:0,added:0});console.log("Progression remise à zéro (catalogue conservé).")},
+    progress:async()=>console.table(await getMeta("state")||{})
+  };
+
+  // Hydratation immédiate, puis lancement différé du catalogue.
+  db().then(hydrate).catch(()=>{});
+  setTimeout(()=>run(),1800);
+})();
+</script>
 </body></html>
 
 <style>.lst .grid{gap:18px}.reveal .card{width:138px}.mcard .card{box-shadow:0 18px 34px rgba(0,0,0,.38)}</style>
