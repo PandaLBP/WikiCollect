@@ -3165,75 +3165,197 @@ main{padding:14px 16px 26px!important}
 </style>
 
 <script>
-/* ===== WIKICOLLECT CATALOG V4 — catalogue massif, récursif et persistant =====
-   - Explore les catégories ET leurs sous-catégories.
-   - Récupère les pages avec image réelle uniquement.
-   - Reprend automatiquement dans IndexedDB.
-   - Ne touche jamais à wc_col ni wc_money.
-   - Le catalogue vise 3 000 000 de cartes; le nombre réellement atteignable dépend
-     des sources disponibles avec image. Wikipédia FR compte ~2,78 M articles actuellement,
-     donc le moteur peut compléter avec des sources Wikipédia supplémentaires plus tard.
+/* ===== WIKICOLLECT CATALOG V4.1 — massif, persistant, image-only =====
+   Le moteur est séparé de wc_col / wc_money et reprend exactement où il s'est arrêté.
+   Il ne promet pas artificiellement 3 M : il collecte réellement les cartes trouvées avec image.
 */
 (()=>{
-  if(window.__WCV4Installed)return;
-  window.__WCV4Installed=true;
-  const DBN='WikiCollectCatalogV4',DBV=1,STORE='cards',META='meta';
+  if(window.__WCV41Installed)return; window.__WCV41Installed=true;
+  const DBN='WikiCollectCatalogV41',DBV=3,STORE='cards',META='meta';
   const API='https://fr.wikipedia.org/w/api.php?format=json&origin=*';
-  const TARGET=3000000, BATCH=50, WAIT=180, MAX_CAT_DEPTH=8;
+  const TARGET=3000000,BATCH=100,WAIT=90,MAX_CAT_DEPTH=8;
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const norm=s=>String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const title=s=>String(s||'').replace(/_/g,' ').trim();
   const bad=/^(liste|portail|homonymie|catégorie|modèle|annexe|fichier|aide|projet|chronologie|bibliographie|discographie|filmographie|sitographie|webographie|navigation):/i;
-  const R=[['Commun',50.735],['Peu commune',27.988],['Rare',12.439],['Holo',6.219],['Ultra rare',1.555],['Full art',.777],['Légendaire',.207],['Légendaire holo full art',.080]];
   const OV={};
   [['Pelé',7],['Cristiano Ronaldo',7],['Lionel Messi',7],['Karim Benzema',7],['Kylian Mbappé',7],['Michael Jackson',7],['Paris',7],['Tokyo',7],['New York',7],['Londres',7],['Los Angeles',7],['Albert Einstein',7],['Stephen Hawking',7],['Rayan Cherki',6]].forEach(([x,r])=>OV[norm(x)]=r);
   const SEEDS=[
-    'Footballeur','Footballeuse','Joueur de football','Joueuse de football','Entraîneur de football','Arbitre de football',
-    'Joueur de basket-ball','Joueuse de basket-ball','Joueur de tennis','Joueuse de tennis','Pilote automobile','Pilote de Formule 1','Boxeur','Boxeuse','Arts martiaux mixtes',
-    'Acteur français','Actrice française','Acteur américain','Actrice américaine','Acteur britannique','Actrice britannique','Acteur canadien','Actrice canadienne','Acteur allemand','Actrice allemande','Acteur japonais','Actrice japonaise',
-    'Acteur de films pornographiques','Actrice de films pornographiques','Acteur de films pornographiques français','Actrice de films pornographiques française','Acteur de films pornographiques américain','Actrice de films pornographiques américaine','Film pornographique','Film pornographique français','Film pornographique américain','Réalisateur de films pornographiques',
-    'Chanteur français','Chanteuse française','Chanteur américain','Chanteuse américaine','Chanteur britannique','Chanteuse britannique','Groupe musical','K-pop','Groupe de K-pop','Idole sud-coréenne','Chanteur sud-coréen','Chanteuse sud-coréenne',
-    'YouTubeur','Youtubeuse','Streamer','Streameuse','Personnalité d Internet','Personnalité du web',
-    'Film français','Film américain','Film britannique','Film japonais','Film sud-coréen','Série télévisée française','Série télévisée américaine','Série télévisée britannique','Série télévisée japonaise','Série télévisée sud-coréenne','Anime','Manga','Jeu vidéo','Personnage de jeu vidéo',
-    'Animal','Insecte','Araignée','Poisson','Oiseau','Reptile','Mammifère','Dinosaure','Plante','Fleur','Arbre','Champignon','Bactérie','Virus','Espèce animale','Espèce végétale',
-    'Astronomie','Étoile','Galaxie','Planète','Exoplanète','Objet céleste','Physicien','Mathématicien','Scientifique','Chimiste','Biologiste','Médecin','Ingénieur',
-    'Écrivain français','Écrivain américain','Écrivain britannique','Poète','Artiste','Peintre','Sculpteur','Photographe','Personnalité historique','Chef d État','Monarque','Empereur','Impératrice','Roi','Reine',
-    'Ville','Capitale','Pays','Commune de France','Monument historique','Architecture','Château','Cathédrale','Église','Musée','Pont','Stade','Aéroport','Gare',
-    'Entreprise','Marque automobile','Automobile','Moto','Train','Avion','Hélicoptère','Bateau','Navire','Technologie','Informatique','Logiciel','Smartphone',
-    'Cuisine française','Plat','Fromage','Dessert','Boisson','Livre','Album musical','Chanson','Compétition sportive','Trophée sportif','Événement historique','Guerre','Catastrophe naturelle','Événement culturel'
+   'Footballeur','Footballeuse','Joueur de football','Joueuse de football','Entraîneur de football','Arbitre de football','Joueur de basket-ball','Joueuse de basket-ball','Joueur de tennis','Joueuse de tennis','Pilote automobile','Pilote de Formule 1','Boxeur','Boxeuse','Arts martiaux mixtes',
+   'Acteur français','Actrice française','Acteur américain','Actrice américaine','Acteur britannique','Actrice britannique','Acteur canadien','Actrice canadienne','Acteur allemand','Actrice allemande','Acteur japonais','Actrice japonaise','Acteur italien','Actrice italienne','Acteur espagnol','Actrice espagnole','Acteur sud-coréen','Actrice sud-coréenne',
+   'Acteur de films pornographiques','Actrice de films pornographiques','Acteur de films pornographiques français','Actrice de films pornographiques française','Acteur de films pornographiques américain','Actrice de films pornographiques américaine','Film pornographique','Film pornographique français','Film pornographique américain','Réalisateur de films pornographiques',
+   'Chanteur français','Chanteuse française','Chanteur américain','Chanteuse américaine','Chanteur britannique','Chanteuse britannique','Groupe musical','K-pop','Groupe de K-pop','Idole sud-coréenne','Chanteur sud-coréen','Chanteuse sud-coréenne','Musicien','Musicienne',
+   'YouTubeur','Youtubeuse','Streamer','Streameuse','Personnalité d Internet','Personnalité du web','Créateur de contenu',
+   'Film français','Film américain','Film britannique','Film japonais','Film sud-coréen','Série télévisée française','Série télévisée américaine','Série télévisée britannique','Série télévisée japonaise','Série télévisée sud-coréenne','Anime','Manga','Jeu vidéo','Personnage de jeu vidéo',
+   'Animal','Insecte','Araignée','Poisson','Oiseau','Reptile','Mammifère','Dinosaure','Plante','Fleur','Arbre','Champignon','Bactérie','Virus','Espèce animale','Espèce végétale',
+   'Astronomie','Étoile','Galaxie','Planète','Exoplanète','Objet céleste','Physicien','Mathématicien','Scientifique','Chimiste','Biologiste','Médecin','Ingénieur',
+   'Écrivain français','Écrivain américain','Écrivain britannique','Poète','Artiste','Peintre','Sculpteur','Photographe','Personnalité historique','Chef d État','Monarque','Empereur','Impératrice','Roi','Reine',
+   'Ville','Capitale','Pays','Commune de France','Monument historique','Architecture','Château','Cathédrale','Église','Musée','Pont','Stade','Aéroport','Gare',
+   'Entreprise','Marque automobile','Automobile','Moto','Train','Avion','Hélicoptère','Bateau','Navire','Technologie','Informatique','Logiciel','Smartphone',
+   'Cuisine française','Plat','Fromage','Dessert','Boisson','Livre','Album musical','Chanson','Compétition sportive','Trophée sportif','Événement historique','Guerre','Catastrophe naturelle','Événement culturel'
   ];
-  const seeds=[...new Set(SEEDS)];
-  let dbp=null;
+  const seeds=[...new Set(SEEDS)]; let dbp=null;
   const db=()=>dbp||(dbp=new Promise((resolve,reject)=>{const q=indexedDB.open(DBN,DBV);q.onupgradeneeded=()=>{const d=q.result;if(!d.objectStoreNames.contains(STORE)){const st=d.createObjectStore(STORE,{keyPath:'k'});st.createIndex('title','title',{unique:false});st.createIndex('r','r',{unique:false})}if(!d.objectStoreNames.contains(META))d.createObjectStore(META,{keyPath:'k'})};q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)}));
-  const tx=(sn,mode,fn)=>db().then(d=>new Promise((res,rej)=>{const t=d.transaction(sn,mode),s=t.objectStore(sn);let o;try{o=fn(s)}catch(e){rej(e);return}t.oncomplete=()=>res(o);t.onerror=()=>rej(t.error)}));
+  const tx=(sn,mode,fn)=>db().then(d=>new Promise((res,rej)=>{const t=d.transaction(sn,mode),st=t.objectStore(sn);let o;try{o=fn(st)}catch(e){rej(e);return}t.oncomplete=()=>res(o);t.onerror=()=>rej(t.error)}));
   const get=k=>tx(STORE,'readonly',s=>new Promise((r,j)=>{const q=s.get(k);q.onsuccess=()=>r(q.result||null);q.onerror=()=>j(q.error)}));
   const putMany=a=>a.length?tx(STORE,'readwrite',s=>a.forEach(x=>s.put(x))):Promise.resolve();
   const metaGet=k=>tx(META,'readonly',s=>new Promise((r,j)=>{const q=s.get(k);q.onsuccess=()=>r(q.result?.v);q.onerror=()=>j(q.error)}));
   const metaSet=(k,v)=>tx(META,'readwrite',s=>s.put({k,v}));
   const count=()=>tx(STORE,'readonly',s=>new Promise((r,j)=>{const q=s.count();q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)}));
-  const allCards=()=>tx(STORE,'readonly',s=>new Promise((r,j)=>{const a=[],q=s.openCursor();q.onsuccess=()=>{const c=q.result;if(!c)return r(a);a.push(c.value);c.continue()};q.onerror=()=>j(q.error)}));
-  async function api(params){const u=API+'&'+new URLSearchParams(params);for(let n=0;n<4;n++){try{const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}catch(e){if(n===3)throw e;await sleep(700*(n+1))}}}
-  const rarity=(t,pv,cats)=>{const o=OV[norm(t)];if(o!=null)return o;const v=Number(pv)||0;let r=v>=2000000?6:v>=1000000?5:v>=500000?5:v>=200000?4:v>=100000?3:v>=25000?2:v>=5000?1:0;const c=(cats||[]).join(' ').toLowerCase();if(/foot|basket|tennis|sport|pilote|boxe|athlet/.test(c))r++;if(/acteur|actrice|chanteur|chanteuse|musique|film|serie|anime|k-pop|youtube|streamer/.test(c))r++;if(/histor|chef d.?etat|monarque|roi|reine|guerre/.test(c))r++;if(/science|physicien|math|astronomie|medecin|biolog/.test(c))r++;return Math.min(6,r)};
-  const labelSeed=s=>String(s).replace(/^Catégorie:/i,'');
-  async function categoryMembers(cat,cmcontinue){return api({action:'query',list:'categorymembers',cmtitle:'Catégorie:'+labelSeed(cat),cmtype:'page|subcat',cmnamespace:'0|14',cmlimit:'500',...(cmcontinue?{cmcontinue}:{})})}
-  async function pageInfo(titles){if(!titles.length)return[];const j=await api({action:'query',prop:'pageimages|description|info',inprop:'url',piprop:'thumbnail',pithumbsize:'500',pilicense:'free',titles:titles.join('|'),formatversion:'2'});return (j.query?.pages||[])}
-  async function ingest(pages,cats){const rows=[];for(const p of pages){const t=title(p.title),k=norm(t);if(!p.thumbnail?.source||!k||bad.test(t)||p.missing)continue;const old=await get(k);if(old?.img)continue;rows.push({k,title:t,id:'wiki-v4-'+String(p.pageid),r:rarity(t,0,cats),v:0,img:p.thumbnail.source,desc:p.description||'',url:p.fullurl||('https://fr.wikipedia.org/wiki/'+encodeURIComponent(t.replace(/ /g,'_'))),src:'wiki',cats:[...new Set(cats)],updatedAt:Date.now()})}if(rows.length){await putMany(rows);await hydrate()}return rows.length}
-  const hydrate=async()=>{try{const arr=await allCards();let n=0;for(const c of arr){if(!c?.img)continue;try{if(window.store&&c.id&&!store[c.id]){store[c.id]={id:c.id,t:c.title,r:c.r,v:c.v||0,img:c.img,src:'wiki',desc:c.desc||'',url:c.url||('https://fr.wikipedia.org/wiki/'+encodeURIComponent(c.title.replace(/ /g,'_')))};n++}}catch{}}window.__wcV4Hydrated=n}catch(e){console.warn('WCV4 hydrate',e)}};
+  const sample=async(limit=600)=>tx(STORE,'readonly',s=>new Promise((res,rej)=>{
+    const out=[],seen=new Set(); let r=7;
+    const next=()=>{
+      if(out.length>=limit||r<0){res(out);return;}
+      const q=s.index('r').openCursor(IDBKeyRange.only(r),'next');
+      q.onsuccess=e=>{
+        const c=e.target.result;
+        if(!c){r--;next();return;}
+        if(c.value?.img&&!seen.has(c.value.k)){
+          seen.add(c.value.k);
+          out.push({id:'v4-'+c.value.k,pid:'v4-'+c.value.k,t:c.value.title,r:c.value.r,v:c.value.v||0,img:c.value.img,src:'wiki',d:c.value.desc||'',url:c.value.url,cats:c.value.cats||[]});
+        }
+        if(out.length>=limit){res(out);return;}
+        c.continue();
+      };
+      q.onerror=()=>rej(q.error);
+    };
+    next();
+  }));
+  async function api(params){const u=API+'&'+new URLSearchParams(params);for(let n=0;n<4;n++){try{const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}catch(e){if(n===3)throw e;await sleep(500*(n+1))}}}
+  /*
+   * Rareté V4.2 : notoriété réelle avant catégorie.
+   * Les vues sont mesurées sur 30 jours. La portée internationale et
+   * la couverture encyclopédique servent seulement de départage.
+   */
+  const rarity=(t,pv,cats=[],meta={})=>{
+    const forced=OV[norm(t)];
+    if(forced!=null)return forced;
+    const views=Math.max(0,Number(pv)||0);
+    const langs=Math.max(0,Number(meta.langs)||0);
+    const length=Math.max(0,Number(meta.length)||0);
+    let r =
+      views>=3000000 ? 6 :
+      views>=1500000 ? 5 :
+      views>=500000  ? 4 :
+      views>=150000  ? 3 :
+      views>=30000   ? 2 :
+      views>=5000    ? 1 : 0;
+    if(langs>=80 && r>=2) r++;
+    else if(langs>=30 && r>=2) r++;
+    if(length>=120000 && r>=3) r++;
+    return Math.min(6,r);
+  };
+  async function pageInfo(titles){if(!titles.length)return[];const j=await api({action:'query',prop:'pageimages|description|info|pageviews|langlinks',inprop:'url',piprop:'thumbnail',pithumbsize:'500',pilicense:'free',pvipdays:'30',lllimit:'100',titles:titles.join('|'),formatversion:'2'});return j.query?.pages||[]}
+  async function ingest(pages,cats,{refresh=false}={}){
+    const rows=[];
+    for(const p of pages){
+      const t=title(p.title),k=norm(t);
+      if(!p.thumbnail?.source||!k||bad.test(t)||p.missing)continue;
+      const old=await get(k);
+      if(old?.img&&!refresh)continue;
+      const pv=p.pageviews?Object.values(p.pageviews).reduce((a,b)=>a+(Number(b)||0),0):0;
+      const langs=Array.isArray(p.langlinks)?p.langlinks.length:0;
+      const length=Number(p.length)||0;
+      const r=rarity(t,pv,cats,{langs,length});
+      rows.push({
+        ...(old||{}),k,title:t,id:old?.id||'wiki-v41-'+String(p.pageid),
+        r,v:pv,img:p.thumbnail.source,desc:p.description||old?.desc||'',
+        url:p.fullurl||old?.url||('https://fr.wikipedia.org/wiki/'+encodeURIComponent(t.replace(/ /g,'_'))),
+        src:'wiki',cats:[...new Set([...(old?.cats||[]),...cats])],
+        langs,length,pop:Math.round(Math.min(100,
+          Math.log10(1+pv)/7*75 +
+          Math.min(langs,100)/100*15 +
+          Math.min(length,120000)/120000*10
+        )),updatedAt:Date.now()
+      });
+    }
+    if(rows.length)await putMany(rows);
+    return rows;
+  }
+  async function refreshExisting(limit=200){
+    const keys=[];
+    await tx(STORE,'readonly',st=>new Promise((resolve,reject)=>{
+      const cur=st.openCursor();
+      cur.onsuccess=e=>{
+        const c=e.target.result;
+        if(!c||keys.length>=limit){resolve();return;}
+        if(c.value?.img&&c.value?.url)keys.push(c.value.title);
+        c.continue();
+      };
+      cur.onerror=()=>reject(cur.error);
+    }));
+    for(let i=0;i<keys.length;i+=50){
+      try{await ingest(await pageInfo(keys.slice(i,i+50)),['refresh'],{refresh:true})}
+      catch(e){console.warn('refresh batch',e)}
+      await sleep(250);
+    }
+    return keys.length;
+  }
   let running=false;
   async function crawlCategory(root,state){
-    const q=state.catQueue||[];const seen=state.catSeen||{};const pageSeen=state.pageSeen||{};
-    if(!q.length)q.push({cat:root,depth:0});
-    while(q.length && (await count())<TARGET){const item=q.shift(),key=norm(item.cat);if(seen[key]||item.depth>MAX_CAT_DEPTH)continue;seen[key]=1;let cont='';let pages=[];do{const j=await categoryMembers(item.cat,cont);for(const x of Object.values(j.query?.categorymembers||{})){if(x.ns===14){const ck=norm(x.title.replace(/^Catégorie:/i,''));if(!seen[ck]&&item.depth<MAX_CAT_DEPTH)q.push({cat:x.title.replace(/^Catégorie:/i,''),depth:item.depth+1})}else if(x.ns===0){const pk=norm(x.title);if(!pageSeen[pk]){pageSeen[pk]=1;pages.push(x.title)}}}cont=j.continue?.cmcontinue||'';if(cont)await sleep(50)}while(cont&&pages.length<2500&&Object.keys(pageSeen).length<TARGET*2);for(let i=0;i<pages.length&&await count()<TARGET;i+=BATCH){try{const added=await ingest(await pageInfo(pages.slice(i,i+BATCH)),[labelSeed(root),item.cat]);state.added=(state.added||0)+added}catch(e){console.warn('batch',e)}state.processed=(state.processed||0)+Math.min(BATCH,pages.length-i);await metaSet('state',state);await sleep(WAIT)}state.catQueue=q;state.catSeen=seen;state.pageSeen=pageSeen;await metaSet('state',state);console.log('📚',root,'→ catalogue',await count(),'· files/catégories restantes',q.length)}
-    state.catQueue=q;state.catSeen=seen;state.pageSeen=pageSeen;await metaSet('state',state);
+    state.catQueue=state.catQueue||[];state.doneCats=state.doneCats||{};
+    if(!state.catQueue.length)state.catQueue=[{cat:root,depth:0,cont:''}];
+    while(state.catQueue.length&&(await count())<TARGET){const item=state.catQueue.shift(),ck=norm(item.cat);if(item.depth>MAX_CAT_DEPTH)continue;if(state.doneCats[ck]&&!item.cont)continue;
+      const j=await api({action:'query',list:'categorymembers',cmtitle:'Catégorie:'+item.cat,cmtype:'page|subcat',cmnamespace:'0|14',cmlimit:'500',...(item.cont?{cmcontinue:item.cont}:{})});
+      const pages=[],subs=[];for(const x of Object.values(j.query?.categorymembers||{})){if(x.ns===14){subs.push({cat:x.title.replace(/^Catégorie:/i,''),depth:item.depth+1,cont:''})}else if(x.ns===0)pages.push(x.title)}
+      for(const sub of subs){const sk=norm(sub.cat);if(!state.doneCats[sk]&&sub.depth<=MAX_CAT_DEPTH&&!state.catQueue.some(x=>norm(x.cat)===sk&&!x.cont))state.catQueue.push(sub)}
+      for(let i=0;i<pages.length&&await count()<TARGET;i+=BATCH){try{const rows=await ingest(await pageInfo(pages.slice(i,i+BATCH)),[root,item.cat]);state.added=(state.added||0)+rows.length}catch(e){console.warn('batch',e)}state.processed=(state.processed||0)+Math.min(BATCH,pages.length-i);await metaSet('state',state);await sleep(WAIT)}
+      const next=j.continue?.cmcontinue||'';if(next)state.catQueue.push({cat:item.cat,depth:item.depth,cont:next});else state.doneCats[ck]=1;await metaSet('state',state);
+      console.log('📚',root,'→',await count(),'cartes · file',state.catQueue.length);
+    }
   }
-  async function run(){if(running)return;running=true;try{await db();let st=await metaGet('state')||{seed:0,added:0,processed:0,catQueue:[],catSeen:{},pageSeen:{},globalCursor:''};const bc=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('wc_col')||'{}')).length}catch{return -1}})();const bm=localStorage.getItem('wc_money');console.log('🎴 WikiCollect V4 — objectif',TARGET.toLocaleString('fr-FR'));console.log('🛡️ Collection',bc,'· WikiCo',bm);
-      for(;st.seed<seeds.length&&(await count())<TARGET;st.seed++){const root=seeds[st.seed];console.log(`🚀 [${st.seed+1}/${seeds.length}] ${root}`);try{await crawlCategory(root,st)}catch(e){console.warn('Catégorie ignorée/reprise possible',root,e)}st.catQueue=[];st.catSeen={};st.pageSeen={};await metaSet('state',st)}
-      /* Filet de sécurité : après les catégories, parcourt les articles FR par ordre alphabétique et ne garde que ceux avec image. */
-      while((await count())<TARGET){let cont=st.globalCursor||'';let progressed=false;const j=await api({action:'query',list:'allpages',apnamespace:'0',aplimit:'500',...(cont?{apcontinue:cont}:{})});const titles=(j.query?.allpages||[]).map(x=>x.title);if(!titles.length)break;for(let i=0;i<titles.length&&await count()<TARGET;i+=BATCH){try{const n=await ingest(await pageInfo(titles.slice(i,i+BATCH)),['Catalogue Wikipédia FR']);st.added=(st.added||0)+n;progressed=true}catch(e){console.warn('allpages batch',e)}await metaSet('state',st);await sleep(WAIT)}if(!j.continue?.apcontinue)break;st.globalCursor=j.continue.apcontinue;await metaSet('state',st);if(!progressed)await sleep(500)}
-      await hydrate();const ac=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('wc_col')||'{}')).length}catch{return -1}})();const am=localStorage.getItem('wc_money');console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');console.log('✅ WCV4 CATALOGUE');console.log('🎴 Cartes avec image :',(await count()).toLocaleString('fr-FR'),' / ',TARGET.toLocaleString('fr-FR'));console.log('➕ ajoutées cette version :',(st.added||0).toLocaleString('fr-FR'));console.log('🖼️ aucune carte sans image');console.log('🛡️ Collection :',bc,'→',ac,' | WikiCo :',bm,'→',am);console.log('🔄 progression sauvegardée dans IndexedDB');
-    }catch(e){console.error('❌ WCV4',e)}running=false}
-  window.wcCatalogV4={start:run,count, cards:allCards,hydrate,progress:async()=>console.table(await metaGet('state')||{}),resetProgress:async()=>{await metaSet('state',{seed:0,added:0,processed:0,catQueue:[],catSeen:{},pageSeen:{},globalCursor:''});console.log('Progression remise à zéro — catalogue conservé.')}};
-  db().then(hydrate).catch(()=>{});setTimeout(run,1500);
+  async function run(){if(running)return;running=true;try{await db();let st=await metaGet('state')||{seed:0,added:0,processed:0,catQueue:[],doneCats:{},globalCursor:''};
+    const beforeCol=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('wc_col')||'{}')).length}catch{return -1}})(),beforeMoney=localStorage.getItem('wc_money');
+    console.log('🎴 WikiCollect V4.2 — objectif',TARGET.toLocaleString('fr-FR'),'· collection protégée',beforeCol,'· WikiCo',beforeMoney);
+    try{const refreshed=await refreshExisting(200);console.log('🔄 Rareté/notoriété réévaluées :',refreshed,'cartes')}catch(e){console.warn('refresh rarity',e)}
+    for(;st.seed<seeds.length&&(await count())<TARGET;st.seed++){const root=seeds[st.seed];console.log(`🚀 [${st.seed+1}/${seeds.length}] ${root}`);try{await crawlCategory(root,st)}catch(e){console.warn('Catégorie ignorée/reprise',root,e)}st.catQueue=[];st.doneCats={};await metaSet('state',st)}
+    while((await count())<TARGET){const j=await api({action:'query',list:'allpages',apnamespace:'0',aplimit:'500',...(st.globalCursor?{apcontinue:st.globalCursor}:{})});const titles=(j.query?.allpages||[]).map(x=>x.title);if(!titles.length)break;for(let i=0;i<titles.length&&await count()<TARGET;i+=BATCH){try{const rows=await ingest(await pageInfo(titles.slice(i,i+BATCH)),['Catalogue Wikipédia FR']);st.added=(st.added||0)+rows.length}catch(e){console.warn('allpages',e)}await metaSet('state',st);await sleep(WAIT)}st.globalCursor=j.continue?.apcontinue||'';await metaSet('state',st);if(!st.globalCursor)break}
+    const afterCol=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('wc_col')||'{}')).length}catch{return -1}})();const afterMoney=localStorage.getItem('wc_money');console.log('━━━━━━━━━━━━━━━━━━━━');console.log('✅ Catalogue V4.1 :',(await count()).toLocaleString('fr-FR'),'cartes avec image');console.log('➕ nouvelles cartes :',(st.added||0).toLocaleString('fr-FR'));console.log('🛡️ Collection',beforeCol,'→',afterCol,'· WikiCo',beforeMoney,'→',afterMoney);console.log('💾 Progression persistante dans IndexedDB');
+  }catch(e){console.error('❌ WCV4.1',e)}running=false}
+  async function queryPage(opts={}){
+    const page=Math.max(1,opts.page|0),size=Math.min(50,Math.max(1,opts.size||50)),term=norm(opts.q||''),rs=Array.isArray(opts.rarities)?opts.rarities.map(Number):[],az=opts.sort==='az',skip=(page-1)*size;
+    const make=c=>({id:'v4-'+c.k,pid:'v4-'+c.k,t:c.title,r:c.r,v:c.v||0,pop:c.pop||0,langs:c.langs||0,length:c.length||0,img:c.img,src:'wiki',d:c.desc||'',url:c.url});
+    return tx(STORE,'readonly',s=>new Promise((resolve,reject)=>{
+      const out=[];let matched=0;
+      const accept=c=>!!c?.img&&(!rs.length||rs.includes(c.r))&&(!term||norm(c.title).includes(term));
+      if(az){
+        const cur=s.index('title').openCursor(null,'next');
+        cur.onsuccess=e=>{const c=e.target.result;if(!c){resolve({rows:out,matched});return;}if(accept(c.value)){if(matched>=skip&&out.length<size)out.push(make(c.value));matched++;}if(out.length>=size){resolve({rows:out,matched});return;}c.continue()};
+        cur.onerror=()=>reject(cur.error);return;
+      }
+      const ranks=rs.length?rs:[7,6,5,4,3,2,1,0];let ri=0;
+      const openRank=()=>{
+        if(ri>=ranks.length){resolve({rows:out,matched});return;}
+        const cur=s.index('r').openCursor(IDBKeyRange.only(ranks[ri]),'prev');
+        cur.onsuccess=e=>{const c=e.target.result;if(!c){ri++;openRank();return;}if(accept(c.value)){if(matched>=skip&&out.length<size)out.push(make(c.value));matched++;}if(out.length>=size){resolve({rows:out,matched});return;}c.continue()};
+        cur.onerror=()=>reject(cur.error);
+      };
+      openRank();
+    }));
+  }
+
+  window.wcCatalogV41={start:run,count,progress:async()=>console.table(await metaGet('state')||{}),sample,queryPage,resetProgress:async()=>{await metaSet('state',{seed:0,added:0,processed:0,catQueue:[],doneCats:{},globalCursor:''});console.log('Progression remise à zéro — catalogue conservé.')}};
+  db().catch(()=>{});setTimeout(run,1200);
+})();
+</script>
+<script id="wc-v41-integration">
+/* ===== V4.1 : branche le gros catalogue sur Toutes les cartes + cases + boosters ===== */
+(()=>{
+ if(window.__WCV41Integration)return;window.__WCV41Integration=true;
+ const wait=fn=>setTimeout(fn,1800);
+ const catalogPage=async()=>{
+  /* V4.1 reste actif pour les boosters/cases, tandis que Toutes les cartes
+     réutilise le moteur de pagination Wikipédia complet d'origine. */
+  if(window.__wcOldAll) return window.__wcOldAll();
+ };
+ const oldAll=all;window.__wcOldAll=oldAll;all=catalogPage;
+ const oldLoad=loadCasePool;
+ loadCasePool=async function(need){let pool=await oldLoad(need);try{if(window.wcCatalogV41){const extra=await window.wcCatalogV41.sample(700);const seen=new Set(pool.map(c=>c.id));extra.forEach(c=>{if(c.img&&(!need||c.r>=need)&&!seen.has(c.id)){seen.add(c.id);pool.push(c);store[c.id]=c}})}}catch(e){}return pool};
+ const oldBuild=buildPack;
+ buildPack=async function(minRarity=null){try{const extra=window.wcCatalogV41?await window.wcCatalogV41.sample(900):[];if(extra.length){const old=window.__wcV41ExtraPool||[];const seen=new Set(old.map(c=>c.id));extra.forEach(c=>{if(!seen.has(c.id)){seen.add(c.id);old.push(c);store[c.id]=c}});window.__wcV41ExtraPool=old}}catch(e){}return oldBuild(minRarity)};
+ const oldChoose=typeof chooseCaseCard==='function'?chooseCaseCard:null;
+ wait(()=>{try{if(typeof render==='function'&&typeof tab!=='undefined'&&tab===1)all()}catch(e){}});
+ console.log('🔌 WikiCollect V4.1 connecté : Toutes les cartes / Card Case / boosters utilisent le nouveau catalogue quand disponible.');
 })();
 </script>
 </body></html>
