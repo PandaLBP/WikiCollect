@@ -1,0 +1,12 @@
+<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WikiMaster → WikiCollect</title>
+<style>body{font-family:system-ui;background:#0d0b12;color:#f1eef7;max-width:800px;margin:40px auto;padding:20px}a,button{background:#a855f7;color:white;border:0;border-radius:10px;padding:12px 16px;font-weight:800;cursor:pointer}code{background:#17131f;padding:3px 6px;border-radius:5px}pre{white-space:pre-wrap;background:#17131f;padding:16px;border-radius:12px;color:#ddd}</style>
+<h1>WikiMaster → WikiCollect</h1>
+<p>Le navigateur interdit à WikiCollect de lire directement le stockage d'un autre domaine. Cet outil te permet de lancer un export <b>depuis la page WikiMaster elle-même</b>.</p>
+<h2>Méthode rapide</h2>
+<ol><li>Ouvre WikiMaster et connecte-toi à ta collection.</li><li>Ouvre les outils développeur (F12) puis l'onglet Console.</li><li>Colle le script ci-dessous et valide.</li><li>Un fichier <code>WikiMaster_localStorage.json</code> sera téléchargé.</li><li>Dans WikiCollect → Profil → Sauvegarde & transfert, importe ce fichier.</li></ol>
+<button id="copy">Copier le script</button>
+<pre id="script"></pre>
+<script>
+const code=`(()=>{const o={exportedAt:new Date().toISOString(),origin:location.origin,localStorage:{},sessionStorage:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);o.localStorage[k]=localStorage.getItem(k)}for(let i=0;i<sessionStorage.length;i++){const k=sessionStorage.key(i);o.sessionStorage[k]=sessionStorage.getItem(k)}const b=new Blob([JSON.stringify(o)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='WikiMaster_localStorage.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);alert('Export terminé : WikiMaster_localStorage.json');})()`;
+document.getElementById('script').textContent=code;document.getElementById('copy').onclick=async()=>{await navigator.clipboard.writeText(code);document.getElementById('copy').textContent='Copié !'};
+</script></html>
