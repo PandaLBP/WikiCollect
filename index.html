@@ -581,298 +581,10 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 @media(max-width:900px){.bkCover{padding:16px}.bkPage{padding:12px}.bkGrid{gap:8px}}
 </style>
 </head><body>
-<nav><h1>Wiki<span>Collect</span></h1><button id="t7">👤 Profil</button><button id="t0" class="on">🎁 Boosters</button><button id="t1">🌍 Toutes les cartes</button><button id="t2">📚 Collection</button><button id="t3">🔨 Enchères</button><button id="t4">🎰 Casino</button><button id="t5">🎯 Missions du jour</button><button id="t6">🔥 Événement du jour</button><button id="t8">🏆 Succès</button><button id="hw">❓ Comment ça marche</button><div class="wc-nav-sound"><button id="soundToggle" title="Activer / couper les sons">🔊 Sons</button><input id="volSlider" type="range" min="0" max="100" step="5" title="Volume des sons"></div><div id="mn" class="mny"></div><div class="sp"></div></nav>
+<nav><h1>Wiki<span>Collect</span></h1><button id="t0" class="on">🎁 Boosters</button><button id="t1">🌍 Toutes les cartes</button><button id="t2">📚 Collection</button><button id="t3">🔨 Enchères</button><button id="t4">🎰 Casino</button>
+<button id="t5">🎯 Missions du jour</button><button id="t6">🔥 Événement du jour</button><button id="t7">👤 Profil</button><button id="t8">🏆 Succès</button><button id="hw">❓ Comment ça marche</button><button id="soundToggle" title="Activer / couper les sons">🔊 Sons</button><input id="volSlider" type="range" min="0" max="100" step="5" title="Volume des sons"><div id="mn" class="mny"></div><div class="sp"></div></nav>
 <main id="main"></main>
 <div class="modal" id="modal"></div>
-<script>window.WIKICOLLECT_CONFIG={supabaseUrl:"https://ewtjbciugjudovzswadt.supabase.co",supabaseAnonKey:"sb_publishable_NqArZXyx0z3hSI6tbuHB-A_Xay6Ay9j"};</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style id="wc-ui-v110">
-nav{position:relative}
-.wc-nav-sound{display:flex;align-items:center;gap:8px;margin:2px 0}.wc-nav-sound #soundToggle{flex:0 0 auto}.wc-nav-sound #volSlider{flex:1 1 auto;width:auto;margin:0;min-width:0}
-#mn{position:fixed!important;top:14px;right:18px;z-index:10000;background:rgba(23,19,31,.94);border:1px solid #3a2f4d;border-radius:12px;padding:9px 14px!important;box-shadow:0 8px 25px #0007;backdrop-filter:blur(10px);color:#ffd23c!important;font-size:14px}
-@media(max-width:900px){#mn{top:10px;right:10px;font-size:12px;padding:7px 10px!important}.wc-nav-sound{gap:6px}.wc-nav-sound #volSlider{width:80px}}
-</style>
-<style id="wc-vhost">
-#wcCloudBox{margin-top:16px;max-width:1000px}.wc-cloud-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.wc-cloud-row input{min-width:220px}.wc-status{font-size:12px;color:var(--mut)}.wc-status.ok{color:#78f0b0}.wc-status.warn{color:#ffd27a}.wc-import{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.wc-import input[type=file]{display:none}.wc-filebtn{display:inline-flex;align-items:center;justify-content:center}.wc-wish-btn{margin-top:10px;width:100%}.wc-wish-btn.on{background:#5a337f}.wc-watch{display:inline-flex;align-items:center;gap:6px;background:#241d31;border:1px solid #3a2f4d;color:var(--fg);border-radius:10px;padding:7px 10px;font-weight:800;cursor:pointer}.wc-watch.on{border-color:#a855f7;background:#a855f733}.wc-alert{border:1px solid #6d45a3;background:#241632;border-radius:14px;padding:12px 14px;margin:12px 0;box-shadow:0 8px 24px #0005}.wc-empty{padding:35px;text-align:center;color:var(--mut)}.wc-importbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.wc-progress{height:8px;background:#241d31;border-radius:99px;overflow:hidden;margin-top:10px}.wc-progress i{display:block;height:100%;background:#a855f7;width:0;transition:width .15s}
-@media(max-width:650px){.wc-cloud-row input{min-width:0;flex:1 1 100%}.wc-cloud-row .btn{flex:1 1 auto}}
-</style>
-<script id="wc-vhost-js">
-/* ===== WikiCollect V108 : hébergement + compte cloud + wishlist + import WikiMaster =====
-   GitHub Pages reste le frontend statique. Supabase fournit l'identité et la sauvegarde
-   cross-device. Sans configuration Supabase, le site conserve le mode localStorage.
-*/
-const WC_SUPABASE_URL=(window.WIKICOLLECT_CONFIG||{}).supabaseUrl||"__SUPABASE_URL__";
-const WC_SUPABASE_ANON_KEY=(window.WIKICOLLECT_CONFIG||{}).supabaseAnonKey||"__SUPABASE_ANON_KEY__";
-let WC_SB=null,WC_USER=null,WC_CLOUD_TIMER=null,WC_CLOUD_BUSY=false,WC_CLOUD_READY=false;
-let WC_WISHLIST={}; // id -> {id,t,r,src,pid}
-const WC_WISH_KEY="wc_wishlist_v1";
-
-function wcLoadWishlist(){
- try{WC_WISHLIST=JSON.parse(localStorage.getItem(WC_WISH_KEY)||"{}")||{}}catch(e){WC_WISHLIST={}}
-}
-function wcSaveWishlist(){
- try{localStorage.setItem(WC_WISH_KEY,JSON.stringify(WC_WISHLIST))}catch(e){}
- wcCloudSchedule();
-}
-wcLoadWishlist();
-
-function wcCloudConfigured(){
- return typeof window.supabase!=="undefined" && /^https:\/\/.+\.supabase\.co$/.test(WC_SUPABASE_URL) &&
-        WC_SUPABASE_ANON_KEY && !WC_SUPABASE_ANON_KEY.startsWith("__");
-}
-function wcCloudInit(){
- if(!wcCloudConfigured())return false;
- if(!WC_SB)WC_SB=window.supabase.createClient(WC_SUPABASE_URL,WC_SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
- return true;
-}
-async function wcCloudMergeLoad(){
- if(!WC_SB||!WC_USER)return;
- try{
-  const {data,error}=await WC_SB.from("wc_user_data").select("snapshot").eq("user_id",WC_USER.id).maybeSingle();
-  if(error)throw error;
-  if(!data||!data.snapshot)return;
-  const remote=data.snapshot||{};
-  const localCol=col||{},remoteCol=remote.col||{};
-  const merged={...remoteCol};
-  Object.keys(localCol).forEach(id=>{
-    const a=localCol[id],b=merged[id];
-    if(!b)merged[id]=a;
-    else merged[id]={...b,...a,n:Math.max(+b.n||0,+a.n||0),tags:Array.from(new Set([...(b.tags||[]),...(a.tags||[])])).slice(0,8)};
-  });
-  col=merged;
-  if(remote.money!=null)money=Math.max(+money||0,+remote.money||0);
-  if(remote.stock!=null)stock=Math.max(+stock||0,+remote.stock||0);
-  if(remote.t0!=null)t0=Math.max(+t0||0,+remote.t0||0);
-  WC_WISHLIST={...(remote.wishlist||{}),...WC_WISHLIST};
-  wcSaveWishlist();
-  save();
-  collection();
-  upM();
- }catch(e){console.warn("WikiCollect cloud load",e)}
-}
-async function wcCloudUpload(){
- if(!WC_SB||!WC_USER||WC_CLOUD_BUSY)return;
- WC_CLOUD_BUSY=true;
- try{
-  const snapshot={v:1,savedAt:Date.now(),col,money,stock,t0,wishlist:WC_WISHLIST};
-  const {error}=await WC_SB.from("wc_user_data").upsert({user_id:WC_USER.id,snapshot,updated_at:new Date().toISOString()},{onConflict:"user_id"});
-  if(error)throw error;
-  WC_CLOUD_READY=true;
-  wcCloudStatus("☁️ Sauvegarde cloud synchronisée","ok");
- }catch(e){console.warn("WikiCollect cloud save",e);wcCloudStatus("⚠️ Sauvegarde locale active — cloud indisponible","warn")}
- finally{WC_CLOUD_BUSY=false}
-}
-function wcCloudSchedule(){
- if(!WC_USER)return;
- clearTimeout(WC_CLOUD_TIMER);WC_CLOUD_TIMER=setTimeout(wcCloudUpload,1200);
-}
-function wcCloudStatus(msg,kind=""){
- const e=document.getElementById("wcCloudStatus");if(e){e.textContent=msg;e.className="wc-status "+kind}
-}
-async function wcCloudLogin(email){
- if(!wcCloudInit())return alert("Le cloud n'est pas encore configuré. Ajoute les clés Supabase dans config.js.");
- const {error}=await WC_SB.auth.signInWithOtp({email,options:{emailRedirectTo:location.href}});
- if(error)return alert(error.message);
- wcCloudStatus("📨 Lien de connexion envoyé à "+email+"…","ok");
-}
-async function wcCloudLogout(){if(WC_SB)await WC_SB.auth.signOut();WC_USER=null;wcCloudStatus("Mode local — non connecté","warn");profilePage()}
-async function wcCloudBoot(){
- if(!wcCloudInit()){wcCloudStatus("💾 Mode local — cloud non configuré","warn");return}
- const {data}=await WC_SB.auth.getSession();WC_USER=data&&data.session&&data.session.user||null;
- if(WC_USER){wcCloudStatus("☁️ Connecté · "+(WC_USER.email||"compte"),"ok");await wcCloudMergeLoad()}
- WC_SB.auth.onAuthStateChange((_event,session)=>{
-   WC_USER=session&&session.user||null;
-   wcCloudStatus(WC_USER?"☁️ Compte connecté":"💾 Mode local",WC_USER?"ok":"warn");
-   if(WC_USER)wcCloudMergeLoad();
- });
-}
-wcCloudBoot();
-
-function wcAddWishlist(c){
- if(!c)return;
- WC_WISHLIST[c.id]={id:c.id,t:c.t,r:c.r,src:c.src,pid:c.pid||c.id,img:c.img||"",addedAt:Date.now()};
- wcSaveWishlist();toast("⭐ "+c.t+" ajouté à ta liste de souhaits.");wcCheckWishlistListings(true);
-}
-function wcRemoveWishlist(id){
- delete WC_WISHLIST[id];wcSaveWishlist();toast("☆ Carte retirée de ta liste de souhaits.");
-}
-function wcIsWish(id){return !!WC_WISHLIST[id]}
-function wcWishButton(c){
- return `<button class="btn g wc-wish-btn ${wcIsWish(c.id)?"on":""}" id="wcWishBtn" data-wish-id="${esc(c.id)}">${wcIsWish(c.id)?"⭐ Suivie · retirer de la liste":"☆ Suivre cette carte"}</button>`;
-}
-function wcDecorateModal(id){
- const c=store[id];if(!c)return;const box=document.querySelector("#modal .minfo");if(!box||box.querySelector("#wcWishBtn"))return;
- const d=document.createElement("div");d.innerHTML=wcWishButton(c);box.appendChild(d.firstElementChild);
-}
-(function(){
- const _openModal=window.openModal;
- if(typeof _openModal==="function"){
-  window.openModal=async function(id){const r=await _openModal.apply(this,arguments);setTimeout(()=>wcDecorateModal(id),0);return r}
- }
-})();
-document.addEventListener("click",e=>{
- const b=e.target.closest&&e.target.closest("#wcWishBtn");if(b){
-  const id=b.dataset.wishId,c=store[id]||WC_WISHLIST[id];
-  wcIsWish(id)?wcRemoveWishlist(id):wcAddWishlist(c);
-  setTimeout(()=>{const x=document.getElementById("wcWishBtn");if(x)x.outerHTML=wcWishButton(c)},0);
- }
-});
-
-function wcCheckWishlistListings(forceToast=false){
- const active=(typeof MK!=="undefined"&&MK.A)||[];
- const now=Date.now();
- let found=0;
- active.forEach(a=>{
-  const c=a&&a.c;if(!c||!wcIsWish(c.id))return;
-  const key="wc_alert_"+a.id;
-  if(localStorage.getItem(key))return;
-  found++;
-  localStorage.setItem(key,String(now));
-  if(forceToast||document.visibilityState==="visible"){
-   toast("🔔 Ta carte suivie est en vente : « "+c.t+" »");
-   try{if("Notification"in window&&Notification.permission==="granted")new Notification("WikiCollect · nouvelle enchère",{body:c.t+" est maintenant en vente."})}catch(e){}
-  }
- });
- return found;
-}
-function wcEnableNotifications(){
- if(!("Notification"in window))return toast("Les notifications navigateur ne sont pas disponibles sur cet appareil.");
- Notification.requestPermission().then(p=>toast(p==="granted"?"🔔 Notifications activées.":"Notifications refusées."));
-}
-
-function wishlistPage(){
- const L=Object.values(WC_WISHLIST).sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
- const active=(typeof MK!=="undefined"&&MK.A)||[];
- const live=new Map(active.map(a=>[a.c.id,a]));
- main.innerHTML=`<h2>⭐ Liste de souhaits</h2>
- <div class="sub">Suis les cartes que tu recherches. WikiCollect te signale une nouvelle mise en vente quand le marché la propose.</div>
- <div class="bar"><button class="btn g" id="wcNotify">🔔 Activer les notifications</button><button class="btn g" id="wcCheck">🔄 Vérifier les enchères</button></div>
- <div class="grid">${L.length?L.map(c=>{
-   const a=live.get(c.id);
-   return `<div class="at" style="position:relative"><div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><b>${esc(c.t)}</b><button class="wc-watch on" data-wc-remove="${esc(c.id)}">⭐</button></div>
-    ${a?`<div class="wc-alert"><b>🔔 En vente maintenant</b><br><span class="sub" style="margin:0">Mise actuelle : ${a.w==null?a.st:a.b} 🪙 · ${dt(Math.max(0,a.end-Date.now()))}</span><br><button class="btn" data-wc-au="${esc(a.id)}" style="margin-top:8px">Voir l'enchère</button></div>`:`<div class="sub" style="margin:12px 0 0">Aucune mise en vente actuellement.</div>`}
-   </div>`}).join(""):`<div class="wc-empty">⭐ Ta liste est vide.<br><span class="sub">Ouvre une carte et appuie sur « Suivre cette carte ».</span></div>`}</div>`;
- main.querySelector("#wcNotify").onclick=wcEnableNotifications;
- main.querySelector("#wcCheck").onclick=()=>{const n=wcCheckWishlistListings(true);if(!n)toast("Aucune nouvelle mise en vente pour tes cartes suivies.")};
- main.querySelectorAll("[data-wc-remove]").forEach(b=>b.onclick=()=>{wcRemoveWishlist(b.dataset.wcRemove);wishlistPage()});
- main.querySelectorAll("[data-wc-au]").forEach(b=>b.onclick=()=>{if(typeof AV!=="undefined"){AV.d=b.dataset.wcAu;tab=3;render()}});
-}
-setInterval(()=>{try{wcCheckWishlistListings(false)}catch(e){}},15000);
-
-/* Import WikiMaster : accepte JSON/CSV et plusieurs formes de collections.
-   Pour 20k cartes, tout est traité en mémoire sans création d'une carte par image.
-*/
-function wcNormCard(raw,key){
- if(!raw||typeof raw!=="object")return null;
- const t=String(raw.t||raw.title||raw.name||raw.nom||raw.label||"").trim();
- if(!t)return null;
- const r=Math.max(0,Math.min(7,Number(raw.r??raw.rarity??raw.rarete??raw.rarityIndex??0)||0));
- const n=Math.max(1,Number(raw.n??raw.count??raw.quantity??raw.qty??raw.amount??1)||1);
- const id=String(raw.id||raw.cardId||raw.pid||raw.slug||key||("wm-"+t.toLowerCase().replace(/\W+/g,"-")));
- return {id,pid:String(raw.pid||raw.id||id),t,r,n,src:raw.src||raw.source||"wiki",img:raw.img||raw.image||raw.imageUrl||"",url:raw.url||"",d:raw.d||raw.description||"",tags:Array.isArray(raw.tags)?raw.tags.slice(0,8):[],addedAt:raw.addedAt||Date.now()};
-}
-function wcExtractCollection(data){
- const candidates=[];
- const visit=(v,depth=0)=>{
-  if(depth>5||v==null)return;
-  if(Array.isArray(v)){v.forEach(x=>visit(x,depth+1));return}
-  if(typeof v!=="object")return;
-  for(const k of ["collection","col","cards","inventory","owned","ownedCards","myCollection"]){
-   if(v[k]&&typeof v[k]==="object"){if(Array.isArray(v[k]))v[k].forEach(x=>candidates.push(x));else Object.entries(v[k]).forEach(([id,x])=>candidates.push({...x,__key:id}));}
-  }
-  const maybe=wcNormCard(v,v.__key);if(maybe)candidates.push(maybe);
-  Object.entries(v).forEach(([k,x])=>{
-   if(["A","H","W","PX","settings","config"].includes(k))return;
-   if(typeof x==="string"&&x.length>1&&x.length<800000){try{const j=JSON.parse(x);if(j&&typeof j==="object")visit(j,depth+1)}catch(e){}}
-   else if(typeof x==="number"&&x>0&&x<100000){const c=wcNormCard({title:k,n:x},k);if(c)candidates.push(c)}
-   else if(depth<3&&x&&typeof x==="object")visit(x,depth+1)
-  });
- };
- visit(data);
- const out={};
- candidates.forEach((raw,i)=>{
-  const c=raw&&raw.id&&raw.t?raw:wcNormCard(raw,raw&&raw.__key||"wm-"+i);if(!c)return;
-  if(out[c.id])out[c.id].n+=c.n;else out[c.id]=c;
- });
- return out;
-}
-function wcParseCSV(text){
- const lines=text.split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return [];
- const split=line=>line.split(/[,;\t]/).map(x=>x.trim().replace(/^"|"$/g,""));
- const h=split(lines[0]).map(x=>x.toLowerCase());
- return lines.slice(1).map(line=>{const a=split(line),o={};h.forEach((k,i)=>o[k]=a[i]);return o});
-}
-async function wcImportWikiMaster(file){
- const text=await file.text();let data;
- try{data=JSON.parse(text)}catch(e){data=wcParseCSV(text)}
- const imported=wcExtractCollection(data);
- const ids=Object.keys(imported);
- if(!ids.length)throw new Error("Aucune carte reconnue. Utilise un export JSON/CSV de la collection WikiMaster.");
- let total=0;
- ids.forEach(id=>{const c=imported[id],old=col[id];if(old){old.n=(+old.n||0)+c.n;old.tags=Array.from(new Set([...(old.tags||[]),...(c.tags||[])])).slice(0,8);store[id]=old}else{col[id]=c;store[id]=c}total+=c.n});
- save();collection();wcCloudSchedule();
- toast("✅ Import terminé : "+ids.length.toLocaleString("fr-FR")+" cartes différentes · "+total.toLocaleString("fr-FR")+" exemplaires.");
-}
-function wcExportCollection(){
- const payload={format:"WikiCollect",version:1,exportedAt:new Date().toISOString(),collection:col};
- const blob=new Blob([JSON.stringify(payload)],{type:"application/json"}),a=document.createElement("a");
- a.href=URL.createObjectURL(blob);a.download="WikiCollect_collection.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
-function wcImportUI(){
- return `<div class="wc-importbar">
- <label class="btn g wc-filebtn">📥 Importer WikiMaster / JSON / CSV<input id="wcImportFile" type="file" accept=".json,.csv,.txt,application/json,text/csv"></label>
- <button class="btn g" id="wcExport">📤 Exporter ma collection</button>
- </div>
- <div class="sub">L'import fusionne les quantités avec ta collection actuelle : il ne supprime rien. Idéal pour tes ~20 000 cartes.</div>`;
-}
-function wcWireImport(){
- const f=document.getElementById("wcImportFile");if(f)f.onchange=async()=>{try{if(f.files[0])await wcImportWikiMaster(f.files[0])}catch(e){alert(e.message||e)}};
- const b=document.getElementById("wcExport");if(b)b.onclick=wcExportCollection;
-}
-
-(function(){
- const _profile=window.profilePage;
- if(typeof _profile==="function"){
-  window.profilePage=function(){
-   _profile.apply(this,arguments);
-   const host=document.querySelector("main");
-   if(!host)return;
-   const box=document.createElement("div");box.id="wcCloudBox";box.className="dbox";
-   box.innerHTML=`<h3 style="margin-top:0">☁️ Sauvegarde & transfert</h3>
-    <div id="wcCloudStatus" class="wc-status ${WC_USER?"ok":"warn"}">${WC_USER?"☁️ Compte connecté":"💾 Mode local — non connecté"}</div>
-    <div class="wc-cloud-row" style="margin-top:10px"><input id="wcEmail" type="email" placeholder="Ton adresse e-mail"><button class="btn" id="wcLogin">Se connecter / créer le compte</button>${WC_USER?'<button class="btn g" id="wcLogout">Se déconnecter</button>':""}</div>
-    ${wcImportUI()}`;
-   host.appendChild(box);wcWireImport();
-   const l=document.getElementById("wcLogin");if(l)l.onclick=()=>{const e=document.getElementById("wcEmail");if(e&&e.value.trim())wcCloudLogin(e.value.trim())};
-   const lo=document.getElementById("wcLogout");if(lo)lo.onclick=wcCloudLogout;
-  }
- }
-})();
-
-(function(){
- const _render=window.render;
- if(typeof _render==="function"){
-  window.render=function(){
-   const r=_render.apply(this,arguments);
-   setTimeout(()=>{try{if(tab===9)wishlistPage()}catch(e){}},0);
-   return r;
-  }
- }
-})();
-
-/* On ajoute la 10e entrée de navigation sans toucher aux 9 onglets existants. */
-(function(){
- const nav=document.querySelector("nav");
- if(nav&&!document.getElementById("t9")){
-  const b=document.createElement("button");b.id="t9";b.textContent="⭐ Liste de souhaits";const a=document.getElementById("t3");nav.insertBefore(b,a?a.nextSibling:nav.querySelector(".sp"));
-  b.onclick=()=>{tab=9;render()};
- }
-})();
-</script>
-<script id="wc-ui-order-v110">
-(function(){const nav=document.querySelector('nav');if(!nav)return;['t7','t0','t1','t2','t3','t9','t4','t5','t6','t8','hw'].forEach(id=>{const e=document.getElementById(id);if(e)nav.appendChild(e)});const snd=document.querySelector('.wc-nav-sound');if(snd)nav.appendChild(snd);const mn=document.getElementById('mn');if(mn)nav.appendChild(mn);const sp=nav.querySelector('.sp');if(sp)nav.appendChild(sp)})();
-</script>
-
 <script>
 // Raretés : [nom, couleur, poids de tirage par carte].
 const R=[["Commun","#c4c8cc",50.735],["Peu commune","#7ee29a",27.988],["Rare","#6cb2ff",12.439],["Holo","#8feaff",6.219],["Ultra rare","#ffae5c",1.555],["Full art","#ff7676",0.777],["Légendaire","#ffd23c",0.207],["Légendaire holo full art","#fff2a8",0.080]];const HID=new Set();
@@ -1075,7 +787,7 @@ if(localStorage.getItem("ACCOUNT_RESET_V105_GUARD")!=="1"){
     localStorage.setItem("ACCOUNT_RESET_V105_GUARD","1");
   }catch(e){}
 }
-const save=()=>{try{localStorage.setItem("wc_rarity_schema","v92");localStorage.setItem("wc_col",JSON.stringify(col,(k,v)=>typeof v=="string"&&v.startsWith("data:image/jpeg")?undefined:v));localStorage.setItem("wc_stock",stock);localStorage.setItem("wc_t0",t0);localStorage.setItem("wc_money",money);saveBoosterCooldowns()}catch(e){}try{wcCloudSchedule()}catch(e){}};
+const save=()=>{try{localStorage.setItem("wc_rarity_schema","v92");localStorage.setItem("wc_col",JSON.stringify(col,(k,v)=>typeof v=="string"&&v.startsWith("data:image/jpeg")?undefined:v));localStorage.setItem("wc_stock",stock);localStorage.setItem("wc_t0",t0);localStorage.setItem("wc_money",money);saveBoosterCooldowns()}catch(e){}};
 // V87 : Kameto canonique = créateur Twitch @kamet0 avec sa vraie photo de profil.
 // L'ancienne carte Wikipédia « Kameto » est la mauvaise variante pour ce jeu : on la retire du catalogue et de la collection,
 // puis on conserve/restaure uniquement la carte créateur correcte.
@@ -1192,8 +904,8 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
  draw();
  if(c.src=="wiki"){try{const j=await(await fetch("https://fr.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(c.t))).json();if(M.style.display=="flex"&&j.extract&&store[id]===c){desc=j.extract;draw()}}catch(e){}}}
 function render(){clearInterval(timer);closeModal();try{SFX.stopAll()}catch(e){}try{simulate()}catch(e){}
- [0,1,2,3,4,5,6,7,8,9].forEach(i=>{const e=$("t"+i);if(e)e.className=tab==i?"on":""});
- try{([packs,all,collection,market,casino,missionsPage,eventPage,profilePage,succesPage,wishlistPage][tab]||packs)()}
+ [0,1,2,3,4,5,6,7,8].forEach(i=>{const e=$("t"+i);if(e)e.className=tab==i?"on":""});
+ try{([packs,all,collection,market,casino,missionsPage,eventPage,profilePage,succesPage][tab]||packs)()}
  catch(e){console.error(e);main.innerHTML=`<div class="msg">Oups, une erreur est survenue.<br><br><button class="btn" onclick="render()">Réessayer</button></div>`}}
 /* ===== PAQUETS ===== */
 const SPECIALS=[
@@ -2405,7 +2117,7 @@ function fusionHTML(A){
 /* ===== COLLECTION V55 : tags + sélection + suppression + 50 cartes/page ===== */
 const UNTAGGED_FILTER="__NO_TAG__";
 let colPage=1,colTagFilter="",colSearch="",colSort="rar",colSelected=new Set();
-const COL_PAGE_SIZE=50;let colView="binder",bkIdx=0,bkPer=9,bkAnim="";try{const u=JSON.parse(localStorage.getItem("wc_bk")||"null");if(u){bkPer=9;bkIdx=u.i|0}}catch(e){}const saveBk=()=>{try{localStorage.setItem("wc_bk",JSON.stringify({v:"binder",p:bkPer,i:bkIdx}))}catch(e){};colView="binder"};
+const COL_PAGE_SIZE=50;let colView="binder",bkIdx=0,bkPer=9,bkAnim="";try{const u=JSON.parse(localStorage.getItem("wc_bk")||"null");if(u){colView="binder";bkPer=9;bkIdx=u.i|0}}catch(e){}const saveBk=()=>{try{localStorage.setItem("wc_bk",JSON.stringify({v:colView,p:bkPer,i:bkIdx}))}catch(e){}};
 const selKey=v=>String(v);
 const selHas=v=>colSelected.has(selKey(v));
 const selAdd=v=>colSelected.add(selKey(v));
@@ -2421,7 +2133,6 @@ const cleanTag=t=>(t||"").trim().replace(/\s+/g," ").slice(0,24);
 function saveCollectionState(){try{localStorage.setItem("wc_col_ui",JSON.stringify({tag:colTagFilter,q:colSearch,sort:colSort,page:colPage}))}catch(e){}}
 try{const u=JSON.parse(localStorage.getItem("wc_col_ui")||"null");if(u){colTagFilter=u.tag||"";colSearch=u.q||"";colSort=u.sort||"rar";colPage=Math.max(1,+u.page||1)}}catch(e){}
 function collection(){
- colView="binder";
  try{const s=JSON.parse(localStorage.getItem("wc_col")||"null");if(s){col=s;hyd()}}catch(e){}
  colSelected=new Set([...colSelected].map(selKey));
  Object.values(col).forEach(c=>{c.tags=Array.isArray(c.tags)?c.tags.filter(Boolean).slice(0,8):[];store[c.id]=c});
@@ -2451,9 +2162,9 @@ function collection(){
  const bkPage=(p,side)=>p>=np?`<div class="bkPage ${side} blank"></div>`:`<div class="bkPage ${side}"><div class="bkHead"><span>${escAttr(blab)}</span><b>${p+1}</b></div><div class="bkGrid" style="--cols:${bcols}">${Array.from({length:per},(_,i)=>pocket(L[p*per+i])).join("")}</div></div>`;
  const banim=bkAnim;bkAnim="";
  const bookHTML=`<div class="bkWrap"><div class="bkCover ${single?"single":""}"><div class="bkSpread ${banim?"enter"+banim:""}">${bkPage(bkIdx,"left")}${single?"":`<div class="bkRings">${"<i></i>".repeat(6)}</div>`+bkPage(bkIdx+1,"right")}</div></div>
-  <div class="bkNav"><button class="btn g" id="bkPrev" ${bkIdx<=0?"disabled":""}>◀ Page précédente</button><span>${single||bkIdx+1>=np?"Page "+(bkIdx+1):"Pages "+(bkIdx+1)+"–"+Math.min(bkIdx+2,np)} / ${np} · ${L.length} cartes</span><button class="btn g" id="bkNext" ${bkIdx+step>=np?"disabled":""}>Page suivante ▶</button><select id="bkPer">${[9].map(v=>`<option value="${v}" selected>${v} pochettes par page</option>`).join("")}</select></div>${L.length?"":'<div class="msg">Aucune carte ne correspond à ta recherche ou à tes filtres.</div>'}</div>`;
+  <div class="bkNav"><button class="btn g" id="bkPrev" ${bkIdx<=0?"disabled":""}>◀ Page précédente</button><span>${single||bkIdx+1>=np?"Page "+(bkIdx+1):"Pages "+(bkIdx+1)+"–"+Math.min(bkIdx+2,np)} / ${np} · ${L.length} cartes</span><button class="btn g" id="bkNext" ${bkIdx+step>=np?"disabled":""}>Page suivante ▶</button></div>${L.length?"":'<div class="msg">Aucune carte ne correspond à ta recherche ou à tes filtres.</div>'}</div>`;
  const visItems=colView==="binder"?L.slice(bkIdx*per,(bkIdx+step)*per):pageItems,allVis2=visItems.length>0&&visItems.every(c=>selHas(c.id));
- main.innerHTML=`<div class="colHead"><div><h2>📚 Ma collection</h2><div class="sub">${A.length} cartes différentes · ${A.reduce((s,c)=>s+c.n,0)} au total · ${L.length} dans le filtre</div></div><div class="colHeadStat">📖 Vue classeur</div></div>
+ main.innerHTML=`<div class="colHead"><div><h2>📚 Ma collection</h2><div class="sub">${A.length} cartes différentes · ${A.reduce((s,c)=>s+c.n,0)} au total · ${L.length} dans le filtre</div></div><div class="colHeadStat"><button class="btn g" id="viewTgl">${colView==="binder"?"▦ Vue grille":"📖 Vue classeur"}</button></div></div>
   ${fusionHTML(A)}
   <div class="colTools">
    <div class="colToolTop"><input id="colSearch" placeholder="🔍 Rechercher dans ma collection…" value="${colSearch.replace(/"/g,"&quot;")}"><select id="colSort"><option value="rar" ${colSort==="rar"?"selected":""}>Plus rares d'abord</option><option value="az" ${colSort==="az"?"selected":""}>A → Z</option><option value="count" ${colSort==="count"?"selected":""}>Plus de doublons</option><option value="recent" ${colSort==="recent"?"selected":""}>Plus récentes</option></select></div>
@@ -2462,31 +2173,24 @@ function collection(){
    <div class="colHint">Classeur : « Toutes » affiche tout, une étiquette affiche uniquement ses cartes, et « Sans étiquette » affiche les cartes non classées. 50 cartes maximum par page.</div>
   </div>
   <div class="chips">${R.map((r,i)=>HID.has(i)?"":`<button class="chip ${fr.has(i)?"on":""}" style="background:${r[1]}" data-r="${i}">${r[0]} (${cnt[i]})</button>`).join("")}</div>
-  ${bookHTML}
-  <div class="pag" style="display:none"><button class="btn g" id="colPrev" ${colPage<=1?"disabled":""}>← Précédent</button><span>Page <b>${colPage}</b> / <b>${totalPages}</b> · ${pageItems.length} cartes affichées</span><button class="btn g" id="colNext" ${colPage>=totalPages?"disabled":""}>Suivant →</button></div>`;
+  ${colView==="binder"?bookHTML:`<div class="binder"><div class="binderRail"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="binderPage"><div class="binderLabel"><span>WIKICOLLECT · CLASSEUR</span><b>Page ${colPage} / ${totalPages}</b></div><div id="g" class="grid lg colGrid">${pageItems.length?pageItems.map(wrap).join(""):'<div class="msg">Aucune carte ne correspond à ta recherche ou à tes filtres.</div>'}</div></div></div>`}
+  <div class="pag" style="${colView==="binder"?"display:none":""}"><button class="btn g" id="colPrev" ${colPage<=1?"disabled":""}>← Précédent</button><span>Page <b>${colPage}</b> / <b>${totalPages}</b> · ${pageItems.length} cartes affichées</span><button class="btn g" id="colNext" ${colPage>=totalPages?"disabled":""}>Suivant →</button></div>`;
 
  main.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;fr.has(i)?fr.delete(i):fr.add(i);colPage=1;colSelected.clear();collection()});
  main.querySelector("#colSearch").oninput=e=>{colSearch=e.target.value;colPage=1;colSelected.clear();saveCollectionState();};
  main.querySelector("#colSearch").onkeydown=e=>{if(e.key==="Enter")collection()};
  main.querySelector("#colSort").onchange=e=>{colSort=e.target.value;colPage=1;colSelected.clear();collection()};
- const bkP=$("bkPrev"),bkN=$("bkNext"),bkR=$("bkPer");
+ const tgl=$("viewTgl");if(tgl)tgl.onclick=()=>{colView=colView==="binder"?"grid":"binder";saveBk();collection()};
+ const bkP=$("bkPrev"),bkN=$("bkNext");
  const turn=d=>{const sp=document.querySelector(".bkSpread"),go=()=>{bkIdx=Math.max(0,bkIdx+d*step);bkAnim=d>0?"N":"P";saveBk();collection()};if(!sp){go();return}sp.classList.add(d>0?"leaveN":"leaveP");setTimeout(go,230)};
- if(bkP)bkP.onclick=()=>turn(-1);if(bkN)bkN.onclick=()=>turn(1);if(bkR)bkR.onchange=e=>{bkPer=+e.target.value;bkIdx=0;saveBk();collection()};
+ if(bkP)bkP.onclick=()=>turn(-1);if(bkN)bkN.onclick=()=>turn(1);
  main.querySelector("#colPrev").onclick=()=>{if(colPage>1){colPage--;colSelected.clear();collection();main.scrollTo(0,0)}};
  main.querySelector("#colNext").onclick=()=>{if(colPage<totalPages){colPage++;colSelected.clear();collection();main.scrollTo(0,0)}};
  main.querySelector("#selectPage").onclick=()=>{if(allVis2)visItems.forEach(c=>selDel(c.id));else visItems.forEach(c=>selAdd(c.id));collection()};
  main.querySelector("#clearSel").onclick=()=>{selClear();collection()};
  main.querySelectorAll("[data-pick]").forEach(b=>b.onclick=e=>{e.stopPropagation();const id=selKey(b.dataset.pick);selHas(id)?selDel(id):selAdd(id);collection()});
  main.querySelectorAll("[data-tag-filter]").forEach(b=>b.onclick=()=>{colTagFilter=b.dataset.tagFilter||"";colPage=1;colSelected.clear();saveCollectionState();collection()});
- const addTag=()=>{const inp=$("newTag"),t=cleanTag(inp&&inp.value);if(!t)return;
-  let savedTags=[];try{savedTags=JSON.parse(localStorage.getItem("wc_col_tags")||"[]")}catch(e){}
-  if(!Array.isArray(savedTags))savedTags=[];
-  if(!savedTags.some(x=>cleanTag(x)===t))savedTags.push(t);
-  savedTags=[...new Set(savedTags.map(cleanTag).filter(Boolean))].slice(0,100);
-  try{localStorage.setItem("wc_col_tags",JSON.stringify(savedTags))}catch(e){}
-  const target=colSelected.size?[...colSelected]:visItems.map(c=>c.id);
-  let applied=0;target.forEach(id=>{const c=col[id];if(c){c.tags=c.tags||[];if(!c.tags.includes(t)){c.tags.push(t);c.tags=c.tags.slice(0,8);applied++}}});
-  save();inp.value="";toast(applied?`🏷 Étiquette « ${t} » créée et ajoutée à ${applied} carte(s).`:`🏷 Étiquette « ${t} » créée.`);collection()};
+ const addTag=()=>{const inp=$("newTag"),t=cleanTag(inp&&inp.value);if(!t)return;const target=colSelected.size?[...colSelected]:visItems.map(c=>c.id);if(!target.length)return toast("Aucune carte sélectionnée.");target.forEach(id=>{const c=col[id];if(c){c.tags=c.tags||[];if(!c.tags.includes(t))c.tags.push(t);c.tags=c.tags.slice(0,8)}});save();toast(`🏷 Étiquette « ${t} » ajoutée à ${target.length} carte(s).`);collection()};
  main.querySelector("#addTag").onclick=addTag;main.querySelector("#newTag").onkeydown=e=>{if(e.key==="Enter")addTag()};
  const at=$("applyTag");if(at)at.onchange=e=>{const t=cleanTag(e.target.value);if(!t||!colSelected.size)return;let tagged=0;[...colSelected].forEach(id=>{const c=col[id];if(c){c.tags=c.tags||[];if(!c.tags.includes(t)){c.tags.push(t);c.tags=c.tags.slice(0,8);tagged++}}});if(tagged)wcCount("tag",tagged);save();toast(`🏷 Étiquette « ${t} » ajoutée à la sélection.`);collection()};
  main.querySelector("#delSelected").onclick=()=>{const ids=[...colSelected].map(selKey).filter(id=>Object.prototype.hasOwnProperty.call(col,id));if(!ids.length){toast("Aucune carte sélectionnée.");return;}ids.forEach(id=>{delete col[id];delete store[id]});selClear();save();colPage=1;toast(`🗑 ${ids.length} carte(s) supprimée(s).`);collection()};
@@ -2500,7 +2204,7 @@ function creators(){
  main.innerHTML=`<h2>Créateurs</h2><div class="sub">${CRE.length} YouTubeurs & streamers · rareté selon leur popularité · photo de profil (carte supprimée si elle ne charge pas)</div><div class="chips">${R.map((r,i)=>HID.has(i)?"":`<button class="chip ${fr.has(i)?"on":""}" style="background:${r[1]}" data-r="${i}">${r[0]}</button>`).join("")}</div><div id="g" class="grid">${L.map(card).join("")}</div>`;
  main.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;fr.has(i)?fr.delete(i):fr.add(i);creators()});bind($("g"))}
 $("hw").onclick=()=>{M.style.display="flex";M.innerHTML=`<div class="mbox" style="flex-direction:column"><button class="btn g x" id="mx">✕</button><h2>Comment ça marche ?</h2><div class="sub">Chaque carte est un vrai article Wikipédia (ou un créateur). Sa rareté dépend du nombre de <b>vues par mois</b> de la page : plus elle est consultée, plus la carte est rare.</div>${R.map((r,i)=>HID.has(i)?"":`<div class="row"><span style="color:${r[1]};font-weight:800">${SYM[i]} ${r[0]}</span><span>${i==0?"moins de "+THR[1]:THR[i].toLocaleString("fr-FR")+"+"} vues/mois</span></div>`).join("")}<p class="sub" style="margin-top:14px">Les sujets sexuels (+5 rangs) et les drames / attentats (+3 rangs) montent en grade. Boosters : 10 max, 1 rechargé toutes les 10 minutes. « Toutes les cartes » est classé de la plus rare à la plus commune.</p><button class="btn" id="mo">Compris !</button></div>`;$("mx").onclick=$("mo").onclick=closeModal};
-[0,1,2,3,4,5,6,7,8,9].forEach(i=>{const e=$("t"+i);if(e)e.onclick=()=>{tab=i;render()}});
+[0,1,2,3,4,5,6,7,8].forEach(i=>{const e=$("t"+i);if(e)e.onclick=()=>{tab=i;render()}});
 /* V92 : après le reset, la collection reste réellement vide. Aucun cadeau de test automatique. */
 try{col=JSON.parse(localStorage.getItem("wc_col")||"{}");hyd()}catch(e){}
 upM();render();
@@ -3440,35 +3144,6 @@ main{padding:14px 16px 26px!important}
  #ah .bar .btn{flex:0 0 auto}
 }
 </style>
-
-<script>
-/* WikiCollect V109 — correction du bloc Profil/Sauvegarde & transfert.
-   Le premier patch était exécuté avant la déclaration de profilePage(). */
-(function(){
-  const originalProfile = window.profilePage;
-  if(typeof originalProfile !== 'function') return;
-  window.profilePage = function(){
-    originalProfile.apply(this, arguments);
-    const host = document.querySelector('main');
-    if(!host || document.getElementById('wcCloudBox')) return;
-    const box = document.createElement('div');
-    box.id = 'wcCloudBox';
-    box.className = 'dbox';
-    box.style.maxWidth = '1000px';
-    box.style.marginTop = '16px';
-    box.innerHTML = `<h3 style="margin-top:0">☁️ Sauvegarde & transfert</h3>
-      <div id="wcCloudStatus" class="wc-status ${typeof WC_USER!=='undefined'&&WC_USER?'ok':'warn'}">${typeof WC_USER!=='undefined'&&WC_USER?'☁️ Compte connecté':'💾 Mode local — non connecté'}</div>
-      <div class="wc-cloud-row" style="margin-top:10px"><input id="wcEmail" type="email" placeholder="Ton adresse e-mail"><button class="btn" id="wcLogin">Se connecter / créer le compte</button>${typeof WC_USER!=='undefined'&&WC_USER?'<button class="btn g" id="wcLogout">Se déconnecter</button>':''}</div>
-      ${typeof wcImportUI==='function'?wcImportUI():''}`;
-    host.appendChild(box);
-    if(typeof wcWireImport==='function') wcWireImport();
-    const l=document.getElementById('wcLogin');
-    if(l) l.onclick=()=>{const e=document.getElementById('wcEmail');if(e&&e.value.trim()&&typeof wcCloudLogin==='function')wcCloudLogin(e.value.trim())};
-    const lo=document.getElementById('wcLogout');
-    if(lo) lo.onclick=()=>{if(typeof wcCloudLogout==='function')wcCloudLogout()};
-  };
-})();
-</script>
 </body></html>
 
 <style>.lst .grid{gap:18px}.reveal .card{width:138px}.mcard .card{box-shadow:0 18px 34px rgba(0,0,0,.38)}</style>
