@@ -583,11 +583,11 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 <style id="v112-final-ui">
 /* V112 — classeur uniquement + argent en haut à droite + sons côte à côte */
 .colHeadStat{display:none!important}
-.soundCtl{display:flex;align-items:center;gap:6px;flex:0 0 auto}
-.soundCtl #soundToggle{padding:8px 9px;font-size:12px}
-.soundCtl #volSlider{width:72px;margin:0;flex:0 0 72px}
+.soundCtl{display:flex;align-items:center;gap:5px;flex:0 1 100%;min-width:0;max-width:100%;overflow:hidden}
+.soundCtl #soundToggle{padding:7px 8px;font-size:12px;flex:0 0 auto;white-space:nowrap}
+.soundCtl #volSlider{width:58px;min-width:0;max-width:58px;margin:0;flex:0 1 58px}
 .mny{position:fixed!important;top:12px!important;right:18px!important;z-index:9999!important;margin:0!important;padding:8px 12px!important;border-radius:10px;background:#17131fdd;border:1px solid #3a2f4d;backdrop-filter:blur(8px);box-shadow:0 4px 16px #0008}
-@media(max-width:820px){.mny{top:8px!important;right:8px!important}.soundCtl{gap:4px}.soundCtl #volSlider{width:58px;flex-basis:58px}}
+@media(max-width:820px){.mny{top:8px!important;right:8px!important}.soundCtl{gap:4px}.soundCtl #volSlider{width:52px;max-width:52px;flex-basis:52px}}
 </style></head><body>
 <nav><h1>Wiki<span>Collect</span></h1><button id="t0" class="on">🎁 Boosters</button><button id="t1">🌍 Toutes les cartes</button><button id="t2">📚 Collection</button><button id="t3">🔨 Enchères</button><button id="t4">🎰 Casino</button>
 <button id="t5">🎯 Missions du jour</button><button id="t6">🔥 Événement du jour</button><button id="t7">👤 Profil</button><button id="t8">🏆 Succès</button><button id="hw">❓ Comment ça marche</button><div class="soundCtl"><button id="soundToggle" title="Activer / couper les sons">🔊 Sons</button><input id="volSlider" type="range" min="0" max="100" step="5" title="Volume des sons"></div><div id="mn" class="mny"></div><div class="sp"></div></nav>
