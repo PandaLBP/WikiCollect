@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WikiCollect · V98</title>
+<title>WikiCollect · V100</title>
 <style>
 :root{--bg:#0d0b12;--sf:#17131f;--sf2:#241d31;--fg:#f1eef7;--mut:#9d94b0;--ac:#a855f7;color-scheme:dark}
 *{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}html,body{height:100%;margin:0}
@@ -169,6 +169,10 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 .tabs2{display:flex;gap:26px;border-bottom:1px solid #2b2238;margin:14px 0 18px;overflow-x:auto}.tabs2 button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mut);font-weight:700;font-size:14px;padding:10px 4px;cursor:pointer;white-space:nowrap}.tabs2 .on{color:var(--ac);border-color:var(--ac)}
 #ah select{background:var(--sf2);border:1px solid var(--ac);color:var(--fg);border-radius:9px;padding:0 12px;font:inherit}
 .botdot{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#78f0b0;font-weight:800}.botdot::before{content:"";width:7px;height:7px;border-radius:50%;background:#49e68a;box-shadow:0 0 8px #49e68a;animation:botpulse 1.3s infinite}@keyframes botpulse{50%{opacity:.35;transform:scale(.7)}}
+.wlb{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:#ffb020;color:#1a1020;font-size:11px;font-weight:800;text-align:center;margin-left:4px}
+.at{position:relative}.wst{position:absolute;top:6px;right:8px;z-index:5;font-size:18px;filter:drop-shadow(0 1px 3px #000)}
+.wlbtn{margin:0 0 8px}.wlbtn.on{background:#ffb02033;border-color:#ffb020;color:#ffd27a}
+.wll{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .at{background:#120e1a;border:1px solid #2b2238;border-radius:14px;padding:12px;cursor:pointer;transition:border-color .15s}.at:hover{border-color:var(--ac)}
 /* V73 : les cartes d'enchères restent stables pendant les mises IA */
 .at .card img{animation:none!important;transition:none!important}
@@ -942,8 +946,9 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
    <div class="sub">Exemplaires : ${own?own.n:0}${c.src=="cr"?" · "+c.plat:""}</div><div style="margin-top:10px">${link}</div>${c.src=="wiki"?`<div class="sub" style="margin-top:8px">Texte de l'article : CC BY-SA 4.0 — crédits sur la page Wikipédia.</div>`:""}`;
   const hist=MK.H.filter(x=>x.r==c.r).slice(0,6),act=MK.A.filter(a=>!a.done&&a.c.pid==c.pid).length;
   const mkt=`<div class="sb2"><div><b>🪙 ${fair(c)}</b><span>Prix estimé</span></div><div><b>${MK.PX[c.r]||"—"}</b><span>Prix moyen ${n}</span></div></div><div class="sub">Dernières ventes (${n}) : ${hist.length?hist.map(x=>x.p+" 🪙").join(" · "):"aucune pour l'instant"}</div><div class="sub" style="margin-top:6px">${act?act+" exemplaire(s) en vente en ce moment.":"Aucun exemplaire en vente en ce moment."}</div>`;
-  M.innerHTML=`<div class="mbox v2"><button class="btn g x" id="mx">✕</button><div class="mtop"><div class="mcard">${card(c)}</div><div class="minfo"><h2>${c.t}</h2><div class="hd"><span class="rchip" style="background:${cl}">${n}</span>${c.src=="film"?`<span class="film-badge">🎬 ${c.year||""}${c.rating?` · ⭐ ${c.rating.toFixed(1)}`:""}</span>`:""}<span class="tabs"><button class="${tabm?"":"on"}" data-m="0">Détails</button><button class="${tabm?"on":""}" data-m="1">Marché</button></span></div>${tabm?mkt:det}</div></div>${own?`<div class="mbot"><button class="btn" id="au">🔨 Mettre aux enchères</button><button class="btn g" id="ds">🗑 Défausser (+${dsc(c)} 🪙)</button></div>`:""}</div>`;
+  M.innerHTML=`<div class="mbox v2"><button class="btn g x" id="mx">✕</button><div class="mtop"><div class="mcard">${card(c)}</div><div class="minfo"><h2>${c.t}</h2><button class="btn g wlbtn ${isW(c)?"on":""}" id="wl">${isW(c)?"⭐ Suivie":"☆ Suivre"}</button><div class="hd"><span class="rchip" style="background:${cl}">${n}</span>${c.src=="film"?`<span class="film-badge">🎬 ${c.year||""}${c.rating?` · ⭐ ${c.rating.toFixed(1)}`:""}</span>`:""}<span class="tabs"><button class="${tabm?"":"on"}" data-m="0">Détails</button><button class="${tabm?"on":""}" data-m="1">Marché</button></span></div>${tabm?mkt:det}</div></div>${own?`<div class="mbot"><button class="btn" id="au">🔨 Mettre aux enchères</button><button class="btn g" id="ds">🗑 Défausser (+${dsc(c)} 🪙)</button></div>`:""}</div>`;
   $("mx").onclick=closeModal;M.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{tabm=+b.dataset.m;draw()});
+  if($("wl"))$("wl").onclick=()=>{toggleW(c);if(tab==3&&!AV.d)paintMk(true);draw()};
   if($("au"))$("au").onclick=()=>openAuction(c.id);
   if($("ds"))$("ds").onclick=()=>{if(!confirm("Défausser « "+c.t+" » pour "+dsc(c)+" 🪙 ?"))return;const e=col[c.id];e.n>1?e.n--:delete col[c.id];gain(dsc(c));closeModal();render()};
   const ti=$("tin");if(ti)ti.onkeydown=e=>{if(e.key=="Enter"&&ti.value.trim()){own.tags=[...(own.tags||[]),ti.value.trim().slice(0,20)];save();draw()}};
@@ -1410,6 +1415,62 @@ function simulate(){
  });
  MK.A=MK.A.filter(a=>!a.done);if(ch){save();upM();saveMk()}return ch
 }
+
+/* ===== V100 : liste de souhaits + alertes d'enchères ===== */
+let WL={},WLOG=[],WLU=0,WLV=0;
+try{WL=JSON.parse(localStorage.getItem("wc_wish")||"{}")||{};WLOG=JSON.parse(localStorage.getItem("wc_wish_log")||"[]")||[];WLU=+localStorage.getItem("wc_wish_unread")||0}catch(e){WL={};WLOG=[]}
+const saveWL=()=>{try{localStorage.setItem("wc_wish",JSON.stringify(WL));localStorage.setItem("wc_wish_log",JSON.stringify(WLOG.slice(0,40)));localStorage.setItem("wc_wish_unread",String(WLU))}catch(e){}};
+const isW=c=>!!(c&&WL[c.pid]);
+function wlBadge(){const b=$("t3");if(b)b.innerHTML="🔨 Enchères"+(WLU>0?` <span class="wlb" title="Alertes de ta liste de souhaits">⭐${WLU}</span>`:"")}
+function toggleW(c){if(!c)return false;
+ if(WL[c.pid]){delete WL[c.pid];toast("⭐ « "+c.t+" » retirée de ta liste de souhaits.")}
+ else{const k={...c};delete k.n;WL[c.pid]={c:k,ts:Date.now(),warned:{}};store[c.id]=c;MK.A.forEach(a=>{if(a.c.pid==c.pid)a.wl=1});toast("⭐ « "+c.t+" » ajoutée. Tu seras prévenue dès qu'elle est mise en vente.")}
+ WLV++;saveWL();return isW(c)}
+function wlAlert(a,kind){
+ const w=WL[a.c.pid];if(!w)return;
+ const cur=a.w==null?a.st:a.b;
+ const msg=kind=="soon"?`⏰ « ${a.c.t} » (liste de souhaits) se termine bientôt · ${cur} 🪙`:`⭐ « ${a.c.t} » vient d'être mise en vente · dès ${cur} 🪙`;
+ WLOG.unshift({pid:a.c.pid,t:a.c.t,k:kind,p:cur,ts:Date.now(),aid:a.id});WLOG.length=Math.min(WLOG.length,40);
+ if(!(tab==3&&AV.tab=="w"))WLU++;
+ WLV++;saveWL();wlBadge();toast(msg);try{SFX.reveal(Math.min(3,a.c.r))}catch(e){}
+ try{if(document.hidden&&window.Notification&&Notification.permission=="granted")new Notification("WikiCollect",{body:msg.replace(/^[^ ]+ /,"")})}catch(e){}
+}
+function wlOnListed(a){if(a&&a.s!=ME&&WL[a.c.pid]){a.wl=1;wlAlert(a,"listed")}}
+function wlTick(){
+ const now=Date.now();let ch=0;
+ MK.A.forEach(a=>{if(a.done||a.s==ME||!WL[a.c.pid])return;
+  if(!a.wl){a.wl=1;wlAlert(a,"listed");ch=1}
+  else if(a.end-now<120000&&a.end>now&&!a.wlSoon){a.wlSoon=1;wlAlert(a,"soon");ch=1}});
+ if(ch)saveMk();
+}
+/* une carte suivie finit par apparaître : les acheteurs IA la mettent en vente de temps en temps */
+function wlSpawn(){
+ const now=Date.now();let n=0;
+ Object.values(WL).forEach(w=>{
+  const c=w.c;if(!c||!c.pid)return;
+  if(MK.A.some(a=>!a.done&&a.c.pid==c.pid&&a.s!=ME))return;
+  if(Math.random()>.1)return;
+  const s=PSEUDOS[Math.floor(Math.random()*PSEUDOS.length)],f=fair(c);
+  const d=[300000,420000,600000,900000,1800000,3600000][Math.floor(Math.random()*6)];
+  const m=Math.random(),sf=m<.42?.30+Math.random()*.25:m<.72?.55+Math.random()*.22:m<.9?.77+Math.random()*.23:1+Math.random()*.4;
+  const st=Math.max(1,Math.round(f*sf));store[c.id]=c;
+  const a={id:AID(),c:{...c},s,st,b:st,w:null,n:0,hs:[],cool:{},end:now+d,t:now,ts:now,dur:d,nextBot:now+2000+Math.random()*9000};
+  MK.A.push(a);wlOnListed(a);n++});
+ if(n){saveMk();if(tab==3)paintMk(true)}
+}
+setInterval(()=>{try{wlSpawn()}catch(e){}},20000);
+setInterval(()=>{try{wlTick()}catch(e){}},4000);
+setTimeout(()=>{try{wlBadge();wlTick()}catch(e){}},1500);
+function wishTab(){
+ const L=Object.values(WL).sort((x,y)=>y.ts-x.ts);
+ const sale=pid=>MK.A.find(a=>!a.done&&a.c.pid==pid&&a.s!=ME);
+ const items=L.map(w=>{const c=w.c;store[c.id]=c;const a=sale(c.pid);
+  return `<div class="at" ${a?`data-id="${a.id}" data-auid="${a.id}"`:""}>${card(c)}<div class="as">${a?`<b style="color:#7ee29a">En vente · ${a.w==null?a.st:a.b} 🪙</b><br><span class="cd" data-e="${a.end}"></span>`:`<span style="color:var(--mut)">Pas en vente pour l'instant</span>`}<div class="wll"><button class="btn g wlrm" data-p="${String(c.pid).replace(/"/g,"&quot;")}">Retirer</button></div></div></div>`}).join("");
+ const lg=WLOG.slice(0,12).map(x=>`<div class="off">${x.k=="soon"?"⏰":"⭐"} « ${x.t} » ${x.k=="soon"?"se termine bientôt":"mise en vente"} · <b>${x.p} 🪙</b> <span class="sub" style="margin:0 0 0 auto">${ago(x.ts)}</span></div>`).join("");
+ const perm=window.Notification&&Notification.permission=="default"?`<button class="btn g" id="wlnotif">🔔 Activer les notifications du navigateur</button>`:"";
+ return `<div class="sub" style="margin:0 0 12px">Suis une carte avec le bouton ⭐ sur sa fiche. Tu es prévenue quand elle est mise en vente (et quand son enchère se termine bientôt).</div>${perm}
+ <div class="grid mg">${items||'<div class="msg">Ta liste est vide. Ouvre une carte (Toutes les cartes, Collection…) et clique sur « ⭐ Suivre ».</div>'}</div>
+ <h3 style="margin-top:26px">Alertes récentes</h3>${lg||'<div class="sub">Aucune alerte pour le moment.</div>'}`}
 let filling=false;
 async function refill(){
  if(filling)return;
@@ -1495,7 +1556,7 @@ async function refill(){
     a.last=a.hs[0].ts;
     a.cool[u]=now+4000+Math.random()*9000;
    }
-   MK.A.push(a);
+   MK.A.push(a);try{wlOnListed(a)}catch(e){}
   });
   saveMk()
  }catch(e){console.error(e)}finally{filling=false}
@@ -1520,9 +1581,9 @@ function pickSell(){M.style.display="flex";const L=Object.values(col).sort((a,b)
 // ---- page Enchères ----
 let AV={tab:"b",q:"",sort:"new",fr:new Set(),d:null};
 const tile=a=>{store[a.c.id]=a.c;const cur=a.w==null?a.st:a.b;
- return `<div class="at" data-id="${a.id}" data-auid="${a.id}">${card(a.c)}<div class="ar"><div><small data-au-label="price-label">${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</small><b data-au-price>🪙 ${cur}</b></div><div style="text-align:right"><small>⏱ DURÉE</small><b class="cd" data-e="${a.end}"></b></div></div><div class="as"><span data-au-status>${a.s==ME?"Ta vente":"Vendu par "+a.s}${a.w?` · ${a.w==ME?"<b style='color:#7ee29a'>tu mènes</b>":"👑 "+a.w}`:""}${a.mine&&a.w!=ME?" · <b style='color:#ff9a7a'>surenchéri</b>":""}</span></div></div>`};
+ return `<div class="at" data-id="${a.id}" data-auid="${a.id}">${WL[a.c.pid]?'<div class="wst" title="Dans ta liste de souhaits">⭐</div>':""}${card(a.c)}<div class="ar"><div><small data-au-label="price-label">${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</small><b data-au-price>🪙 ${cur}</b></div><div style="text-align:right"><small>⏱ DURÉE</small><b class="cd" data-e="${a.end}"></b></div></div><div class="as"><span data-au-status>${a.s==ME?"Ta vente":"Vendu par "+a.s}${a.w?` · ${a.w==ME?"<b style='color:#7ee29a'>tu mènes</b>":"👑 "+a.w}`:""}${a.mine&&a.w!=ME?" · <b style='color:#ff9a7a'>surenchéri</b>":""}</span></div></div>`};
 const SORTS={new:["Récemment listées",(x,y)=>y.ts-x.ts],end:["Se termine bientôt",(x,y)=>x.end-y.end],pa:["Prix croissant",(x,y)=>(x.w==null?x.st:x.b)-(y.w==null?y.st:y.b)],pd:["Prix décroissant",(x,y)=>(y.w==null?y.st:y.b)-(x.w==null?x.st:x.b)],rar:["Rareté",(x,y)=>y.c.r-x.c.r]};
-const aucViewSig=()=>AV.tab+"|"+AV.d+"|"+AV.q+"|"+AV.sort+"|"+[...AV.fr].join(",");
+const aucViewSig=()=>WLV+"|"+AV.tab+"|"+AV.d+"|"+AV.q+"|"+AV.sort+"|"+[...AV.fr].join(",");
 let mkViewSig="";
 function paintMk(force){if(!$("ah"))return;const viewSig=aucViewSig();
  if(force||viewSig!==mkViewSig){mkViewSig=viewSig;if(AV.d){detailPage()}else listPage()}
@@ -1542,7 +1603,7 @@ function updateAuctionDom(){
 }
 function listPage(){
  const A=MK.A.filter(a=>!a.done),mineS=A.filter(a=>a.s==ME),mineB=A.filter(a=>a.mine),myH=MK.H.filter(x=>x.s==ME||x.u==ME);
- const tabs=[["b","Parcourir"],["v",`Mes ventes (${mineS.length}/${MAXS})`],["e","Mes enchères"],["g",`Gagnées (${MK.W.length})`],["h",`Historique (${myH.length})`]];
+ const tabs=[["b","Parcourir"],["v",`Mes ventes (${mineS.length}/${MAXS})`],["e","Mes enchères"],["g",`Gagnées (${MK.W.length})`],["h",`Historique (${myH.length})`],["w",`⭐ Souhaits (${Object.keys(WL).length})`]];
  let body="";
  if(AV.tab=="b"){let L=A.filter(a=>a.s!=ME&&(!AV.q||a.c.t.toLowerCase().includes(AV.q.toLowerCase()))&&(!AV.fr.size||AV.fr.has(a.c.r))).sort(SORTS[AV.sort][1]);
   body=`<div class="bar"><input id="aq" placeholder="Rechercher une carte…" value="${AV.q}"><button class="btn" id="ago">🔍 Rechercher</button><select id="asr">${Object.entries(SORTS).map(([k,v])=>`<option value="${k}" ${k==AV.sort?"selected":""}>${v[0]}</option>`).join("")}</select></div>
@@ -1552,22 +1613,26 @@ function listPage(){
  else if(AV.tab=="v")body=`<div class="bar"><button class="btn" id="sell">➕ Mettre une carte aux enchères</button><span class="sub" style="align-self:center;margin:0">Frais de vente 5 % · ${MAXS} ventes max en même temps</span></div><div class="grid mg">${mineS.sort((x,y)=>x.end-y.end).map(a=>tile(a)+"").join("")||'<div class="msg">Aucune vente en cours. Mets une carte de ta collection aux enchères.</div>'}</div>`;
  else if(AV.tab=="e")body=`<div class="grid mg">${mineB.sort((x,y)=>x.end-y.end).map(tile).join("")||'<div class="msg">Tu n\'as misé sur aucune enchère.</div>'}</div>`;
  else if(AV.tab=="g")body=`<div class="grid mg">${MK.W.map(x=>{store[x.c.id]=x.c;return `<div class="at">${card(x.c)}<div class="as">Gagnée pour <b>${x.p} 🪙</b> · ${ago(x.ts)}<br>Vendeur : ${nm(x.s)}</div></div>`}).join("")||'<div class="msg">Tu n\'as encore rien gagné.</div>'}</div>`;
+ else if(AV.tab=="w"){body=wishTab();if(WLU){WLU=0;saveWL();wlBadge()}}
  else body=myH.map(x=>`<div class="off">${x.s==ME?(x.u?`💰 Vendue à <b>${x.u}</b> pour <b>${x.p} 🪙</b>`:"↩ Invendue"):`🛒 Achetée à <b>${nm(x.s)}</b> pour <b>${x.p} 🪙</b>`} · « ${x.c.t} » <b style="color:${R[x.r][1]}">${R[x.r][0]}</b> <span class="sub" style="margin:0">${ago(x.ts)}</span></div>`).join("")||'<div class="sub">Aucun historique.</div>';
  $("ah").innerHTML=`<div class="tabs2">${tabs.map(t=>`<button class="${AV.tab==t[0]?"on":""}" data-t="${t[0]}">${t[1]}</button>`).join("")}</div>${body}`;
  $("ah").querySelectorAll(".tabs2 button").forEach(b=>b.onclick=()=>{AV.tab=b.dataset.t;paintMk(true)});
  if($("aq")){const go=()=>{AV.q=$("aq").value.trim();paintMk(true)};$("aq").onkeydown=e=>{if(e.key=="Enter")go()};$("ago").onclick=go;$("asr").onchange=e=>{AV.sort=e.target.value;paintMk(true)};
   $("ah").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;AV.fr.has(i)?AV.fr.delete(i):AV.fr.add(i);paintMk(true)})}
  if($("sell"))$("sell").onclick=pickSell;
+ $("ah").querySelectorAll(".wlrm").forEach(b=>b.onclick=e=>{e.stopPropagation();const p=b.dataset.p;if(WL[p]){delete WL[p]}else{const k=Object.keys(WL).find(x=>String(x)==p);if(k)delete WL[k]}WLV++;saveWL();paintMk(true)});
+ if($("wlnotif"))$("wlnotif").onclick=()=>{try{Notification.requestPermission().then(()=>paintMk(true))}catch(e){}};
  bind($("ah"),false);$("ah").querySelectorAll(".at").forEach(t=>{const cd=t.querySelector(".card");if(cd)cd.onclick=null;if(t.dataset.id)t.onclick=()=>{AV.d=t.dataset.id;paintMk(true)}})}
 function detailPage(){const a=MK.A.find(x=>x.id==AV.d&&!x.done);
  if(!a){AV.d=null;return listPage()}
  store[a.c.id]=a.c;const mine=a.s==ME,cur=a.w==null?a.st:a.b,nb=nextBid(a),f=fair(a.c),hs=(a.hs||[]).slice().reverse();
  const box=mine?`<div class="abox"><div class="arow"><span>Valeur estimée</span><b>≈ ${f} 🪙 <small style="color:var(--mut)">(${Math.round(f*.8)}–${Math.round(f*1.25)})</small></b></div><div class="arow"><span>Si l'enchère s'arrêtait maintenant</span><b style="color:#7ee29a">${a.w==null?"aucune mise":"+"+Math.round(a.b*.95)+" 🪙 (après 5 % de frais)"}</b></div>${a.n==0?`<button class="btn g" id="acn" style="margin-top:10px">Annuler l'enchère (aucune mise)</button>`:""}</div>`
  :`<div class="abox"><div class="arow"><span>Votre solde : <b style="color:var(--fg)">${money.toLocaleString("fr-FR")}</b> pièces</span><span>Mise minimum : <b style="color:var(--fg)">${nb}</b></span></div><div class="abid">${STP(nb)}<button class="btn" id="abd">Miser</button></div>${a.w==ME?`<div class="sub" style="color:#7ee29a;margin:8px 0 0">Tu mènes avec ${a.b} 🪙 — ta mise actuelle te sera rendue si tu surenchéris.</div>`:""}<div class="sub" style="font-size:11px;margin:10px 0 0">La mise est débitée de votre solde immédiatement. Si vous êtes surenchéri, elle vous est intégralement remboursée. Une mise dans les 20 dernières secondes remet le chronomètre à 1 minute.</div></div>`;
- $("ah").innerHTML=`<div class="bkl" id="abk">← Retour aux enchères</div><div class="ad"><div class="adl">${card(a.c)}</div><div class="adr"><h2 style="margin:0">${a.c.t}</h2><div class="sub" style="margin:4px 0 14px">${mine?"Ta vente":"Mis en vente par <b style='color:var(--ac)'>"+a.s+"</b>"}</div>
+ $("ah").innerHTML=`<div class="bkl" id="abk">← Retour aux enchères</div><div class="ad"><div class="adl">${card(a.c)}</div><div class="adr"><h2 style="margin:0">${a.c.t}</h2><button class="btn g wlbtn ${isW(a.c)?"on":""}" id="wlD" style="margin-top:8px">${isW(a.c)?"⭐ Suivie":"☆ Suivre cette carte"}</button><div class="sub" style="margin:4px 0 14px">${mine?"Ta vente":"Mis en vente par <b style='color:var(--ac)'>"+a.s+"</b>"}</div>
  <div class="abox"><div class="arow"><span>${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</span><b class="big">🪙 ${cur}</b></div>${a.w?`<div class="arow"><span>Meilleur enchérisseur</span><b>${a.w==ME?"Toi":"👑 "+a.w}</b></div>`:""}<div class="arow"><span>🔨 Temps restant</span><b id="atl"></b></div></div>${box}
  <h4 class="lab" style="margin-top:22px">HISTORIQUE DES MISES (${hs.length})</h4>${hs.length?hs.map(x=>`<div class="off"><b>${nm(x.u)}</b> a misé <b>${x.p} 🪙</b> <span class="sub" style="margin:0 0 0 auto">${ago(x.ts)}</span></div>`).join(""):'<div class="sub">Aucune mise placée pour l\'instant.</div>'}</div></div>`;
  $("abk").onclick=()=>{AV.d=null;paintMk(true)};bind($("ah"),false);const cd=$("ah").querySelector(".card");if(cd)cd.onclick=()=>openModal(a.c.id);
+ if($("wlD"))$("wlD").onclick=()=>{toggleW(a.c);paintMk(true)};
  if($("acn"))$("acn").onclick=()=>{MK.A=MK.A.filter(x=>x!==a);addCard(a.c);save();saveMk();toast("Enchère annulée, carte rendue.");AV.d=null;paintMk(true)};
  if($("abd")){wireStp(nb,Math.max(1,Math.round(nb*.05)));$("abd").onclick=()=>{simulate();const b=MK.A.find(x=>x.id==a.id);if(!b){toast("Cette enchère est terminée.");AV.d=null;return paintMk(true)}
   const v=Math.floor(+$("sv").value)||0,mn=nextBid(b);if(v<mn)return toast("Mise trop basse (minimum "+mn+" 🪙).");if(v>money+(b.w==ME?b.b:0))return toast("Pas assez de pièces.");
@@ -1580,24 +1645,7 @@ async function market(){MK.n=main.clientWidth>=1150?12:main.clientWidth>=850?8:m
 setInterval(()=>{try{if(tab!=3)simulate();else {simulate();updateAuctionDom()}}catch(e){}},15000);
 const take=b=>{b=Math.floor(b);if(!(b>=1)||b>money){try{SFX.error()}catch(e){}alert("Mise invalide ou pas assez de pièces.");return 0}money-=b;SFX.bet();WCJ+=Math.max(1,Math.floor(b*.02));bumpDaily("casino",1);save();saveJ();upM();return b};
 const alive=id=>!!$(id);
-function casino(g){
- try{SFX.stopAll()}catch(e){}
- if(g=="roulette")return roulette();if(g=="blackjack")return blackjack();if(g=="slots")return slots();if(g=="mines")return mines();
- if(g=="coin")return coinflip();if(g=="double")return doublegame();if(g=="cardcases")return cardcases();if(g=="upgrade")return cardupgrade();if(g=="crash")return crash();
- main.innerHTML=`<h2>Casino</h2><div class="sub">Mini-jeux à pièces virtuelles 🪙 · tout reste dans WikiCollect</div><div class="jbox" style="margin-bottom:16px"><div class="jnum">${WCJ.toLocaleString("fr-FR")} 🪙</div><div class="jsub">JACKPOT WIKICOLLECT · 2 % des mises alimentent la cagnotte</div><div class="frow" style="justify-content:center;margin-top:10px"><button class="btn" id="jgo">🎯 Tenter le jackpot · 1000 🪙</button><span class="mut" style="font-size:11px">chance rare · test virtuel</span></div><div class="jhist">${WCJL.map(x=>`<span>${x.n} · ${x.p.toLocaleString("fr-FR")} 🪙</span>`).join("")||"<span>Aucun gagnant récent</span>"}</div></div><div class="casino-grid">
-  <div class="cg" data-g="roulette"><div class="ico">🎡</div><div><h3>Roulette</h3><p>Numéros, couleurs, douzaines et colonnes.</p></div><div class="cost">Mise dès 1 🪙</div></div>
-  <div class="cg" data-g="blackjack"><div class="ico">🃏</div><div><h3>Blackjack</h3><p>Contre le croupier, tire ou reste.</p></div><div class="cost">Mise dès 1 🪙</div></div>
-  <div class="cg" data-g="mines"><div class="ico">💣</div><div><h3>Mines</h3><p>Ouvre les cases sûres et encaisse avant la mine.</p></div><div class="cost">Mise dès 1 🪙</div></div>
-  <div class="cg" data-g="slots"><div class="ico">🎰</div><div><h3>Machine à sous</h3><p>Fais tourner les rouleaux et cherche les lignes.</p></div><div class="cost">Mise dès 20 🪙</div></div>
-  <div class="cg" data-g="coin"><div class="ico">🪙</div><div><h3>Pile ou Face</h3><p>Choisis un côté et lance la pièce.</p></div><div class="cost">Gain 2×</div></div>
-  <div class="cg" data-g="double"><div class="ico">✖️</div><div><h3>Double ou rien</h3><p>Mise une somme, commence à ×1 et tente de doubler à chaque étape.</p></div><div class="cost">Risque à chaque clic</div></div>
-  <div class="cg" data-g="upgrade"><div class="ico">⬆️</div><div><h3>Card Upgrade</h3><p>Mise une carte, choisis une cible et tente l’amélioration.</p></div><div class="cost">Carte contre carte</div></div>
-  <div class="cg" data-g="crash"><div class="ico">✈️</div><div><h3>Crash</h3><p>Le multiplicateur monte pendant que l’avion vole. Encaisse avant le crash.</p></div><div class="cost">Mise dès 1 🪙</div></div>
- </div>
- <button class="btn g" id="dly" style="margin-top:22px">🎁 Cadeau quotidien : +200 🪙</button>`;
- main.querySelectorAll(".cg").forEach(e=>e.onclick=()=>casino(e.dataset.g));$("jgo").onclick=()=>{if(money<1000)return alert("Pas assez de pièces.");money-=1000;WCJ+=20;save();saveJ();upM();const win=Math.random()<0.01;if(win){const w=WCJ;WCJ=10000;WCJL.unshift({n:"Toi",p:w,ts:Date.now()});saveJ();gain(w);toast("🏆 JACKPOT : +"+w.toLocaleString("fr-FR")+" 🪙");casino()}else toast("Pas cette fois… le jackpot continue de monter.");};
- $("dly").onclick=()=>{const l=+localStorage.getItem("wc_dly")||0;if(Date.now()-l<864e5)return alert("Reviens dans "+fmt(864e5-(Date.now()-l))+".");try{localStorage.setItem("wc_dly",Date.now())}catch(e){}gain(200)}
-}
+/* V99 : ancienne version de casino() supprimée (elle était écrasée par la suivante) */
 const bk=()=>`<button class="btn g" id="bk" style="margin-bottom:14px">← Retour au casino</button>`;()=>`<button class="btn g" id="bk" style="margin-bottom:14px">← Retour au casino</button>`;
 /* ---------- MINES ---------- */
 function mines(){
@@ -1619,77 +1667,9 @@ function mines(){
  paint()}
 
 /* ---------- PILE OU FACE ---------- */
-function coinflip(){
- let bet=50,choice="pile",busy=false;
- main.innerHTML=`${bk()}<div class="cgame"><h2>🪙 Pile ou Face</h2><div class="sub">Choisis un côté. Une victoire paie 2× la mise.</div><div class="choice-row"><button class="btn g choice sel" data-c="pile">🪙 Pile</button><button class="btn g choice" data-c="face">🔵 Face</button></div><div class="bar"><span class="sub" style="align-self:center">Mise :</span><input id="cfb" type="number" min="1" value="${bet}"><button class="btn" id="cgo">Lancer</button></div><div id="cfr" class="big-result">🪙</div></div>`;
- $("bk").onclick=()=>casino();
- main.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{if(busy)return;choice=b.dataset.c;main.querySelectorAll(".choice").forEach(x=>x.classList.toggle("sel",x===b))});
- $("cgo").onclick=()=>{if(busy)return;SFX.coin();bet=Math.floor(+$ ("cfb").value);if(!take(bet))return;busy=true;$ ("cgo").disabled=true;let n=0;const iv=setInterval(()=>{n++;try{SFX.tick(n)}catch(e){}$("cfr").textContent=Math.random()<.5?"🪙 Pile":"🔵 Face";if(n>12){clearInterval(iv);const r=Math.random()<.5?"pile":"face";if(r==choice){try{SFX.win()}catch(e){}gain(bet*2);$("cfr").innerHTML=`🎉 ${r=="pile"?"🪙 Pile":"🔵 Face"}<div style="font-size:15px;color:#3ddc97">+${bet*2} 🪙</div>`}else{try{SFX.lose()}catch(e){}$("cfr").innerHTML=`❌ ${r=="pile"?"🪙 Pile":"🔵 Face"}<div style="font-size:15px;color:var(--mut)">Perdu · ${bet} 🪙</div>`}busy=false;$ ("cgo").disabled=false}},80)}
-}
+/* V99 : ancienne version de coinflip() supprimée (elle était écrasée par la suivante) */
 /* ---------- DOUBLE OU RIEN ---------- */
-function doublegame(){
- let G=null,busy=false;
- const levels=[1,2,3,4,5,8,12,20];
- const paint=()=>{
-  const mult=G?G.m:1, active=!!G&&!G.over;
-  const next=G?levels[Math.min(levels.length-1,G.i+1)]:2;
-  main.innerHTML=`${bk()}<div class="cgame"><h2>✖️ Double ou rien</h2>
-   <div class="sub">Commence à ×1. À chaque clic, tu peux tenter la prochaine étape. Réussite → tu montes. Échec → tu perds la mise. Encaisse quand tu veux.</div>
-   <div style="display:flex;justify-content:center;margin:22px 0">
-    <div style="width:min(360px,80vw);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#24183b 0,#0f0c16 66%);border:8px solid #2b2340;box-shadow:0 0 0 4px #a855f733,0 0 45px #a855f733">
-     <div style="text-align:center"><div style="font-size:58px;font-weight:950;color:#fff">${G?('×'+mult.toFixed(2)):'×1.00'}</div><div class="sub" style="margin:0">gain potentiel</div><div style="font-size:20px;font-weight:900;color:#ffd23c;margin-top:6px">${G?Math.floor(G.bet*mult).toLocaleString('fr-FR'):0} 🪙</div></div>
-    </div>
-   </div>
-   <div class="bar" style="justify-content:center"><span class="sub" style="align-self:center">Mise :</span><input id="dbet" type="number" min="1" value="${G?G.bet:50}" ${active?'disabled':''}><button class="btn g" id="dstart" ${active?'disabled':''}>Commencer à ×1</button></div>
-   <div class="bar" style="justify-content:center">
-    <button class="btn" id="drisk" ${active?'':'disabled'}>🎲 Tenter ×${next}</button>
-    <button class="btn g" id="dcash" ${active&&G.i>=0?'':'disabled'}>💰 Encaisser ${active?Math.floor(G.bet*G.m).toLocaleString('fr-FR'):''} 🪙</button>
-   </div>
-   <div id="dmsg" class="bjm">${G&&G.msg?G.msg:'À toi de choisir quand t’arrêter.'}</div>
-  </div>`;
-  $("bk").onclick=()=>casino();
-  $("dstart").onclick=start;
-  $("drisk").onclick=risk;
-  $("dcash").onclick=cash;
- };
- const start=()=>{
-  if(G&&!G.over)return;
-  const b=Math.floor(+$("dbet").value);
-  if(!b||b<1||b>money)return alert("Mise invalide ou pas assez de pièces.");
-  if(!take(b))return;
-  G={bet:b,m:1,i:0,over:false,msg:"Tu es à ×1.00. Tu peux encaisser ou tenter la suite."};
-  paint();
- };
- const risk=()=>{
-  if(busy||!G||G.over)return;
-  SFX.suspense(2600);
-  busy=true;
-  const win=Math.random()<0.5;
-  const target=levels[Math.min(levels.length-1,G.i+1)];
-  $("drisk").disabled=true;$("dcash").disabled=true;
-  $("dmsg").textContent="La roue tourne…";
-  setTimeout(()=>{
-   if(win){
-    SFX.win();
-    G.i=Math.min(levels.length-1,G.i+1);
-    G.m=levels[G.i];
-    G.msg=`✅ Réussi · tu passes à ×${G.m.toFixed(2)}.`;
-    if(G.i>=levels.length-1){G.over=true;const w=Math.floor(G.bet*G.m);gain(w);G.msg=`🏆 Maximum atteint · +${w.toLocaleString('fr-FR')} 🪙`; }
-   }else{
-    SFX.lose();
-    G.over=true;G.msg=`💥 Perdu à l’étape ×${target}. Mise perdue : ${G.bet.toLocaleString('fr-FR')} 🪙`;
-   }
-   busy=false;paint();
-  },700);
- };
- const cash=()=>{
-  if(busy||!G||G.over)return;
-  const w=Math.floor(G.bet*G.m);
-  G.over=true;gain(w);G.msg=`✅ Encaissé à ×${G.m.toFixed(2)} · +${w.toLocaleString('fr-FR')} 🪙`;
-  paint();
- };
- paint();
-}
+/* V99 : ancienne version de doublegame() supprimée (elle était écrasée par la suivante) */
 
 /* ---------- CARD UPGRADE ---------- */
 function cardupgrade(){
@@ -2151,27 +2131,7 @@ async function fusionSame(c){
  }
 }
 
-function fusionHTML(A){
- const candidates=A.filter(c=>c.n>=3&&c.r<7).sort((a,b)=>a.r-b.r||a.t.localeCompare(b.t)).slice(0,18);
- return `<div class="fusion">
-  <div class="dhero">
-   <div>
-    <h3 style="margin:0">⚗️ Fusion · 3 cartes identiques</h3>
-    <div class="mut" style="font-size:12px">Comme un reroll : tu sacrifies 3 exemplaires identiques pour obtenir 1 carte aléatoire de la même rareté ou d'une rareté supérieure.</div>
-   </div>
-   <span class="mut" style="font-size:12px">${candidates.length} fusion(s) possible(s)</span>
-  </div>
-  <div class="fmeta">
-   <span>3 mêmes cartes → <strong>1 nouvelle carte</strong></span>
-   <span>Même rareté <strong>70 %</strong></span>
-   <span>+1 rareté <strong>25 %</strong></span>
-   <span>+2 raretés <strong>5 %</strong></span>
-  </div>
-  <div class="frow" style="margin-top:12px">
-   ${candidates.length?candidates.map(c=>`<div class="fcard"><span>${SYM[c.r]} ${c.t}</span><span class="mut">×${c.n} → ${rarityName(c.r)}+</span><button class="btn" data-fuse="${c.id}">Fusionner</button></div>`).join(""):'<div class="mut">Aucun doublon de 3 exemplaires pour le moment.</div>'}
-  </div>
- </div>`;
-}
+/* V99 : ancienne version de fusionHTML() supprimée (elle était écrasée par la suivante) */
 
 /* ===== COLLECTION ===== */
 /* ===== COLLECTION V55 : tags + sélection + suppression + 50 cartes/page ===== */
@@ -3378,14 +3338,14 @@ main{padding:14px 16px 26px!important}
  function openSave(){
   autosave();
   let nCards=0,nDiff=0;tryf(()=>{const c=Object.values(col);nDiff=c.length;nCards=c.reduce((s,x)=>s+(x.n||0),0)});
-  const t=W.last?new Date(W.last).toLocaleTimeString("fr-FR"):"en cours…";
+  const t=W.last?new Date(W.last).toLocaleTimeString("fr-FR"):"en cours…";let le=0;tryf(()=>{le=+localStorage.getItem("wc_lastexport")||0});const les=le?new Date(le).toLocaleDateString("fr-FR",{day:"numeric",month:"long"})+" ("+Math.floor((Date.now()-le)/864e5)+" j)":"jamais";
   M.style.display="flex";
   M.innerHTML=`<div class="mbox v2" style="flex-direction:column;max-width:540px"><button class="btn g x" id="mx">✕</button><h2 style="margin:0">💾 Sauvegarde</h2>
   <div class="sub">Ta progression (cartes, pièces, succès, missions, enchères…) est enregistrée automatiquement toutes les 15 secondes dans ce navigateur, avec une copie de secours. Pour la mettre à l'abri ou la changer d'appareil, exporte-la dans un fichier.</div>
-  <div class="row"><span>Cartes différentes</span><b>${nDiff.toLocaleString("fr-FR")}</b></div><div class="row"><span>Cartes au total</span><b>${nCards.toLocaleString("fr-FR")}</b></div><div class="row"><span>Pièces</span><b>${(typeof money!=="undefined"?money:0).toLocaleString("fr-FR")} 🪙</b></div><div class="row"><span>Dernière copie de secours</span><b>${t}</b></div>
+  <div class="row"><span>Cartes différentes</span><b>${nDiff.toLocaleString("fr-FR")}</b></div><div class="row"><span>Cartes au total</span><b>${nCards.toLocaleString("fr-FR")}</b></div><div class="row"><span>Pièces</span><b>${(typeof money!=="undefined"?money:0).toLocaleString("fr-FR")} 🪙</b></div><div class="row"><span>Dernière copie de secours</span><b>${t}</b></div><div class="row"><span>Dernier export en fichier</span><b>${les}</b></div>
   <div class="bar" style="margin-top:14px"><button class="btn" id="svx">⬇️ Exporter ma sauvegarde</button><label class="btn g" style="cursor:pointer">⬆️ Importer<input id="svi" type="file" accept=".json,application/json" hidden></label></div><div id="svm" class="sub"></div></div>`;
   document.getElementById("mx").onclick=closeModal;
-  document.getElementById("svx").onclick=()=>{autosave();const d=W.snap();const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:"application/json"}));a.download="wikicollect-sauvegarde-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},600);document.getElementById("svm").textContent="✅ Sauvegarde exportée ("+Object.keys(d.d).length+" éléments)."};
+  document.getElementById("svx").onclick=()=>{autosave();const d=W.snap();const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:"application/json"}));a.download="wikicollect-sauvegarde-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},600);tryf(()=>{localStorage.setItem("wc_lastexport",Date.now());localStorage.removeItem("wc_remind_snooze")});document.getElementById("svm").textContent="✅ Sauvegarde exportée ("+Object.keys(d.d).length+" éléments)."};
   document.getElementById("svi").onchange=async e=>{const f=e.target.files[0];if(!f)return;const m=document.getElementById("svm");
    try{const j=JSON.parse(await f.text());if(!j||!j.d||typeof j.d!=="object"||!Object.keys(j.d).some(k=>k.startsWith("wc_")))throw 0;
     const n=Object.keys(JSON.parse(j.d.wc_col||"{}")).length;
@@ -3396,5 +3356,27 @@ main{padding:14px 16px 26px!important}
     localStorage.setItem("ACCOUNT_RESET_V105_GUARD","1");sessionStorage.setItem("wc_restored","1");location.reload()}
    catch(err){m.textContent="❌ Fichier invalide : choisis un fichier .json exporté depuis WikiCollect."}}
  }
+
+ /* V99 : rappel de sauvegarde — la progression n'est que dans ce navigateur, donc on rappelle d'exporter un fichier */
+ (function(){
+  const DAYS=7,SNOOZE=864e5;
+  const css=document.createElement("style");css.textContent="#bkRemind{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9500;width:min(560px,calc(100vw - 24px));display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-radius:16px;background:#1d1432;border:1px solid #a855f7;box-shadow:0 14px 40px rgba(0,0,0,.65);color:#f2ecff;font-size:14px;line-height:1.35;animation:bkR .35s ease-out}#bkRemind b{color:#ffd86b}#bkRemind .bkrb{display:flex;gap:8px;margin-left:auto}@keyframes bkR{from{opacity:0;transform:translate(-50%,20px)}}";document.head.appendChild(css);
+  const prog=()=>{let n=0;tryf(()=>{n=Object.values(col).filter(c=>c&&c.n>0).length});return n};
+  function check(){
+   if(document.getElementById("bkRemind")||document.hidden)return;
+   if(typeof M!=="undefined"&&M.style.display==="flex")return;
+   let le=0,sn=0;tryf(()=>{le=+localStorage.getItem("wc_lastexport")||0;sn=+localStorage.getItem("wc_remind_snooze")||0});
+   const n=prog(),age=le?(Date.now()-le)/864e5:Infinity;
+   if(Date.now()<sn)return;
+   if(le?age<DAYS:n<10)return;   // jamais exporté : on attend 10 cartes différentes ; sinon, rappel après 7 jours
+   const txt=le?"Ta dernière sauvegarde en fichier date de <b>"+Math.floor(age)+" jours</b>. Ta progression ne vit que dans ce navigateur : exporte-la pour ne rien perdre.":"Tu as déjà <b>"+n+" cartes différentes</b> mais aucune sauvegarde en fichier. Si tu vides ton navigateur ou changes d'adresse, tout disparaît.";
+   const d=document.createElement("div");d.id="bkRemind";d.innerHTML='<span>💾 '+txt+'</span><span class="bkrb"><button class="btn" id="bkrGo">Sauvegarder</button><button class="btn g" id="bkrLater">Plus tard</button></span>';
+   document.body.appendChild(d);
+   document.getElementById("bkrGo").onclick=()=>{d.remove();openSave()};
+   document.getElementById("bkrLater").onclick=()=>{tryf(()=>localStorage.setItem("wc_remind_snooze",Date.now()+SNOOZE));d.remove()};
+  }
+  setTimeout(check,9000);setInterval(check,5*60*1000);
+  window.wcBackupCheck=check;
+ })();
 })();
 </script>
