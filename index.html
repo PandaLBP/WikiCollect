@@ -581,12 +581,17 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 @media(max-width:900px){.bkCover{padding:16px}.bkPage{padding:12px}.bkGrid{gap:8px}}
 </style>
 </head><body>
-<nav><h1>Wiki<span>Collect</span></h1><button id="t0" class="on">🎁 Boosters</button><button id="t1">🌍 Toutes les cartes</button><button id="t2">📚 Collection</button><button id="t3">🔨 Enchères</button><button id="t4">🎰 Casino</button>
-<button id="t5">🎯 Missions du jour</button><button id="t6">🔥 Événement du jour</button><button id="t7">👤 Profil</button><button id="t8">🏆 Succès</button><button id="hw">❓ Comment ça marche</button><button id="soundToggle" title="Activer / couper les sons">🔊 Sons</button><input id="volSlider" type="range" min="0" max="100" step="5" title="Volume des sons"><div id="mn" class="mny"></div><div class="sp"></div></nav>
+<nav><h1>Wiki<span>Collect</span></h1><button id="t7">👤 Profil</button><button id="t0" class="on">🎁 Boosters</button><button id="t1">🌍 Toutes les cartes</button><button id="t2">📚 Collection</button><button id="t3">🔨 Enchères</button><button id="t4">🎰 Casino</button><button id="t5">🎯 Missions du jour</button><button id="t6">🔥 Événement du jour</button><button id="t8">🏆 Succès</button><button id="hw">❓ Comment ça marche</button><div class="wc-nav-sound"><button id="soundToggle" title="Activer / couper les sons">🔊 Sons</button><input id="volSlider" type="range" min="0" max="100" step="5" title="Volume des sons"></div><div id="mn" class="mny"></div><div class="sp"></div></nav>
 <main id="main"></main>
 <div class="modal" id="modal"></div>
 <script>window.WIKICOLLECT_CONFIG={supabaseUrl:"https://ewtjbciugjudovzswadt.supabase.co",supabaseAnonKey:"sb_publishable_NqArZXyx0z3hSI6tbuHB-A_Xay6Ay9j"};</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style id="wc-ui-v110">
+nav{position:relative}
+.wc-nav-sound{display:flex;align-items:center;gap:8px;margin:2px 0}.wc-nav-sound #soundToggle{flex:0 0 auto}.wc-nav-sound #volSlider{flex:1 1 auto;width:auto;margin:0;min-width:0}
+#mn{position:fixed!important;top:14px;right:18px;z-index:10000;background:rgba(23,19,31,.94);border:1px solid #3a2f4d;border-radius:12px;padding:9px 14px!important;box-shadow:0 8px 25px #0007;backdrop-filter:blur(10px);color:#ffd23c!important;font-size:14px}
+@media(max-width:900px){#mn{top:10px;right:10px;font-size:12px;padding:7px 10px!important}.wc-nav-sound{gap:6px}.wc-nav-sound #volSlider{width:80px}}
+</style>
 <style id="wc-vhost">
 #wcCloudBox{margin-top:16px;max-width:1000px}.wc-cloud-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.wc-cloud-row input{min-width:220px}.wc-status{font-size:12px;color:var(--mut)}.wc-status.ok{color:#78f0b0}.wc-status.warn{color:#ffd27a}.wc-import{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.wc-import input[type=file]{display:none}.wc-filebtn{display:inline-flex;align-items:center;justify-content:center}.wc-wish-btn{margin-top:10px;width:100%}.wc-wish-btn.on{background:#5a337f}.wc-watch{display:inline-flex;align-items:center;gap:6px;background:#241d31;border:1px solid #3a2f4d;color:var(--fg);border-radius:10px;padding:7px 10px;font-weight:800;cursor:pointer}.wc-watch.on{border-color:#a855f7;background:#a855f733}.wc-alert{border:1px solid #6d45a3;background:#241632;border-radius:14px;padding:12px 14px;margin:12px 0;box-shadow:0 8px 24px #0005}.wc-empty{padding:35px;text-align:center;color:var(--mut)}.wc-importbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.wc-progress{height:8px;background:#241d31;border-radius:99px;overflow:hidden;margin-top:10px}.wc-progress i{display:block;height:100%;background:#a855f7;width:0;transition:width .15s}
 @media(max-width:650px){.wc-cloud-row input{min-width:0;flex:1 1 100%}.wc-cloud-row .btn{flex:1 1 auto}}
@@ -859,10 +864,13 @@ function wcWireImport(){
 (function(){
  const nav=document.querySelector("nav");
  if(nav&&!document.getElementById("t9")){
-  const b=document.createElement("button");b.id="t9";b.textContent="⭐ Liste de souhaits";nav.insertBefore(b,nav.querySelector(".sp"));
+  const b=document.createElement("button");b.id="t9";b.textContent="⭐ Liste de souhaits";const a=document.getElementById("t3");nav.insertBefore(b,a?a.nextSibling:nav.querySelector(".sp"));
   b.onclick=()=>{tab=9;render()};
  }
 })();
+</script>
+<script id="wc-ui-order-v110">
+(function(){const nav=document.querySelector('nav');if(!nav)return;['t7','t0','t1','t2','t3','t9','t4','t5','t6','t8','hw'].forEach(id=>{const e=document.getElementById(id);if(e)nav.appendChild(e)});const snd=document.querySelector('.wc-nav-sound');if(snd)nav.appendChild(snd);const mn=document.getElementById('mn');if(mn)nav.appendChild(mn);const sp=nav.querySelector('.sp');if(sp)nav.appendChild(sp)})();
 </script>
 
 <script>
@@ -1236,24 +1244,16 @@ function packs(){
 }
 async function getTop(){if(topCache)return topCache;
  try{const d=new Date(),y=d.getMonth()?d.getFullYear():d.getFullYear()-1,m=d.getMonth()||12;
-  const rr=await fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/top/fr.wikipedia/all-access/${y}/${p2(m)}/all-days`,{cache:"no-store"});
-  if(!rr.ok)throw new Error("pageviews "+rr.status);
-  const j=await rr.json();
-  topCache=(j.items?.[0]?.articles||[]).filter(a=>!/:/.test(a.article)&&a.article!=="Accueil"&&!isRemovedTitle(a.article.replace(/_/g," "))).map(a=>({t:a.article.replace(/_/g," "),r:OVR[a.article.replace(/_/g," ")]??boost(a.article.replace(/_/g," "),rarOf(a.views))}));
- }catch(e){topCache=[]}return topCache}
+  const j=await(await fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/top/fr.wikipedia/all-access/${y}/${p2(m)}/all-days`)).json(),dim=new Date(y,m,0).getDate();
+  topCache=j.items[0].articles.filter(a=>!/:/.test(a.article)&&a.article!="Accueil"&&!isRemovedTitle(a.article.replace(/_/g," "))).map(a=>({t:a.article.replace(/_/g," "),r:OVR[a.article.replace(/_/g," ")]??boost(a.article.replace(/_/g," "),rarOf(a.views))}))}
+ catch(e){topCache=[]}return topCache}
 const CRATE=.03; // chance qu'une carte d'un booster soit un créateur (≈ 26 % des boosters en contiennent un)
 async function buildPack(minRarity=null){
  const rollCount=minRarity!=null?9:10; const rolls=Array.from({length:rollCount},()=>pick(Math.random())).sort((a,b)=>a-b); // 10 cartes au total, dont 1 garantie pour les boosters spéciaux
- // Les appels Wikimedia peuvent être temporairement limités (429), indisponibles ou bloqués par un réseau.
- // On ne doit jamais perdre l'ouverture du booster dans ce cas : on utilise alors les créateurs locaux comme filet de sécurité.
- const top=await getTop();
- const genResults=await Promise.allSettled([0,1,2,3].map(()=>fetch(API+"generator=random&grnnamespace=0&grnlimit=50",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("wiki "+r.status);return r.json()})));
- const rs=genResults.filter(x=>x.status==="fulfilled").map(x=>x.value);
+ const [top,...rs]=await Promise.all([getTop(),...[0,1,2,3].map(()=>fetch(API+"generator=random&grnnamespace=0&grnlimit=50").then(r=>r.json()))]);
  const seen=new Set(),pool=[];
- const add=j=>Object.values(j?.query?.pages||{}).filter(ok).filter(p=>!isExcludedTitle(p.title)).forEach(p=>{if(!seen.has(p.pageid)){seen.add(p.pageid);pool.push(mk(p))}});
+ const add=j=>Object.values(j.query?.pages||{}).filter(ok).filter(p=>!isExcludedTitle(p.title)).forEach(p=>{if(!seen.has(p.pageid)){seen.add(p.pageid);pool.push(mk(p))}});
  rs.forEach(add);
- // Filet de sécurité hors réseau : le catalogue des créateurs est déjà embarqué dans le site.
- const fallbackPool=CRE.filter(c=>c&&c.pid&&!isExcludedTitle(c.t)).map(c=>({...c}));
  if(rolls.some(r=>r>=2)&&top.length){ // articles très consultés (top mensuel) pour les rangs hauts
   const T=[];for(let r=1;r<=7;r++)T.push(...top.filter(x=>x.r==r).sort(()=>Math.random()-.5).slice(0,5));
   if(T.length)try{add(await(await fetch(API+"titles="+encodeURIComponent(T.map(x=>x.t).join("|")))).json())}catch(e){}}
@@ -1286,17 +1286,8 @@ async function buildPack(minRarity=null){
    if(cc.length){const c=cc[Math.floor(Math.random()*cc.length)];used.add(c.pid);res.push(c);return}}
   const order=[];for(let i=rt;i>=0;i--)order.push(i);for(let i=rt+1;i<=7;i++)order.push(i);
   for(const r of order){const cs=pool.filter(c=>c.r==r&&!used.has(c.pid));if(cs.length){const c=cs[Math.floor(Math.random()*cs.length)];used.add(c.pid);res.push(c);break}}});
- // Si Wikimedia n'a fourni aucune carte (ou pas assez), complète avec le catalogue local des créateurs.
- if(res.length<10){
-  const available=fallbackPool.filter(c=>!used.has(c.pid)).sort(()=>Math.random()-.5);
-  for(const c of available){
-   if(res.length>=10)break;
-   used.add(c.pid);res.push(c);
-  }
- }
- // Dernier filet de sécurité : le catalogue embarqué contient largement assez de créateurs pour former un booster.
- if(res.length<10)throw new Error("catalogue local insuffisant");
- return res.slice(0,10).sort((a,b)=>a.r-b.r)}
+ if(res.length<10)throw 0;
+ return res.sort((a,b)=>a.r-b.r)}
 function tear(force,offer,slotIndex=-1){clearInterval(timer);
  main.innerHTML=`<h2>${force!=null?"Booster test · "+R[force][0]:offer?offer.name:"Ouvre ton booster"}</h2><div class="sub">✂️ Découpe le sachet : attrape la ligne en pointillés et fais glisser les ciseaux de gauche à droite</div><div class="stage">${packHTML()}</div>`;
  const pk=main.querySelector(".pack");pk.insertAdjacentHTML("beforeend",'<div class="tz"><span>✂️ Fais glisser pour découper</span></div><div class="tl"></div>');
@@ -2414,7 +2405,7 @@ function fusionHTML(A){
 /* ===== COLLECTION V55 : tags + sélection + suppression + 50 cartes/page ===== */
 const UNTAGGED_FILTER="__NO_TAG__";
 let colPage=1,colTagFilter="",colSearch="",colSort="rar",colSelected=new Set();
-const COL_PAGE_SIZE=50;let colView="binder",bkIdx=0,bkPer=9,bkAnim="";try{const u=JSON.parse(localStorage.getItem("wc_bk")||"null");if(u){colView=u.v==="grid"?"grid":"binder";bkPer=[4,9,12].includes(u.p)?u.p:9;bkIdx=u.i|0}}catch(e){}const saveBk=()=>{try{localStorage.setItem("wc_bk",JSON.stringify({v:colView,p:bkPer,i:bkIdx}))}catch(e){}};
+const COL_PAGE_SIZE=50;let colView="binder",bkIdx=0,bkPer=9,bkAnim="";try{const u=JSON.parse(localStorage.getItem("wc_bk")||"null");if(u){bkPer=[4,9,12].includes(u.p)?u.p:9;bkIdx=u.i|0}}catch(e){}const saveBk=()=>{try{localStorage.setItem("wc_bk",JSON.stringify({v:"binder",p:bkPer,i:bkIdx}))}catch(e){};colView="binder"};
 const selKey=v=>String(v);
 const selHas=v=>colSelected.has(selKey(v));
 const selAdd=v=>colSelected.add(selKey(v));
@@ -2429,6 +2420,7 @@ const cleanTag=t=>(t||"").trim().replace(/\s+/g," ").slice(0,24);
 function saveCollectionState(){try{localStorage.setItem("wc_col_ui",JSON.stringify({tag:colTagFilter,q:colSearch,sort:colSort,page:colPage}))}catch(e){}}
 try{const u=JSON.parse(localStorage.getItem("wc_col_ui")||"null");if(u){colTagFilter=u.tag||"";colSearch=u.q||"";colSort=u.sort||"rar";colPage=Math.max(1,+u.page||1)}}catch(e){}
 function collection(){
+ colView="binder";
  try{const s=JSON.parse(localStorage.getItem("wc_col")||"null");if(s){col=s;hyd()}}catch(e){}
  colSelected=new Set([...colSelected].map(selKey));
  Object.values(col).forEach(c=>{c.tags=Array.isArray(c.tags)?c.tags.filter(Boolean).slice(0,8):[];store[c.id]=c});
@@ -2460,7 +2452,7 @@ function collection(){
  const bookHTML=`<div class="bkWrap"><div class="bkCover ${single?"single":""}"><div class="bkSpread ${banim?"enter"+banim:""}">${bkPage(bkIdx,"left")}${single?"":`<div class="bkRings">${"<i></i>".repeat(6)}</div>`+bkPage(bkIdx+1,"right")}</div></div>
   <div class="bkNav"><button class="btn g" id="bkPrev" ${bkIdx<=0?"disabled":""}>◀ Page précédente</button><span>${single||bkIdx+1>=np?"Page "+(bkIdx+1):"Pages "+(bkIdx+1)+"–"+Math.min(bkIdx+2,np)} / ${np} · ${L.length} cartes</span><button class="btn g" id="bkNext" ${bkIdx+step>=np?"disabled":""}>Page suivante ▶</button><select id="bkPer">${[4,9,12].map(v=>`<option value="${v}" ${per==v?"selected":""}>${v} pochettes par page</option>`).join("")}</select></div>${L.length?"":'<div class="msg">Aucune carte ne correspond à ta recherche ou à tes filtres.</div>'}</div>`;
  const visItems=colView==="binder"?L.slice(bkIdx*per,(bkIdx+step)*per):pageItems,allVis2=visItems.length>0&&visItems.every(c=>selHas(c.id));
- main.innerHTML=`<div class="colHead"><div><h2>📚 Ma collection</h2><div class="sub">${A.length} cartes différentes · ${A.reduce((s,c)=>s+c.n,0)} au total · ${L.length} dans le filtre</div></div><div class="colHeadStat"><button class="btn g" id="viewTgl">${colView==="binder"?"▦ Vue grille":"📖 Vue classeur"}</button> Sélection : <b id="selCount">${colSelected.size}</b></div></div>
+ main.innerHTML=`<div class="colHead"><div><h2>📚 Ma collection</h2><div class="sub">${A.length} cartes différentes · ${A.reduce((s,c)=>s+c.n,0)} au total · ${L.length} dans le filtre</div></div><div class="colHeadStat">📖 Vue classeur · Sélection : <b id="selCount">${colSelected.size}</b></div></div>
   ${fusionHTML(A)}
   <div class="colTools">
    <div class="colToolTop"><input id="colSearch" placeholder="🔍 Rechercher dans ma collection…" value="${colSearch.replace(/"/g,"&quot;")}"><select id="colSort"><option value="rar" ${colSort==="rar"?"selected":""}>Plus rares d'abord</option><option value="az" ${colSort==="az"?"selected":""}>A → Z</option><option value="count" ${colSort==="count"?"selected":""}>Plus de doublons</option><option value="recent" ${colSort==="recent"?"selected":""}>Plus récentes</option></select></div>
@@ -2469,14 +2461,13 @@ function collection(){
    <div class="colHint">Classeur : « Toutes » affiche tout, une étiquette affiche uniquement ses cartes, et « Sans étiquette » affiche les cartes non classées. 50 cartes maximum par page.</div>
   </div>
   <div class="chips">${R.map((r,i)=>HID.has(i)?"":`<button class="chip ${fr.has(i)?"on":""}" style="background:${r[1]}" data-r="${i}">${r[0]} (${cnt[i]})</button>`).join("")}</div>
-  ${colView==="binder"?bookHTML:`<div class="binder"><div class="binderRail"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="binderPage"><div class="binderLabel"><span>WIKICOLLECT · CLASSEUR</span><b>Page ${colPage} / ${totalPages}</b></div><div id="g" class="grid lg colGrid">${pageItems.length?pageItems.map(wrap).join(""):'<div class="msg">Aucune carte ne correspond à ta recherche ou à tes filtres.</div>'}</div></div></div>`}
-  <div class="pag" style="${colView==="binder"?"display:none":""}"><button class="btn g" id="colPrev" ${colPage<=1?"disabled":""}>← Précédent</button><span>Page <b>${colPage}</b> / <b>${totalPages}</b> · ${pageItems.length} cartes affichées</span><button class="btn g" id="colNext" ${colPage>=totalPages?"disabled":""}>Suivant →</button></div>`;
+  ${bookHTML}
+  <div class="pag" style="display:none"><button class="btn g" id="colPrev" ${colPage<=1?"disabled":""}>← Précédent</button><span>Page <b>${colPage}</b> / <b>${totalPages}</b> · ${pageItems.length} cartes affichées</span><button class="btn g" id="colNext" ${colPage>=totalPages?"disabled":""}>Suivant →</button></div>`;
 
  main.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;fr.has(i)?fr.delete(i):fr.add(i);colPage=1;colSelected.clear();collection()});
  main.querySelector("#colSearch").oninput=e=>{colSearch=e.target.value;colPage=1;colSelected.clear();saveCollectionState();};
  main.querySelector("#colSearch").onkeydown=e=>{if(e.key==="Enter")collection()};
  main.querySelector("#colSort").onchange=e=>{colSort=e.target.value;colPage=1;colSelected.clear();collection()};
- const tgl=$("viewTgl");if(tgl)tgl.onclick=()=>{colView=colView==="binder"?"grid":"binder";saveBk();collection()};
  const bkP=$("bkPrev"),bkN=$("bkNext"),bkR=$("bkPer");
  const turn=d=>{const sp=document.querySelector(".bkSpread"),go=()=>{bkIdx=Math.max(0,bkIdx+d*step);bkAnim=d>0?"N":"P";saveBk();collection()};if(!sp){go();return}sp.classList.add(d>0?"leaveN":"leaveP");setTimeout(go,230)};
  if(bkP)bkP.onclick=()=>turn(-1);if(bkN)bkN.onclick=()=>turn(1);if(bkR)bkR.onchange=e=>{bkPer=+e.target.value;bkIdx=0;saveBk();collection()};
