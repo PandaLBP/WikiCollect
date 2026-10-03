@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WikiCollect · V97</title>
+<title>WikiCollect · V100</title>
 <style>
 :root{--bg:#0d0b12;--sf:#17131f;--sf2:#241d31;--fg:#f1eef7;--mut:#9d94b0;--ac:#a855f7;color-scheme:dark}
 *{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}html,body{height:100%;margin:0}
@@ -10,7 +10,7 @@ nav{width:200px;background:var(--sf);padding:18px 12px;display:flex;flex-directi
 nav h1{font-size:21px;margin:0 0 14px 8px}nav h1 span{color:var(--ac)}
 nav button{background:none;border:0;color:var(--mut);text-align:left;padding:10px 12px;border-radius:10px;font-size:14px;cursor:pointer;white-space:nowrap}
 nav button.on{background:#a855f722;color:var(--ac)}nav .sp{flex:1}
-main{flex:1;overflow-y:auto;padding:20px;min-width:0}
+main{flex:1;overflow-y:auto;padding:76px 20px 20px;min-width:0}
 h2{margin:0 0 4px}.sub{color:var(--mut);font-size:13px;margin-bottom:16px}
 .bar{display:flex;gap:8px;margin-bottom:12px}
 input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px solid #3a2f4d;color:var(--fg);padding:9px 12px;border-radius:9px;font-size:14px;flex:1;min-width:150px}
@@ -169,6 +169,10 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 .tabs2{display:flex;gap:26px;border-bottom:1px solid #2b2238;margin:14px 0 18px;overflow-x:auto}.tabs2 button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mut);font-weight:700;font-size:14px;padding:10px 4px;cursor:pointer;white-space:nowrap}.tabs2 .on{color:var(--ac);border-color:var(--ac)}
 #ah select{background:var(--sf2);border:1px solid var(--ac);color:var(--fg);border-radius:9px;padding:0 12px;font:inherit}
 .botdot{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#78f0b0;font-weight:800}.botdot::before{content:"";width:7px;height:7px;border-radius:50%;background:#49e68a;box-shadow:0 0 8px #49e68a;animation:botpulse 1.3s infinite}@keyframes botpulse{50%{opacity:.35;transform:scale(.7)}}
+.wlb{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:#ffb020;color:#1a1020;font-size:11px;font-weight:800;text-align:center;margin-left:4px}
+.at{position:relative}.wst{position:absolute;top:6px;right:8px;z-index:5;font-size:18px;filter:drop-shadow(0 1px 3px #000)}
+.wlbtn{margin:0 0 8px}.wlbtn.on{background:#ffb02033;border-color:#ffb020;color:#ffd27a}
+.wll{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .at{background:#120e1a;border:1px solid #2b2238;border-radius:14px;padding:12px;cursor:pointer;transition:border-color .15s}.at:hover{border-color:var(--ac)}
 /* V73 : les cartes d'enchères restent stables pendant les mises IA */
 .at .card img{animation:none!important;transition:none!important}
@@ -583,16 +587,37 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 <style id="v112-final-ui">
 /* V112 — classeur uniquement + argent en haut à droite + sons côte à côte */
 .colHeadStat{display:none!important}
-.soundCtl{display:flex;align-items:center;gap:6px;flex:0 0 auto}
-.soundCtl #soundToggle{padding:8px 9px;font-size:12px}
-.soundCtl #volSlider{width:72px;margin:0;flex:0 0 72px}
-.mny{position:fixed!important;top:12px!important;right:18px!important;z-index:9999!important;margin:0!important;padding:8px 12px!important;border-radius:10px;background:#17131fdd;border:1px solid #3a2f4d;backdrop-filter:blur(8px);box-shadow:0 4px 16px #0008}
-@media(max-width:820px){.mny{top:8px!important;right:8px!important}.soundCtl{gap:4px}.soundCtl #volSlider{width:58px;flex-basis:58px}}
+.soundCtl{display:flex;align-items:center;gap:5px;flex:0 1 100%;min-width:0;max-width:100%;overflow:hidden}
+.soundCtl #soundToggle{padding:7px 8px;font-size:12px;flex:0 0 auto;white-space:nowrap}
+.soundCtl #volSlider{width:58px;min-width:0;max-width:58px;margin:0;flex:0 1 58px}
+.mny{position:fixed!important;top:12px!important;right:18px!important;z-index:9999!important;pointer-events:none!important;white-space:nowrap!important;margin:0!important;padding:8px 12px!important;border-radius:10px;background:#17131fdd;border:1px solid #3a2f4d;backdrop-filter:blur(8px);box-shadow:0 4px 16px #0008}
+@media(max-width:820px){main{padding-top:58px!important}.mny{top:8px!important;right:8px!important}.soundCtl{gap:4px}.soundCtl #volSlider{width:52px;max-width:52px;flex-basis:52px}}
+.navSoundBottom{margin:0!important;align-self:stretch!important;flex:0 0 auto!important}
+.navMoneyBottom{position:static!important;top:auto!important;right:auto!important;z-index:auto!important;pointer-events:none!important;white-space:nowrap!important;margin:4px 0 0 0!important;align-self:stretch!important;display:flex!important;justify-content:center!important;box-sizing:border-box!important}
 </style></head><body>
 <nav><h1>Wiki<span>Collect</span></h1><button id="t0" class="on">🎁 Boosters</button><button id="t1">🌍 Toutes les cartes</button><button id="t2">📚 Collection</button><button id="t3">🔨 Enchères</button><button id="t4">🎰 Casino</button>
-<button id="t5">🎯 Missions du jour</button><button id="t6">🔥 Événement du jour</button><button id="t7">👤 Profil</button><button id="t8">🏆 Succès</button><button id="hw">❓ Comment ça marche</button><div class="soundCtl"><button id="soundToggle" title="Activer / couper les sons">🔊 Sons</button><input id="volSlider" type="range" min="0" max="100" step="5" title="Volume des sons"></div><div id="mn" class="mny"></div><div class="sp"></div></nav>
+<button id="t5">🎯 Missions du jour</button><button id="t6">🔥 Événement du jour</button><button id="t7">👤 Profil</button><button id="t8">🏆 Succès</button><button id="hw">❓ Comment ça marche</button><div class="sp"></div><div class="soundCtl navSoundBottom"><button id="soundToggle" title="Activer / couper les sons">🔊 Sons</button><input id="volSlider" type="range" min="0" max="100" step="5" title="Volume des sons"></div><div id="mn" class="mny navMoneyBottom"></div></nav>
 <main id="main"></main>
 <div class="modal" id="modal"></div>
+<script id="wc-restore">
+(function(){
+ const SKIP=/^wc_(rank|films)/;
+ const keys=()=>{const a=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith("wc_")||k.startsWith("ACCOUNT_"))&&!SKIP.test(k))a.push(k)}return a};
+ const snap=()=>{const d={};keys().forEach(k=>{d[k]=localStorage.getItem(k)});return{v:2,t:Date.now(),site:"WikiCollect",d}};
+ const has=d=>{try{return Object.keys(JSON.parse(d.wc_col||"{}")).length>0}catch(e){return false}};
+ const idb=()=>new Promise((res,rej)=>{try{const r=indexedDB.open("wikicollect_backup",1);r.onupgradeneeded=()=>r.result.createObjectStore("b");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}});
+ const put=(k,v)=>idb().then(db=>new Promise((res,rej)=>{const t=db.transaction("b","readwrite");t.objectStore("b").put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})).catch(()=>{});
+ const get=k=>idb().then(db=>new Promise(res=>{const q=db.transaction("b").objectStore("b").get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)})).catch(()=>null);
+ const W=window.WCSAVE={keys,snap,has,put,get,ready:false,last:0,block:false};
+ W.backup=async()=>{if(!W.ready||W.block)return;const s=snap();if(!has(s.d))return;const prev=await get("last");if(prev&&s.t-prev.t>36e5)await put("prev",prev);await put("last",s);W.last=s.t};
+ if(!has(snap().d)&&!sessionStorage.getItem("wc_restored")){
+  // navigateur vidé : on récupère la copie de secours (IndexedDB), puis on recharge une seule fois
+  Promise.all([get("last"),get("prev")]).then(([a,b])=>{const best=[a,b].filter(x=>x&&x.d&&has(x.d)).sort((x,y)=>y.t-x.t)[0];
+   if(best){W.block=true;Object.keys(best.d).forEach(k=>localStorage.setItem(k,best.d[k]));sessionStorage.setItem("wc_restored","1");location.reload()}else W.ready=true});
+ }else W.ready=true;
+ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+})();
+</script>
 <script>
 // Raretés : [nom, couleur, poids de tirage par carte].
 const R=[["Commun","#c4c8cc",50.735],["Peu commune","#7ee29a",27.988],["Rare","#6cb2ff",12.439],["Holo","#8feaff",6.219],["Ultra rare","#ffae5c",1.555],["Full art","#ff7676",0.777],["Légendaire","#ffd23c",0.207],["Légendaire holo full art","#fff2a8",0.080]];const HID=new Set();
@@ -608,6 +633,25 @@ const OVR={
  "Attentats du 11 septembre 2001":7,"Attentats de Paris du 13 novembre 2015":7,"Attentat contre Charlie Hebdo":7,"Mort de Diana, princesse de Galles":7,
  "Naufrage du Titanic":7,"Catastrophe nucléaire de Tchernobyl":7,"Accident nucléaire de Fukushima":7,"Incendie de Notre-Dame de Paris":7,"Explosions au port de Beyrouth en 2020":7
 };
+
+/* ===== V98 : catalogue de cartes par catégorie (titres Wikipédia FR + rareté forcée) ===== */
+let CG="";
+const nz2=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9]+/g," ").trim().toLowerCase();
+const CATALOG={"foot":{"t7":"Kylian Mbappé|Lionel Messi|Cristiano Ronaldo|Pelé|Diego Maradona|Zinédine Zidane|Neymar|Équipe de France de football|Coupe du monde de football|Paris Saint-Germain Football Club|Real Madrid Club de Fútbol|Futbol Club Barcelona","t6":"Karim Benzema|Antoine Griezmann|Erling Haaland|Robert Lewandowski|Luka Modrić|Ronaldinho|Johan Cruyff|Michel Platini|Thierry Henry|Franz Beckenbauer|Zlatan Ibrahimović|Paul Pogba|N'Golo Kanté|Vinícius Júnior|Jude Bellingham|Lamine Yamal|Mohamed Salah|Kevin De Bruyne|Didier Deschamps|Olympique de Marseille|Olympique lyonnais|Manchester United Football Club|Liverpool Football Club|Juventus Football Club|Football Club Bayern Munich|Ballon d'or|Ligue des champions de l'UEFA|Coupe du monde de football de 2022|Coupe du monde de football de 2018|Coupe du monde de football de 1998|Stade de France|Olivier Giroud|Ousmane Dembélé|Eden Hazard|Sergio Ramos|Andrés Iniesta|Xavi|Iker Casillas|Eric Cantona|Gianluigi Buffon|Paolo Maldini|David Beckham|Roberto Baggio","t5":"Raphaël Varane|Hugo Lloris|Gareth Bale|Harry Kane|Son Heung-min|Sadio Mané|Samuel Eto'o|Didier Drogba|George Weah|Lilian Thuram|Fabien Barthez|Marcel Desailly|Zico|Romário|Rivaldo|Kaká|Andrea Pirlo|Francesco Totti|Alessandro Del Piero|Wayne Rooney|Steven Gerrard|Frank Lampard|Ruud van Nistelrooy|Dennis Bergkamp|Marco van Basten|Gerd Müller|Lev Yachine|Alfredo Di Stéfano|Ferenc Puskás|Bobby Charlton|Eusébio|Garrincha|Hristo Stoitchkov|Gheorghe Hagi|Roger Milla|Just Fontaine|Raymond Kopa|Jean-Pierre Papin|Youri Djorkaeff|Franck Ribéry|Samir Nasri|Dimitri Payet|Alexandre Lacazette|Pep Guardiola|José Mourinho|Carlo Ancelotti|Arsène Wenger|Alex Ferguson|Jürgen Klopp|Diego Simeone|Aimé Jacquet|Pierluigi Collina|Stade Santiago-Bernabéu|Camp Nou|Old Trafford|Parc des Princes|Stade Vélodrome|Allianz Arena|Wendie Renard|Alexia Putellas|Aitana Bonmatí|Marta Vieira da Silva|Megan Rapinoe|Alex Morgan|Mia Hamm|Ada Hegerberg","t4":"Lucas Hernandez|Théo Hernandez|Aurélien Tchouaméni|Eduardo Camavinga|Kingsley Coman|Marcus Thuram|Randal Kolo Muani|Adrien Rabiot|Mike Maignan|Jules Koundé|William Saliba|Dayot Upamecano|Ibrahima Konaté|Bradley Barcola|Warren Zaïre-Emery|Désiré Doué|Michael Olise|Rayan Cherki|Hatem Ben Arfa|Nicolas Anelka|Patrice Evra|Bacary Sagna|Mathieu Valbuena|Blaise Matuidi|Laurent Blanc|Bixente Lizarazu|Emmanuel Petit|Robert Pirès|Christian Karembeu|Claude Makélélé|Eugénie Le Sommer|Amandine Henry|Sandrine Soubeyrand|Marinette Pichon|Corinne Diacre|Sam Kerr|Sarina Wiegman|Thomas Tuchel|Luis Enrique|Antonio Conte|Rudi Garcia|Christophe Galtier|Raymond Domenech|Hervé Renard|Gérard Houllier|Rinus Michels|Arrigo Sacchi|Clément Turpin|Stéphanie Frappart|Howard Webb|Björn Kuipers|Felix Brych|Mark Clattenburg|Szymon Marciniak|Néstor Pitana|Daniele Orsato","t3":"Slavko Vinčić|Anthony Taylor|François Letexier|Benoît Bastien|Jérôme Brisard|Ruddy Buquet|Antony Gautier|Amaury Delerue|Kylian Hazard|Moussa Dembélé|Wissam Ben Yedder|Layvin Kurzawa|Presnel Kimpembe|Marquinhos|Gianluigi Donnarumma|Achraf Hakimi|Warren Bondo|Jonathan Clauss|Alexis Sánchez|Edinson Cavani|Ángel Di María|Mauro Icardi|Javier Pastore|Thiago Silva|Dani Alves|Gerard Piqué|Carles Puyol|Sergio Busquets|Jordi Alba|Pedri|Gavi|Ansu Fati"},"act":{"t7":"Marilyn Monroe|Charlie Chaplin|Leonardo DiCaprio|Brad Pitt|Johnny Depp|Tom Cruise|Bruce Lee|Arnold Schwarzenegger|Louis de Funès|Alain Delon|Jean-Paul Belmondo|Audrey Hepburn|Scarlett Johansson|Angelina Jolie","t6":"Will Smith|Robert De Niro|Al Pacino|Sylvester Stallone|Jackie Chan|Gérard Depardieu|Omar Sy|Jean Dujardin|Marion Cotillard|Brigitte Bardot|Catherine Deneuve|Sophie Marceau|Vincent Cassel|Tom Hanks|Keanu Reeves|Morgan Freeman|Jim Carrey|Robin Williams|Eddie Murphy|Dwayne Johnson|Ryan Reynolds|Chris Hemsworth|Robert Downey Jr.|Margot Robbie|Emma Watson|Daniel Radcliffe|Zendaya|Timothée Chalamet|Tom Holland|Anne Hathaway|Jennifer Lawrence|Natalie Portman|Meryl Streep|Julia Roberts|Nicole Kidman|Sandra Bullock|Kate Winslet|Jack Nicholson|Clint Eastwood|Harrison Ford|Sean Connery|Daniel Craig|Christian Bale|Heath Ledger|Joaquin Phoenix|Anthony Hopkins|Jean Reno|Christian Clavier|Dany Boon|Kad Merad|Jean Gabin|Bourvil|Fernandel|Yves Montand|Lino Ventura|Jean Marais|Michel Serrault|Pierre Richard|Gérard Jugnot|Fabrice Luchini|Vincent Lindon","t5":"Isabelle Adjani|Isabelle Huppert|Juliette Binoche|Audrey Tautou|Léa Seydoux|Eva Green|Louis Garrel|Romain Duris|Gaspard Ulliel|Josiane Balasko|Thierry Lhermitte|Guillaume Canet|Jean-Pierre Cassel|Ken Watanabe|Toshirō Mifune|Takeshi Kitano|Jet Li|Gong Li|Zhang Ziyi|Donnie Yen|Andy Lau|Tony Leung Chiu-wai|Lee Byung-hun|Song Kang-ho|Shah Rukh Khan|Amitabh Bachchan|Aishwarya Rai|Priyanka Chopra|Deepika Padukone|Aamir Khan|Salman Khan|Hugh Grant|Colin Firth|Benedict Cumberbatch|Idris Elba|Emma Thompson|Helen Mirren|Judi Dench|Maggie Smith|Michael Caine|Gary Oldman|Tom Hiddleston|Eddie Redmayne|Ian McKellen|Patrick Stewart|Gal Gadot|Ana de Armas|Florence Pugh|Sydney Sweeney|Millie Bobby Brown|Jenna Ortega|Pedro Pascal|Cillian Murphy|Austin Butler|Andrew Garfield|Robert Pattinson|Kristen Stewart|Megan Fox|Jessica Alba|Eva Mendes|Penélope Cruz|Salma Hayek|Antonio Banderas|Javier Bardem","t4":"Mélanie Laurent|Adèle Exarchopoulos|Léa Drucker|Karin Viard|Sandrine Kiberlain|Virginie Efira|Camille Cottin|Laure Calamy|Noémie Merlant|Bérénice Bejo|Cécile de France|Mélanie Thierry|Emmanuelle Béart|Vanessa Paradis|Charlotte Gainsbourg|Marina Foïs|Alexandra Lamy|Muriel Robin|Anne Parillaud|Mathilde Seigner|Tahar Rahim|Reda Kateb|Roschdy Zem|Jamel Debbouze|Gad Elmaleh|Franck Dubosc|José Garcia|Clovis Cornillac|Benoît Magimel|Pierre Niney|François Civil|Romain Duris|Raphaël Personnaz|Samuel Le Bihan|Lambert Wilson|Mathieu Kassovitz|Eric Judor|Ramzy Bedia|Kev Adams|Elie Semoun|Michaël Youn|Jérôme Commandeur|Alain Chabat|Dominique Pinon|Maurice Barthélémy","t3":"Masami Nagasawa|Satomi Ishihara|Hiroyuki Sanada|Tadanobu Asano|Ayase Haruka|Yui Aragaki|Kasumi Arimura|Park Seo-joon|Song Hye-kyo|Jun Ji-hyun|Lee Min-ho|Gong Yoo|Kim Soo-hyun|Hyun Bin|Son Ye-jin|Ma Dong-seok|Lee Jung-jae|Jung Ho-yeon|Rinko Kikuchi|Yūko Takeuchi"},"adult":{"t5":"Mia Khalifa|Sasha Grey|Jenna Jameson|Sunny Leone|Pornhub","t4":"Ron Jeremy|Stormy Daniels|Linda Lovelace|Rocco Siffredi|Brigitte Lahaie|Clara Morgane|Lana Rhoades|Maria Ozawa|Yua Mikami|Sora Aoi|Playboy|OnlyFans|XVideos|Gorge profonde","t3":"Lisa Ann|Riley Reid|Asa Akira|Nina Hartley|Marilyn Chambers|John Holmes|Katsuni|Ovidie|Nikita Bellucci|Anissa Kate|Jesse Jane|Tori Black|Mia Malkova|Angela White|Dani Daniels|Tera Patrick|Akiho Yoshizawa|Brazzers|YouPorn|Hustler|Penthouse|Derrière la porte verte|Industrie pornographique|Hot d'or|AVN Awards|Pornographie","t2":"Ginger Lynn|Peter North|Nikki Benz|Sophie Dee|Janine Lindemulder|Kimberly Kane|Bree Olson|Kendra Lust|Abella Danger|Alexis Texas|Madison Ivy|Eva Angelina|Lexi Belle|Remy LaCroix|Savanna Samson|Kobe Tai|Christy Canyon|Seka|Briana Banks|Teagan Presley|Ai Uehara|Dolly Golden|Debbie Does Dallas|Dorcel|Marc Dorcel|Jacquie et Michel|Rocco et les mille et une nuits|Cumshot|Gonzo (pornographie)"},"music":{"t7":"Michael Jackson|Elvis Presley|The Beatles|Queen (groupe)|Wolfgang Amadeus Mozart|Ludwig van Beethoven|Taylor Swift|Beyoncé|Johnny Hallyday|Madonna|David Bowie|Bob Marley|BTS|Eminem|Rihanna|Édith Piaf","t6":"Freddie Mercury|Prince|Lady Gaga|Drake|Blackpink|Céline Dion|Daft Punk|Jul (rappeur)|Stromae|Aya Nakamura|Booba|PNL (groupe)|Angèle (chanteuse)|Indochine|Jimi Hendrix|Kurt Cobain|Nirvana|Metallica|AC/DC|Led Zeppelin|Pink Floyd|The Rolling Stones|U2|Coldplay|Adele|Ed Sheeran|Justin Bieber|Billie Eilish|Ariana Grande|The Weeknd|Kanye West|Jay-Z|Tupac Shakur|The Notorious B.I.G.|Dr. Dre|Snoop Dogg|Shakira|Jennifer Lopez|Bruno Mars|Elton John|Frank Sinatra|Louis Armstrong|Claude Debussy|Frédéric Chopin|Jean-Sébastien Bach|Antonio Vivaldi|Richard Wagner|Johannes Brahms|Maître Gims|Soprano (rappeur)|Orelsan|Nekfeu|Damso|Ninho|Thriller (album)|Abbey Road|The Dark Side of the Moon|Bohemian Rhapsody|Gangnam Style|Despacito|Billie Jean|Smells Like Teen Spirit|Hotel California","t5":"Twice (groupe)|EXO (groupe)|Stray Kids|NewJeans|Seventeen (groupe)|Red Velvet|Girls' Generation|Big Bang (groupe)|Psy (chanteur)|Super Junior|Tomorrow X Together|Aespa|Itzy|Ateez|IU (chanteuse)|G-Dragon|Jungkook|Jimin|Jennie|Rosé (chanteuse)|Lisa (chanteuse)|Johnny Cash|Bob Dylan|Jim Morrison|The Doors|Guns N' Roses|Bon Jovi|Scorpions|Iron Maiden|Black Sabbath|Ozzy Osbourne|Kiss (groupe)|Aerosmith|Eagles (groupe)|ABBA|Bee Gees|Bruce Springsteen|Stevie Wonder|Ray Charles|Whitney Houston|Mariah Carey|Britney Spears|Christina Aguilera|Katy Perry|Dua Lipa|Olivia Rodrigo|Sabrina Carpenter|Doja Cat|Nicki Minaj|Cardi B|Travis Scott|Post Malone|Lil Nas X|Kendrick Lamar|50 Cent|Ice Cube|Lil Wayne|Mylène Farmer|Jacques Brel|Charles Aznavour|Serge Gainsbourg|Georges Brassens|Claude François|Dalida|Françoise Hardy|Michel Sardou|Francis Cabrel|Jean-Jacques Goldman|Renaud|Alain Bashung|Vianney|Zaz|Christophe Maé|M. Pokora|Matt Pokora|Louane|Slimane|Amir (chanteur)|Kendji Girac|Black M|MHD|Gazo|Tiakola|Leto (rappeur)|Hamza (rappeur)|Naps|Kaaris|Médine|IAM|NTM (groupe)|Sexion d'Assaut|Fianso|Dadju|Vald|Lomepal|SCH (rappeur)|Koba LaD","t4":"Mozart: la Flûte enchantée|Eine kleine Nachtmusik|Pour Élise|La Marseillaise|Imagine (chanson)|Stairway to Heaven|La Vie en rose|Je t'aime... moi non plus|Alexandrie Alexandra|Nevermind|Back in Black|Rumours|Dangerous (album)|Bad (album)|Off the Wall|Purple Rain|Born in the U.S.A.|Like a Prayer|Lemonade (album)|1989 (album)|Midnights|Folklore (album)|Renaissance (album de Beyoncé)|Utopia (album)|Les Enfoirés|Star Academy|The Voice (France)|Eurovision|Eurovision 2024"},"game":{"t7":"Minecraft|Pokémon|Super Mario Bros.|Fortnite|Grand Theft Auto V|The Legend of Zelda","t6":"Mario (personnage)|Pac-Man|Sonic the Hedgehog|Tetris|Call of Duty|League of Legends|Among Us|Roblox|Pikachu|Nintendo|PlayStation|Xbox|Counter-Strike|Valorant|Elden Ring|The Witcher 3: Wild Hunt|Red Dead Redemption 2|Assassin's Creed|Final Fantasy VII|Street Fighter II|Space Invaders|Donkey Kong|Kirby|Link (Zelda)|Lara Croft|Kratos|Halo (série de jeux vidéo)|Metal Gear Solid|Crash Bandicoot|Animal Crossing|Mortal Kombat|Resident Evil|Dark Souls|God of War|Uncharted|Clash Royale|Clash of Clans|Candy Crush Saga|FIFA 23|EA Sports FC 24|Rocket League|Overwatch|Apex Legends|World of Warcraft|Dofus|Les Sims|Doom (jeu vidéo)|Half-Life|Portal (jeu vidéo)|Bioshock|Skyrim|Fallout|Cyberpunk 2077|Hollow Knight|Undertale|Stardew Valley|Terraria|Hades (jeu vidéo)|Celeste (jeu vidéo)","t5":"Luigi|Princesse Peach|Bowser|Yoshi|Samus Aran|Mewtwo|Dracaufeu|Évoli|Salamèche|Carapuce|Bulbizarre|Ronflex|Lucario|Mimiqui|Pichu|Jigglypuff|Ganondorf|Zelda (personnage)|Sora (Kingdom Hearts)|Cloud Strife|Sephiroth|Tifa Lockhart|Geralt de Riv|Ezio Auditore|Nathan Drake|Master Chief|Solid Snake|Dante (Devil May Cry)|Ryu (Street Fighter)|Chun-Li|Scorpion (Mortal Kombat)|Steve (Minecraft)|Creeper|Enderman|Ender Dragon|Wither|Tracer|Jett|Sage|Yasuo|Jinx (League of Legends)|Ahri|Teemo","t4":"Kingdom Hearts|Devil May Cry|Tekken|Super Smash Bros.|Mario Kart|Splatoon|Animal Crossing: New Horizons|The Last of Us|Horizon Zero Dawn|Bloodborne|Sekiro|Death Stranding|Persona 5|Genshin Impact|Honkai: Star Rail|Fall Guys|Brawl Stars|Subway Surfers|Angry Birds|Flappy Bird|Temple Run|Pong|Pokémon Go|Pokémon Rouge et Bleu|Pokémon Or et Argent|Counter-Strike: Global Offensive|Dota 2|Rainbow Six Siege|Escape from Tarkov|Palworld|Baldur's Gate III|Lethal Company|Helldivers 2"},"film":{"t7":"Star Wars|Harry Potter|Le Seigneur des anneaux|Dragon Ball|Naruto|One Piece|Avatar (film, 2009)|Titanic (film, 1997)|Game of Thrones|Breaking Bad|Stranger Things|Spider-Man|Batman","t6":"Marvel Cinematic Universe|The Walking Dead|Friends|Les Simpson|South Park|Pulp Fiction|Le Parrain (film)|Fight Club|Matrix|Inception|Interstellar|Gladiator (film, 2000)|Jurassic Park|Retour vers le futur|Indiana Jones|Pirates des Caraïbes|Fast and Furious|Mission impossible|James Bond|Toy Story|Le Roi lion|La Reine des neiges|Shrek|Moi, moche et méchant|Astérix|Tintin|Lucky Luke|Death Note|L'Attaque des Titans|Demon Slayer|My Hero Academia|Sailor Moon|Dragon Ball Z|Fullmetal Alchemist|Bleach|Hunter × Hunter|Jujutsu Kaisen|Berserk|Akira|Le Voyage de Chihiro|Mon voisin Totoro|Princesse Mononoké|Le Château ambulant|Squid Game|La Casa de papel|Lupin (série télévisée)|Peaky Blinders|The Big Bang Theory|How I Met Your Mother|Les Tuche|Intouchables|Le Fabuleux Destin d'Amélie Poulain|La Haine|Taxi (film)|Les Visiteurs|Le Dîner de cons|La Grande Vadrouille|Le Corniaud|Oppenheimer (film)|Barbie (film)|Dune (film, 2021)|Joker (film, 2019)|The Dark Knight : Le Chevalier noir|Avengers: Endgame|Spider-Man: No Way Home","t5":"Naruto Uzumaki|Son Goku|Monkey D. Luffy|Light Yagami|Eren Jäger|Tanjirō Kamado|Izuku Midoriya|Sasuke Uchiwa|Vegeta|Gon Freecss|Edward Elric|Saitama (One-Punch Man)|One-Punch Man|Spy × Family|Chainsaw Man|Fairy Tail|Tokyo Ghoul|Sword Art Online|Evangelion|Cowboy Bebop|Code Geass|Steins;Gate|Haikyū!!|Blue Lock|Slam Dunk|Captain Tsubasa|Olive et Tom|Les Chevaliers du Zodiaque|Albator|Goldorak|Candy Candy|Pokémon (série télévisée d'animation)|Bob l'éponge|Rick et Morty|Les Griffin|Futurama|Avatar, le dernier maître de l'air|Gravity Falls|Adventure Time|Ladybug|Miraculous|Totally Spies!|Kaamelott|Plus belle la vie|Scènes de ménages|Les Experts|Dr House|Grey's Anatomy|Prison Break|Lost : Les Disparus|24 Heures chrono|Dexter (série télévisée)|The Mandalorian|The Witcher (série télévisée)|House of the Dragon|Les Anneaux de pouvoir|Wednesday|Euphoria (série télévisée)|Narcos|Black Mirror|The Crown|Bridgerton|You (série télévisée)|Vikings (série télévisée)","t4":"Le Seigneur des anneaux : La Communauté de l'anneau|Le Hobbit|Harry Potter à l'école des sorciers|Les Animaux fantastiques|Twilight (série de films)|Hunger Games|Divergente|Le Labyrinthe|Maze Runner|Percy Jackson|Narnia|Pirates des Caraïbes : La Malédiction du Black Pearl|Mad Max: Fury Road|John Wick|Top Gun: Maverick|Les Gardiens de la Galaxie|Black Panther|Thor|Iron Man|Captain America|Hulk|Doctor Strange|Deadpool|Wolverine|X-Men|Les 4 Fantastiques|Superman|Wonder Woman|Aquaman|The Flash|Justice League|Suicide Squad|Harley Quinn|Joker (personnage)|Venom|Spider-Man: Into the Spider-Verse"},"animal":{"t7":"Chien|Chat|Lion|Loup gris|Dinosaure","t6":"Tigre|Dauphin|Grand requin blanc|Panda géant|Tyrannosaurus|Tricératops|Vélociraptor|Aigle royal|Cheval|Dragon de Komodo|Crocodile du Nil|Ours polaire|Gorille|Chimpanzé|Orque|Baleine bleue|Girafe|Zèbre|Léopard|Guépard|Hippopotame|Rhinocéros blanc|Éléphant d'Afrique|Kangourou roux|Koala|Panthère noire|Renard roux|Ours brun|Loup arctique|Lynx boréal|Pingouin|Manchot empereur|Flamant rose|Paon bleu|Perroquet|Hibou grand-duc|Colibri|Autruche|Requin-marteau|Raie manta|Poisson-clown|Hippocampe|Méduse|Pieuvre commune|Tortue luth|Caméléon|Cobra royal|Python réticulé|Anaconda|Mante religieuse|Scarabée Hercule|Abeille domestique|Papillon monarque","t5":"Veuve noire|Tarentule|Mygale|Scorpion|Moustique|Fourmi|Termite|Libellule|Coccinelle|Luciole|Criquet pèlerin|Cigale|Scarabée rhinocéros|Lucane cerf-volant|Bourdon|Guêpe|Frelon asiatique|Frelon européen|Piranha|Murène|Anguille électrique|Poisson-lune|Poisson-globe|Poisson-lion|Barracuda|Thon rouge|Saumon atlantique|Carpe commune|Brochet|Truite arc-en-ciel|Poisson rouge|Requin-baleine|Requin-tigre|Requin bouledogue|Poulpe|Calmar géant|Crabe royal|Homard européen|Étoile de mer|Oursin|Axolotl|Grenouille rieuse|Dendrobate|Salamandre tachetée|Iguane vert|Gecko|Varan|Tortue géante des Galápagos|Alligator|Gavial|Tuatara|Smilodon|Mammouth laineux|Diplodocus|Stégosaure|Spinosaure|Brachiosaure|Ptéranodon|Mégalodon|Mosasaure|Ankylosaure|Vélociraptor mongoliensis|Giganotosaurus|Carnotaure|Allosaure|Dilophosaure|Compsognathus|Archéoptéryx","t4":"Berger allemand|Labrador retriever|Golden retriever|Bouledogue français|Husky sibérien|Chihuahua|Caniche|Shiba Inu|Corgi|Rottweiler|Dobermann|Beagle|Chat persan|Maine coon|Chat de Bengale|Sphynx (chat)|Chat siamois|Ragdoll|Cheval de Przewalski|Pur-sang|Mustang (cheval)|Âne|Mulet|Vache|Cochon|Mouton|Chèvre|Poule domestique|Canard colvert|Oie cendrée|Dindon|Lapin|Hamster doré|Cochon d'Inde|Furet|Rat brun|Souris domestique|Chauve-souris|Hérisson d'Europe|Écureuil roux|Castor|Loutre|Blaireau|Sanglier|Cerf élaphe|Chevreuil|Élan|Renne|Bison d'Amérique|Yak|Chameau|Dromadaire|Lama|Alpaga|Paresseux|Tamanoir|Tatou|Opossum|Diable de Tasmanie|Ornithorynque|Wombat|Quokka"},"plant":{"t7":"Rose|Cannabis","t6":"Tournesol|Tulipe|Orchidée|Lavande|Chêne|Baobab|Séquoia géant|Bambou|Cactus|Amanite tue-mouches|Cèpe de Bordeaux|Truffe noire|Morille|Aloe vera|Olivier|Palmier dattier|Pissenlit|Coquelicot|Muguet|Lotus|Rafflesia arnoldii|Dionée attrape-mouche|Café|Cacaoyer|Vigne|Tomate|Pomme de terre|Blé|Riz|Maïs","t5":"Marguerite commune|Lys|Iris (plante)|Pivoine|Hortensia|Jasmin|Lilas|Camélia|Magnolia|Cerisier du Japon|Sakura|Bonsaï|Érable du Japon|Hêtre|Bouleau|Pin parasol|Sapin|Épicéa|Mélèze|Cèdre du Liban|Cyprès|Platane|Marronnier|Tilleul|Saule pleureur|Peuplier|Frêne|Orme|Noyer|Châtaignier|Oranger|Citronnier|Pommier|Poirier|Bananier|Manguier|Palmier|Cocotier|Ananas|Fraisier|Framboisier|Myrtille|Basilic|Menthe|Thym|Romarin|Persil|Ciboulette|Gingembre|Curcuma|Safran|Vanille|Poivre|Cannelle|Champignon de Paris|Pleurote|Chanterelle|Girolle|Amanite phalloïde|Psilocybe|Shiitake|Lichen|Mousse|Fougère|Algue|Kelp|Nénuphar|Papyrus|Ginkgo biloba|Sequoia à feuilles d'if|Arbre de Judée|Welwitschia|Plante carnivore|Nepenthes|Sarracénie","t4":"Edelweiss|Gentiane|Arnica|Camomille|Calendula|Capucine|Cosmos|Dahlia|Zinnia|Pensée|Violette|Primevère|Bleuet|Myosotis|Glycine|Bougainvillier|Hibiscus|Frangipanier|Oiseau de paradis|Anthurium|Monstera|Ficus|Yucca|Agave|Mimosa|Eucalyptus|Acacia|Bruyère|Genêt|Ajonc|Houx|Lierre|Gui|Ortie|Ronce|Chardon|Trèfle|Luzerne|Colza|Lin|Chanvre|Coton|Canne à sucre|Betterave|Tabac|Houblon|Orge"},"science":{"t7":"Albert Einstein|Isaac Newton|Stephen Hawking|Marie Curie|Nikola Tesla|Charles Darwin|Galilée (savant)|Louis Pasteur","t6":"Archimède|Pythagore|Aristote|Platon|Thomas Edison|Alexander Graham Bell|Sigmund Freud|Carl Sagan|Neil Armstrong|Youri Gagarine|Richard Feynman|Max Planck|Niels Bohr|Pierre Curie|Blaise Pascal|René Descartes|Évariste Galois|Carl Friedrich Gauss|Leonhard Euler|Alan Turing|Ada Lovelace|Johannes Kepler|Nicolas Copernic|Edwin Hubble|Rosalind Franklin|Alexander Fleming|Hippocrate|Didier Raoult|Soleil|Terre|Lune|Mars (planète)|Jupiter (planète)|Saturne (planète)|Vénus (planète)|Mercure (planète)|Uranus (planète)|Neptune (planète)|Pluton (planète naine)|Trou noir|Big Bang|Système solaire|Voie lactée|ADN|Théorie de la relativité|Tableau périodique des éléments|Apollo 11|Station spatiale internationale","t5":"Katherine Johnson|Edward Jenner|Claude Bernard|Jean-Jacques Cousteau|Hubert Reeves|Étienne Klein|Cédric Villani|Thomas Pesquet|Claudie Haigneré|Buzz Aldrin|Sally Ride|Valentina Terechkova|Elon Musk|Jeff Bezos|Neil deGrasse Tyson|Brian Cox|Jane Goodall|David Attenborough|Gregor Mendel|Jean-Baptiste de Lamarck|Georges Cuvier|Carl von Linné|Alfred Nobel|Dmitri Mendeleïev|Antoine Lavoisier|Robert Boyle|Michael Faraday|James Clerk Maxwell|Ernest Rutherford|Werner Heisenberg|Erwin Schrödinger|Paul Dirac|Enrico Fermi|Robert Oppenheimer|Richard Dawkins|Peter Higgs|Roger Penrose|Kip Thorne|Subrahmanyan Chandrasekhar|Henri Poincaré|Pierre de Fermat|Joseph Fourier|Sophie Germain|Emmy Noether|Srinivasa Ramanujan|Terence Tao|Grigori Perelman|Andrew Wiles|Pierre-Simon de Laplace|Joseph-Louis Lagrange","t4":"Hermann von Helmholtz|Heinrich Hertz|Guglielmo Marconi|Samuel Morse|Alessandro Volta|Luigi Galvani|André-Marie Ampère|Georg Ohm|Hans Christian Ørsted|Christiaan Huygens|Tycho Brahe|Giordano Bruno|Hypatie|Ératosthène|Euclide|Ptolémée|Averroès|Avicenne|Al-Khwarizmi|Ibn al-Haytham|Zhang Heng|Shen Kuo|Rudolf Virchow|Robert Koch|Paul Ehrlich|Jonas Salk|Albert Sabin|Christiaan Barnard|Michael DeBakey|Ambroise Paré|Philippe Pinel|Jean-Martin Charcot|Marie-François Xavier Bichat|Emile Roux|Luc Montagnier|Françoise Barré-Sinoussi|Emmanuelle Charpentier|Jennifer Doudna|Svante Pääbo|Katalin Karikó|Drew Weissman"},"place":{"t7":"Paris|Tokyo|New York|Londres|Los Angeles|Dubaï|France|États-Unis|Chine|Japon|Tour Eiffel|Pyramides de Gizeh|Colisée|Taj Mahal|Grande Muraille de Chine|Statue de la Liberté|Machu Picchu","t6":"Rome|Barcelone|Berlin|Madrid|Moscou|Pékin|Séoul|Sydney|Rio de Janeiro|Istanbul|Le Caire|Venise|Amsterdam|Las Vegas|Miami|Marseille|Lyon|Monaco|Disneyland Paris|Mont-Saint-Michel|Notre-Dame de Paris|Arc de triomphe de l'Étoile|Sacré-Cœur de Montmartre|Burj Khalifa|Big Ben|Sagrada Família|Acropole d'Athènes|Angkor Vat|Pétra|Everest|Forêt amazonienne|Sahara|Chutes du Niagara|Grand Canyon|Antarctique|Islande|Brésil|Allemagne|Italie|Espagne|Royaume-Uni|Russie|Inde|Canada|Mexique|Maroc|Algérie|Sénégal|Côte d'Ivoire|Belgique|Suisse|Musée du Louvre|Château de Versailles|British Museum|Metropolitan Museum of Art|Musée d'Orsay","t5":"Athènes|Lisbonne|Vienne (Autriche)|Prague|Budapest|Varsovie|Stockholm|Oslo|Copenhague|Helsinki|Dublin|Édimbourg|Bruxelles|Genève|Zurich|Milan|Florence|Naples|Nice|Bordeaux|Toulouse|Lille|Strasbourg|Nantes|Montpellier|Rennes|Cannes|Saint-Tropez|Saint-Étienne|Villeurbanne|Boston|Chicago|San Francisco|Washington|Houston|Seattle|Toronto|Montréal|Vancouver|Mexico|Buenos Aires|Lima|Bogota|Santiago du Chili|Casablanca|Marrakech|Alger|Tunis|Dakar|Abidjan|Lagos|Johannesbourg|Le Cap|Nairobi|Dubaï (émirat)|Abou Dabi|Doha|Riyad|Jérusalem|Tel Aviv|Bagdad|Téhéran|Bombay|New Delhi|Bangkok|Singapour|Hong Kong|Shanghai|Osaka|Kyoto|Manille|Jakarta|Bali|Melbourne|Auckland|Hawaï|Tahiti|Maldives|Seychelles|Santorin|Mykonos|Malte|Sicile|Corse|Toscane|Provence|Côte d'Azur|Alpes|Mont Blanc|Pyrénées|Alsace|Bretagne|Normandie|Louvre|Tour Montparnasse|Champs-Élysées|Place de la Concorde|Panthéon (Paris)|Château de Chambord|Château de Chenonceau|Palais de l'Élysée|Palais de Buckingham|Kremlin|Place Rouge|Cathédrale Saint-Basile de Moscou|Sagrada Família|Alhambra|Parthénon|Stonehenge|Pise|Tour de Pise|Fontaine de Trevi|Vatican|Basilique Saint-Pierre de Rome|Venise (Italie)|Gondole|Opéra de Sydney|Golden Gate Bridge|Empire State Building|Times Square|Central Park|Hollywood|Disney World|Niagara Falls|Mont Rushmore|Table Mountain|Kilimandjaro|Victoria Falls|Désert de Gobi|Mer Morte|Grand Barrière de corail|Galápagos|Île de Pâques|Atlantide","t4":"Stade de Wembley|Maracanã|Stade San Siro|Anfield|Stade Louis-II|Stade Geoffroy-Guichard|Groupama Stadium|Roazhon Park|Stade de la Beaujoire|Stade Pierre-Mauroy|Allianz Riviera|Stade Bollaert-Delelis|Musée Guggenheim Bilbao|Musée du Prado|Galerie des Offices|Musée de l'Ermitage|Rijksmuseum|Musée Grévin|Centre Pompidou|Musée de l'Orangerie|Palais de Tokyo|Fondation Louis-Vuitton|Opéra Garnier|Château de Fontainebleau|Château de Vincennes|Château de Blois|Château d'Amboise|Château de Chantilly|Château d'If|Château de Carcassonne|Pont du Gard|Pont d'Avignon|Palais des Papes|Gorges du Verdon|Dune du Pilat|Étretat|Biarritz|Saint-Malo|La Rochelle|Colmar|Annecy|Chamonix|Grenoble|Clermont-Ferrand|Dijon|Reims|Metz|Nancy|Rouen|Le Havre|Caen|Brest|Angers|Tours|Orléans|Limoges|Poitiers|Perpignan|Toulon|Avignon|Ajaccio|Bastia|Fort-de-France|Saint-Denis (La Réunion)|Nouméa|Papeete"},"vehicle":{"t7":"Ferrari|Lamborghini|Porsche 911|Tesla Model S|Concorde (avion)|Titanic","t6":"Bugatti Veyron|Ford Mustang|Renault 4|Citroën 2 CV|Peugeot 205|Volkswagen Coccinelle|Mini (automobile)|Rolls-Royce|Mercedes-Benz Classe G|Harley-Davidson|TGV|Orient-Express|Shinkansen|Boeing 747|Airbus A380|Supermarine Spitfire|Lockheed Martin F-22 Raptor|Dassault Rafale|Queen Mary 2|Cutty Sark|Falcon 9|Spoutnik 1|Delorean DMC-12|Batmobile|Tesla Cybertruck|McLaren F1|Ferrari F40|Ferrari Testarossa|Porsche 911 GT3|Nissan GT-R|Toyota Supra|Mazda MX-5|Honda NSX|Lamborghini Countach|Lamborghini Aventador|Bugatti Chiron|Aston Martin DB5|Jaguar E-Type|Ford GT40|Chevrolet Corvette","t5":"Renault Clio|Renault Twingo|Renault Espace|Peugeot 206|Peugeot 308|Citroën DS|Citroën C3|Citroën Traction Avant|Volkswagen Golf|Volkswagen Combi|BMW M3|BMW Série 3|Mercedes-Benz Classe S|Audi R8|Audi TT|Opel Corsa|Fiat 500|Alfa Romeo Giulia|Maserati|Bentley|Lotus Elise|Dacia Duster|Toyota Prius|Toyota Corolla|Honda Civic|Subaru Impreza|Mitsubishi Lancer Evolution|Jeep Wrangler|Land Rover Defender|Hummer H1|Ford Model T|Ford F-150|Cadillac Eldorado|Honda CB750|Yamaha YZF-R1|Ducati Panigale|Kawasaki Ninja|Vespa|Lambretta|Triumph Bonneville|Royal Enfield|Mobylette|Solex|BMX|Vélo de course|Locomotive à vapeur|TER|Thalys|Eurostar|Métro de Paris|Tramway|Hyperloop|Boeing 737|Airbus A320|Boeing 787 Dreamliner|Cessna 172|Zeppelin|Montgolfière|Hélicoptère|Hovercraft|Paquebot|Porte-avions Charles de Gaulle|Sous-marin nucléaire|Yacht|Voilier|Caravelle|Galion|Drakkar|Radeau","t4":"Messerschmitt Bf 109|Tiger I|Char T-34|Char Leclerc|Abrams M1|Jeep Willys|Hummer H2|Quad|Motoneige|Karting|Kart|Tracteur|Camion|Autobus|Bus à impériale|Taxi de New York|Fiacre|Calèche|Rickshaw|Tuk-tuk|Trottinette|Skateboard|Roller|Hoverboard|Segway|Monocycle|Tandem|Vélo électrique"},"book":{"t7":"Victor Hugo|William Shakespeare|Léonard de Vinci|Vincent van Gogh|Pablo Picasso|La Joconde|Le Petit Prince","t6":"Molière|Jules Verne|Alexandre Dumas|Albert Camus|Marcel Proust|Antoine de Saint-Exupéry|J. R. R. Tolkien|J. K. Rowling|Stephen King|Agatha Christie|George Orwell|Franz Kafka|Fiodor Dostoïevski|Léon Tolstoï|Ernest Hemingway|Mark Twain|Charles Dickens|Edgar Allan Poe|Homère|Dante Alighieri|Miguel de Cervantes|Johann Wolfgang von Goethe|Friedrich Nietzsche|Voltaire|Jean-Jacques Rousseau|Honoré de Balzac|Émile Zola|Gustave Flaubert|Charles Baudelaire|Arthur Rimbaud|Jean-Paul Sartre|Simone de Beauvoir|Michel Houellebecq|Hergé|René Goscinny|Albert Uderzo|Hayao Miyazaki|Akira Toriyama|Eiichirō Oda|Claude Monet|Salvador Dalí|Michel-Ange|Rembrandt|Frida Kahlo|Andy Warhol|Banksy|Auguste Rodin|Henri Matisse|Paul Cézanne|Edvard Munch|La Nuit étoilée|Guernica (Picasso)|Le Cri|La Naissance de Vénus|La Cène (Léonard de Vinci)|La Liberté guidant le peuple|Les Misérables|Le Comte de Monte-Cristo|Les Trois Mousquetaires|Notre-Dame de Paris (roman)|L'Étranger|Madame Bovary|Germinal|Le Rouge et le Noir|Vingt mille lieues sous les mers|Harry Potter à l'école des sorciers (roman)|1984 (roman)|La Ferme des animaux|Don Quichotte|Roméo et Juliette|Hamlet|La Divine Comédie|L'Iliade|L'Odyssée|La Bible|Le Coran|Tintin au Tibet|Astérix le Gaulois|Lucky Luke (bande dessinée)|Les Schtroumpfs|Spirou et Fantasio|Gaston Lagaffe|Blake et Mortimer|Largo Winch|Titeuf|Boule et Bill|Marsupilami","t5":"Guy de Maupassant|Stendhal|Alphonse Daudet|Paul Verlaine|Stéphane Mallarmé|Guillaume Apollinaire|Louis Aragon|Paul Éluard|Jacques Prévert|Boris Vian|Marguerite Duras|Annie Ernaux|Patrick Modiano|J. M. G. Le Clézio|Amélie Nothomb|Guillaume Musso|Marc Levy|Joël Dicker|Bernard Werber|Frank Thilliez|Franck Thilliez|Maxime Chattam|Mélissa Da Costa|Aurélie Valognes|Muriel Barbery|Anna Gavalda|Stieg Larsson|Dan Brown|Paulo Coelho|Gabriel García Márquez|Jorge Luis Borges|Pablo Neruda|Umberto Eco|Italo Calvino|Haruki Murakami|Yasunari Kawabata|Kōbō Abe|Lu Xun|Rabindranath Tagore|Naguib Mahfouz|Chinua Achebe|Toni Morrison|Maya Angelou|Harper Lee|F. Scott Fitzgerald|John Steinbeck|William Faulkner|Jack London|Herman Melville|Jack Kerouac|Truman Capote|J. D. Salinger|Kurt Vonnegut|Isaac Asimov|Arthur C. Clarke|Philip K. Dick|Frank Herbert|Ray Bradbury|H. P. Lovecraft|Jules Renard|Colette|Georges Simenon|Maurice Leblanc|Gaston Leroux|Arsène Lupin|Sherlock Holmes|Arthur Conan Doyle|Oscar Wilde|Jane Austen|Charlotte Brontë|Emily Brontë|Virginia Woolf|Lewis Carroll|Alice au pays des merveilles|Peter Pan|Pinocchio|Le Livre de la jungle|Cendrillon|Blanche-Neige|La Belle au bois dormant|Le Petit Chaperon rouge|Hansel et Gretel|Les Contes de Perrault|Frères Grimm|Hans Christian Andersen|Jean de La Fontaine|La Cigale et la Fourmi","t4":"Johannes Vermeer|La Jeune Fille à la perle|Diego Vélasquez|Les Ménines|Francisco de Goya|Caravage|Raphaël (peintre)|Sandro Botticelli|Titien|Jérôme Bosch|Pieter Brueghel l'Ancien|Albrecht Dürer|Caspar David Friedrich|William Turner|John Constable|Eugène Delacroix|Théodore Géricault|Jean-Auguste-Dominique Ingres|Jacques-Louis David|François Boucher|Jean-Honoré Fragonard|Antoine Watteau|Édouard Manet|Edgar Degas|Pierre-Auguste Renoir|Camille Pissarro|Alfred Sisley|Paul Gauguin|Georges Seurat|Henri de Toulouse-Lautrec|Henri Rousseau|Marc Chagall|Wassily Kandinsky|Piet Mondrian|Kazimir Malevitch|Joan Miró|René Magritte|Max Ernst|Marcel Duchamp|Jackson Pollock|Mark Rothko|Roy Lichtenstein|Jean-Michel Basquiat|Keith Haring|Yayoi Kusama|Takashi Murakami|Jeff Koons|Damien Hirst|Ai Weiwei|Christo|Niki de Saint Phalle|Camille Claudel|Alberto Giacometti|Constantin Brâncuși|Henry Moore|Louise Bourgeois"},"hist":{"t7":"Napoléon Ier|Adolf Hitler|Jésus de Nazareth|Donald Trump|Emmanuel Macron|Oussama ben Laden|Elon Musk|Steve Jobs|Seconde Guerre mondiale|Attentats du 11 septembre 2001","t6":"Louis XIV|Jeanne d'Arc|Cléopâtre VII|Alexandre le Grand|Jules César|Charlemagne|Gengis Khan|Attila|Joseph Staline|Lénine|Benito Mussolini|Winston Churchill|Charles de Gaulle|Mahomet|Bouddha|Mahatma Gandhi|Nelson Mandela|Martin Luther King|Che Guevara|Fidel Castro|Abraham Lincoln|George Washington|John F. Kennedy|Barack Obama|Vladimir Poutine|Xi Jinping|Élisabeth II|Charles III|Diana Spencer|Marie-Antoinette|Louis XVI|Maximilien de Robespierre|Mère Teresa|François (pape)|Jean-Paul II|Bill Gates|Mark Zuckerberg|Jeff Bezos|Première Guerre mondiale|Révolution française|Débarquement de Normandie|Bataille de Waterloo|Guerre froide|Guerre du Viêt Nam|Chute du mur de Berlin|Pandémie de Covid-19|Shoah|Hiroshima|Auschwitz-Birkenau","t5":"Louis XV|Louis XIII|Henri IV|François Ier|Philippe le Bel|Saint Louis|Clovis Ier|Vercingétorix|Jules Ferry|Georges Clemenceau|Léon Blum|François Mitterrand|Jacques Chirac|Nicolas Sarkozy|François Hollande|Marine Le Pen|Jean-Luc Mélenchon|Éric Zemmour|Jordan Bardella|Édouard Philippe|Gabriel Attal|Élisabeth Borne|Brigitte Macron|Valéry Giscard d'Estaing|Georges Pompidou|Joe Biden|Kamala Harris|Ronald Reagan|Richard Nixon|Franklin Delano Roosevelt|Theodore Roosevelt|Margaret Thatcher|Tony Blair|Boris Johnson|Angela Merkel|Olaf Scholz|Volodymyr Zelensky|Recep Tayyip Erdoğan|Kim Jong-un|Saddam Hussein|Mouammar Kadhafi|Bachar el-Assad|Benyamin Netanyahou|Yasser Arafat|Ayatollah Khomeini|Mao Zedong|Deng Xiaoping|Hô Chi Minh|Pol Pot|Francisco Franco|Augusto Pinochet|Simón Bolívar|Napoléon III|Catherine II de Russie|Pierre le Grand|Ivan le Terrible|Nicolas II de Russie|Raspoutine|Marie Ire d'Angleterre|Henri VIII|Élisabeth Ire|Victoria (reine)|Guillaume le Conquérant|Richard Cœur de Lion|Saladin|Soliman le Magnifique|Tamerlan|Hannibal Barca|Spartacus|Léonidas Ier|Périclès|Socrate|Confucius|Lao Tseu|Sun Tzu|Marco Polo|Christophe Colomb|Vasco de Gama|Magellan|James Cook|Amerigo Vespucci|Néron|Caligula|Auguste|Marc Aurèle|Constantin Ier|Ramsès II|Toutânkhamon|Nefertiti|Khéops|Hatchepsout|Akhenaton","t4":"Ben Laden|Jeffrey Dahmer|Charles Manson|Ted Bundy|Jack l'Éventreur|Al Capone|Pablo Escobar|El Chapo|Mesrine|Jacques Mesrine|Marc Dutroux|Michel Fourniret|Guy Georges|Émile Louis|Francis Heaulme|Landru|Henri Désiré Landru|Dominique Strauss-Kahn|Jérôme Cahuzac|Bernard Madoff|Harvey Weinstein|Jeffrey Epstein|Édouard Philippe|Gérald Darmanin|Bruno Le Maire|Rachida Dati|Nadine Morano|Christiane Taubira|Simone Veil|Ségolène Royal|Anne Hidalgo|Valérie Pécresse|Éric Ciotti|Laurent Wauquiez|Xavier Bertrand|Yannick Jadot|Fabien Roussel|Philippe Poutou|Nathalie Arthaud|Jean Lassalle|Nicolas Dupont-Aignan|François Bayrou|Jean-Marie Le Pen|Philippe de Villiers|Robert Badinter|Jacques Delors|Michel Rocard|Lionel Jospin|Laurent Fabius|Dominique de Villepin|Alain Juppé|Raymond Barre|Pierre Mendès France|Léon Gambetta|Victor Schœlcher|Toussaint Louverture|Thomas Sankara|Patrice Lumumba|Haïlé Sélassié Ier|Kwame Nkrumah|Léopold Sédar Senghor|Félix Houphouët-Boigny|Mobutu Sese Seko|Idi Amin Dada|Robert Mugabe|Mouammar Khadhafi"},"sport":{"t7":"Michael Jordan|LeBron James|Roger Federer|Rafael Nadal|Novak Djokovic|Muhammad Ali|Usain Bolt|Jeux olympiques|Tour de France","t6":"Kobe Bryant|Stephen Curry|Serena Williams|Mike Tyson|Tony Parker|Victor Wembanyama|Teddy Riner|Léon Marchand|Michael Schumacher|Lewis Hamilton|Ayrton Senna|Max Verstappen|Sébastien Loeb|Valentino Rossi|Tadej Pogačar|Eddy Merckx|Bernard Hinault|Jonah Lomu|Antoine Dupont|Tiger Woods|Michael Phelps|Simone Biles|Conor McGregor|Khabib Nurmagomedov|Francis Ngannou|Floyd Mayweather Jr.|Manny Pacquiao|Roland-Garros|Formule 1|National Basketball Association|Super Bowl|Coupe du monde de rugby|Tournoi des Six Nations|Jeux olympiques d'été de 2024|Jeux olympiques d'été de 2024 à Paris|Wimbledon|US Open de tennis|Open d'Australie|Ligue 1|Premier League|Liga|Serie A|Bundesliga","t5":"Shaquille O'Neal|Magic Johnson|Larry Bird|Kareem Abdul-Jabbar|Dirk Nowitzki|Kevin Durant|Giannis Antetokounmpo|Nikola Jokić|Luka Dončić|Rudy Gobert|Boris Diaw|Nicolas Batum|Evan Fournier|Tom Brady|Patrick Mahomes|Lamar Jackson|Aaron Rodgers|Peyton Manning|Pete Sampras|Andre Agassi|Björn Borg|John McEnroe|Jimmy Connors|Ivan Lendl|Boris Becker|Andy Murray|Stan Wawrinka|Carlos Alcaraz|Jannik Sinner|Daniil Medvedev|Alexander Zverev|Gaël Monfils|Jo-Wilfried Tsonga|Richard Gasquet|Yannick Noah|Henri Leconte|Amélie Mauresmo|Marion Bartoli|Justine Henin|Kim Clijsters|Venus Williams|Maria Sharapova|Steffi Graf|Martina Navratilova|Chris Evert|Naomi Osaka|Iga Świątek|Aryna Sabalenka|Coco Gauff|Emma Raducanu|Mike Tyson (boxeur)|Joe Frazier|George Foreman|Sugar Ray Leonard|Marvin Hagler|Canelo Álvarez|Tyson Fury|Anthony Joshua|Oleksandr Usyk|Jon Jones|Georges St-Pierre|Anderson Silva|Jose Aldo|Alex Pereira|Islam Makhachev|Ilia Topuria|Sébastien Vettel|Kimi Räikkönen|Fernando Alonso|Alain Prost|Niki Lauda|Juan Manuel Fangio|Jackie Stewart|Jim Clark|Nigel Mansell|Damon Hill|Jenson Button|Charles Leclerc|Lando Norris|Carlos Sainz Jr.|Pierre Gasly|Esteban Ocon|Isack Hadjar|Marc Márquez|Jorge Lorenzo|Casey Stoner|Fabio Quartararo|Francesco Bagnaia|Lance Armstrong|Miguel Induráin|Jacques Anquetil|Raymond Poulidor|Laurent Fignon|Greg LeMond|Chris Froome|Julian Alaphilippe|Romain Bardet|Thibaut Pinot|Jonas Vingegaard|Wout van Aert|Mathieu van der Poel|Remco Evenepoel","t4":"Emil Zátopek|Carl Lewis|Jesse Owens|Michael Johnson|Florence Griffith-Joyner|Marie-José Pérec|Christine Arron|Renaud Lavillenie|Mondo Duplantis|Sergueï Bubka|Armand Duplantis|Kylian Mbappé (athlétisme)|Yohan Blake|Justin Gatlin|Tyson Gay|Asafa Powell|Allyson Felix|Shelly-Ann Fraser-Pryce|Elaine Thompson-Herah|Eliud Kipchoge|Haile Gebrselassie|Mo Farah|Kenenisa Bekele|Paavo Nurmi|Ian Thorpe|Mark Spitz|Alain Bernard|Florent Manaudou|Laure Manaudou|Camille Muffat|Yannick Agnel|Michael Schumacher (pilote)|Alexander Popov|Katie Ledecky|Caeleb Dressel|Ryan Lochte|Sun Yang|Ariarne Titmus|Summer McIntosh"},"myth":{"t7":"Dieu|Zeus|Satan","t6":"Poséidon|Hadès|Athéna|Apollon|Aphrodite|Hermès|Arès|Héraclès|Achille|Ulysse|Thor|Odin|Loki|Anubis|Râ|Osiris|Isis|Allah|Bouddha|Ange|Dragon|Licorne|Vampire|Loup-garou|Père Noël|Méduse (mythologie)|Minotaure|Hydre de Lerne|Cerbère|Pégase|Phénix (mythologie)|Sirène (mythologie)|Centaure|Cyclope|Titan (mythologie)|Prométhée|Orphée|Persée|Thésée|Jason (mythologie)|Hercule|Perséphone|Déméter|Dionysos|Héra|Artémis|Hestia|Éros|Psyché|Nyx|Gaïa|Chronos|Ouranos","t5":"Freya|Baldr|Heimdall|Fenrir|Jörmungandr|Sleipnir|Yggdrasil|Valhalla|Ragnarök|Walkyrie|Horus|Seth (mythologie)|Bastet|Sekhmet|Thot|Ptah|Sobek|Hathor|Amon|Atoum|Ma'at|Quetzalcoatl|Huitzilopochtli|Tezcatlipoca|Kukulkan|Inti|Pachamama|Amaterasu|Susanoo|Izanagi|Izanami|Tsukuyomi|Raijin|Fūjin|Kitsune|Tengu|Oni|Kappa|Yōkai|Shiva|Vishnou|Brahma|Ganesh|Hanuman|Krishna|Rama|Lakshmi|Durga|Kali|Saraswati|Jésus-Christ|Marie (mère de Jésus)|Joseph de Nazareth|Moïse|Abraham|Noé|David (roi)|Salomon|Goliath|Jean le Baptiste|Pierre (apôtre)|Paul de Tarse|Judas Iscariote|Marie-Madeleine|Archange Michel|Gabriel (archange)|Lucifer|Belzébuth|Diable|Enfer|Paradis|Purgatoire|Apocalypse|Armageddon|Arche de Noé|Tour de Babel|Déluge|Éden","t4":"Lilith|Asmodée|Mammon|Léviathan|Béhémoth|Baal|Moloch|Dagon|Ishtar|Tiamat|Marduk|Gilgamesh|Enkidu|Utnapishtim|Anunnaki|Ereshkigal|Inanna|Enlil|Enki|Nergal|Shamash|Sin (divinité)|Ninurta|Ea|Anu|Dumuzi"},"food":{"t7":"Pizza|Hamburger|Sushi|Chocolat|McDonald's|Coca-Cola","t6":"Baguette|Croissant|Fromage|Vin|Champagne|Café|Thé|Bière|Whisky|Vodka|Tequila|Rhum|Cocktail|Mojito|Pâtes|Riz|Frites|Kebab|Tacos|Burrito|Ramen|Curry|Couscous|Paella|Lasagnes|Raclette|Fondue savoyarde|Crêpe|Macaron|Tiramisu|Glace|Gâteau|Pain|Pomme|Banane|Fraise","t5":"Camembert|Brie|Roquefort|Comté|Reblochon|Mozzarella|Parmesan|Gorgonzola|Feta|Cheddar|Gruyère|Emmental|Mimolette|Saint-Nectaire|Cantal|Beaufort|Munster|Époisses|Maroilles|Boursin|La vache qui rit|Nutella|Kinder Bueno|Oreo|Haribo|M&M's|Snickers|Mars (barre chocolatée)|Twix|KitKat|Toblerone|Milka|Lindt|Ferrero Rocher|Pringles|Doritos|Cheetos|Lay's|Burger King|KFC|Subway|Starbucks|Domino's Pizza|Pizza Hut|Quick|Five Guys|Tacos Bell|Taco Bell|Chipotle|Red Bull|Monster Energy|Fanta|Sprite|Pepsi|Orangina|Schweppes|Perrier|Evian|Volvic|Badoit|Heineken|Guinness|Corona (bière)|Budweiser|Kronenbourg|1664|Jack Daniel's|Jägermeister|Absolut Vodka|Bacardi|Martini|Ricard|Pastis|Cognac|Armagnac|Calvados|Chartreuse|Get 27|Cidre|Vin rouge|Vin blanc|Rosé|Bordeaux (vin)|Bourgogne (vin)|Beaujolais|Côtes-du-Rhône|Châteauneuf-du-Pape","t4":"Foie gras|Escargot|Cuisses de grenouille|Bouillabaisse|Cassoulet|Choucroute|Pot-au-feu|Blanquette de veau|Boeuf bourguignon|Ratatouille|Quiche lorraine|Tarte tatin|Clafoutis|Madeleine|Éclair|Mille-feuille|Paris-Brest|Religieuse|Profiterole|Crème brûlée|Île flottante|Mousse au chocolat|Tarte au citron|Kouign-amann|Far breton|Galette des rois|Brioche|Pain au chocolat|Chausson aux pommes|Palmier (pâtisserie)|Canelé|Financier|Sablé|Cookie|Brownie|Cupcake|Donut|Pancake|Waffle|Gaufre|Churros|Tortilla|Gaspacho|Tapas|Jamón ibérico|Chorizo|Saucisson|Rillettes|Pâté|Andouillette|Boudin noir|Merguez|Couscous royal|Tajine|Tabbouleh|Houmous|Falafel|Shawarma|Baklava|Loukoum|Pho|Pad thaï|Nem|Dim sum|Canard laqué|Tempura|Okonomiyaki|Takoyaki|Yakitori|Mochi|Kimchi|Bibimbap|Bulgogi|Tteokbokki|Poutine|Hot-dog|Barbecue|Steak|Entrecôte|Côte de bœuf|Poulet rôti|Dinde de Noël|Bûche de Noël|Chapon|Foie gras de canard"},"tech":{"t7":"Apple|Google|Microsoft|Amazon|Tesla|Facebook|Instagram|TikTok|YouTube|Netflix|Disney|Wikipédia|iPhone|ChatGPT|Intelligence artificielle|Bitcoin|Internet","t6":"Twitch|WhatsApp|Snapchat|X (réseau social)|Twitter|LinkedIn|Reddit|Pinterest|Discord|Telegram|Spotify|Deezer|Uber|Airbnb|PayPal|Samsung|Sony|Nintendo (entreprise)|Nike|Adidas|Louis Vuitton|Chanel|Gucci|Rolex|IKEA|Lego|Barbie|Linux|Windows|Android|Mac|PlayStation 5|Xbox Series|Nintendo Switch|Starlink|SpaceX|OpenAI|Nvidia|Intel|AMD|Meta Platforms|Alphabet|Oracle|IBM|Huawei|Xiaomi|Alibaba|Tencent|TikTok (entreprise)|ByteDance|Shein|Temu|Zara|H&M|Hermès (maison)|Dior|Yves Saint Laurent|Prada|Balenciaga|Cartier|Tiffany & Co.|Lacoste|Le Coq sportif|Puma|Reebok|New Balance|Converse|Vans|Supreme|Off-White|Jordan Brand|Ferrari (entreprise)|Renault|Peugeot|Citroën|Toyota|Volkswagen|BMW|Mercedes-Benz|Audi|Total|Carrefour|Leclerc|Auchan|Lidl|Decathlon|Fnac|Cdiscount|Leboncoin|Vinted","t5":"Ethereum|Dogecoin|NFT|Blockchain|Métavers|Réalité virtuelle|Réalité augmentée|Robot|Drone|Voiture autonome|Fusée|Satellite|Téléphone mobile|Smartphone|Ordinateur|Ordinateur portable|Tablette tactile|Clavier|Souris d'ordinateur|Écran|Casque audio|AirPods|Apple Watch|MacBook|iPad|iMac|iOS|macOS|Windows 11|Windows 10|Windows XP|Chrome|Firefox|Safari|Opera|Bing|DuckDuckGo|Gmail|Google Maps|Google Drive|Excel|Word|PowerPoint|Photoshop|Illustrator|Premiere Pro|Final Cut Pro|Blender|Unity|Unreal Engine|Python (langage)|JavaScript|Java (langage)|C (langage)|C++|C sharp|PHP|HTML|CSS|SQL|Rust|Go (langage)|Swift (langage)|Kotlin|Git|GitHub|Docker|Kubernetes|Raspberry Pi|Arduino|Wi-Fi|Bluetooth|5G|Fibre optique|Câble sous-marin|Serveur informatique|Cloud computing|Cybersécurité|Piratage informatique|Virus informatique|Ransomware|Phishing|VPN|Tor (réseau)|Dark web|Deep web"},"event":{"t7":"Attentats du 11 septembre 2001|Attentats du 13 novembre 2015 en France|Attentat contre Charlie Hebdo|Naufrage du Titanic|Catastrophe nucléaire de Tchernobyl|Accident nucléaire de Fukushima|Incendie de Notre-Dame de Paris|Explosions au port de Beyrouth en 2020|Mort de Diana Spencer","t6":"Attentat de Nice du 14 juillet 2016|Attentats de Madrid du 11 mars 2004|Attentats de Londres du 7 juillet 2005|Attentats de Bruxelles du 22 mars 2016|Attentats de Bombay de 2008|Attentat du marathon de Boston|Attentat d'Oklahoma City|Attentats de Bali de 2002|Attentat du Bataclan|Prise d'otages de Beslan|Prise d'otages du théâtre de Moscou|Génocide des Tutsi au Rwanda|Génocide arménien|Génocide des Juifs|Holodomor|Massacre de Srebrenica|Massacre de Nankin|Bombardement de Dresde|Bombardement de Guernica|Bombardement atomique de Nagasaki|Bombardement atomique d'Hiroshima|Catastrophe de Seveso|Catastrophe de Bhopal|Catastrophe de Three Mile Island|Explosion de la navette spatiale Challenger|Accident de la navette spatiale Columbia|Incendie du Bazar de la Charité|Incendie de Londres de 1666|Grand incendie de Chicago|Éruption du Vésuve en 79|Éruption de la montagne Pelée en 1902|Séisme de 2010 à Haïti|Séisme et tsunami de 2011 au Japon|Séisme de 2004 dans l'océan Indien|Ouragan Katrina|Tempête Xynthia|Canicule européenne de 2003|Marée noire de l'Erika|Marée noire de l'Exxon Valdez|Naufrage du Lusitania|Naufrage du Costa Concordia|Naufrage du Wilhelm Gustloff|Naufrage de l'Estonia|Naufrage du MS Herald of Free Enterprise|Accident du Concorde|Vol Rio-Paris 447|Vol Malaysia Airlines 370|Vol Malaysia Airlines 17|Catastrophe aérienne de Tenerife|Accident du Boeing 737 MAX|Hindenburg (dirigeable)|Catastrophe de Courrières|Catastrophe du Heysel|Catastrophe de Hillsborough|Drame du Bosphore","t5":"Affaire Dreyfus|Affaire Grégory|Affaire Dominici|Affaire Outreau|Affaire Clearstream|Affaire Bettencourt|Affaire Cahuzac|Affaire Benalla|Affaire Fillon|Affaire des écoutes de l'Élysée|Affaire du sang contaminé|Affaire Mérieux|Affaire Elf|Affaire Urba|Affaire Boulin|Affaire Markovic|Affaire Ben Barka|Affaire Seznec|Affaire Troppmann|Affaire Marie Besnard|Affaire Violette Nozière|Affaire Landru|Affaire Weidmann|Affaire Papin|Affaire Jean-Claude Romand|Affaire Xavier Dupont de Ligonnès|Affaire Agnès Marin|Affaire Lola|Affaire Maddie McCann|Affaire Natascha Kampusch|Affaire JonBenét Ramsey|Affaire O. J. Simpson|Watergate|Scandale des Panama Papers|Scandale Dieselgate|Scandale du Médiator|Scandale du Mediator|Scandale Volkswagen|Scandale Enron|Scandale Lehman Brothers|Faillite de Lehman Brothers|Krach de 1929|Crise de 2008|Crise de 1973|Grande Dépression|Peste noire|Grippe espagnole|Variole|Choléra|Tuberculose|Poliomyélite|Sida|Ebola|Covid long|Grippe aviaire|Fièvre jaune|Paludisme|Rage|Lèpre","t4":"Mai 68|Prise de la Bastille|Fête de la Fédération|Terreur|Commune de Paris|Débarquement de Provence|Libération de Paris|Bataille de Stalingrad|Bataille de Verdun|Bataille de la Somme|Bataille d'Angleterre|Bataille de Midway|Bataille d'Iwo Jima|Bataille des Ardennes|Opération Barbarossa|Opération Overlord|Opération Market Garden|Opération Valkyrie|Nuit de Cristal|Pogrom|Rafle du Vel' d'Hiv|Appel du 18 Juin|Régime de Vichy|Résistance française|Maquis du Vercors|Massacre d'Oradour-sur-Glane|Procès de Nuremberg|Procès de Tokyo|Plan Marshall|Blocus de Berlin|Crise des missiles de Cuba|Mur de Berlin|Printemps de Prague|Révolution russe|Révolution culturelle|Grand Bond en avant|Guerre de Corée|Guerre d'Algérie|Guerre d'Indochine|Guerre du Golfe|Guerre d'Irak|Guerre d'Afghanistan|Guerre de Sécession|Guerre de Cent Ans|Guerre de Trente Ans|Guerres napoléoniennes|Croisades|Inquisition|Chasse aux sorcières de Salem|Colonisation|Traite négrière|Esclavage|Apartheid|Mouvement des droits civiques|Marche sur Washington|Assassinat de John F. Kennedy|Assassinat de Martin Luther King|Assassinat de Gandhi|Assassinat de Rafiq Hariri|Assassinat d'Itzhak Rabin|Assassinat de Benazir Bhutto|Assassinat de Olof Palme"}};
+const CATGROUPS={"foot":{"l":"⚽ Football","n":0,"c":["Footballeur français","Footballeuse française","Footballeur brésilien","Footballeur espagnol","Footballeur italien","Footballeur anglais","Footballeur allemand","Footballeur argentin","Footballeur portugais","Footballeur néerlandais","Footballeur belge","Footballeur sénégalais","Footballeur marocain","Footballeur algérien","Footballeur ivoirien","Footballeur camerounais","Footballeur japonais","Footballeur américain","Footballeuse américaine","Footballeuse allemande","Footballeuse brésilienne","Entraîneur français de football","Entraîneur espagnol de football","Entraîneur italien de football","Arbitre français de football","Arbitre italien de football","Arbitre de football","Stade de football en France","Club de football en France","Club de football en Espagne","Club de football en Italie","Club de football en Angleterre","Club de football en Allemagne","Gardien de but de football"]},"act":{"l":"🎬 Acteurs & actrices","n":0,"c":["Acteur français de cinéma","Actrice française de cinéma","Acteur américain de cinéma","Actrice américaine de cinéma","Acteur britannique de cinéma","Actrice britannique de cinéma","Acteur japonais","Actrice japonaise","Acteur italien de cinéma","Actrice italienne de cinéma","Acteur espagnol de cinéma","Actrice espagnole de cinéma","Acteur sud-coréen","Actrice sud-coréenne","Acteur indien de cinéma","Actrice indienne de cinéma","Acteur allemand de cinéma","Actrice allemande de cinéma","Acteur chinois","Actrice chinoise","Acteur canadien","Actrice canadienne","Acteur australien","Actrice australienne","Acteur de télévision","Réalisateur français","Réalisateur américain"]},"adult":{"l":"🔞 Adultes (contenu sensible)","n":1,"c":["Actrice pornographique américaine","Acteur pornographique américain","Actrice pornographique française","Acteur pornographique français","Actrice pornographique britannique","Actrice pornographique japonaise","Actrice pornographique allemande","Actrice pornographique tchèque","Actrice pornographique hongroise","Actrice pornographique brésilienne","Actrice pornographique italienne","Actrice pornographique espagnole","Actrice pornographique canadienne","Actrice pornographique russe","Actrice pornographique roumaine","Actrice pornographique colombienne","Film pornographique américain","Film pornographique français","Film pornographique","Réalisateur de films pornographiques"]},"music":{"l":"🎵 Musique & K-pop","n":0,"c":["Groupe de K-pop","Chanteur sud-coréen","Chanteuse sud-coréenne","Chanteur français","Chanteuse française","Chanteur américain","Chanteuse américaine","Chanteur britannique","Chanteuse britannique","Chanteur japonais","Chanteuse japonaise","Rappeur français","Rappeur américain","Rappeuse américaine","Groupe de rock britannique","Groupe de rock américain","Groupe de hard rock","Groupe de heavy metal","Groupe musical français","Groupe de pop","Groupe de hip-hop","Compositeur français","Compositeur allemand","Compositeur italien","Pianiste français","Guitariste américain","Batteur américain","Album musical sorti en {1970-2024}","Chanson de {1970-2024}"]},"game":{"l":"🎮 Jeux vidéo & personnages","n":0,"c":["Jeu vidéo sorti en {1980-2024}","Personnage de jeu vidéo","Personnage de Mario","Personnage de Final Fantasy","Personnage de The Legend of Zelda","Personnage de Street Fighter","Personnage de Pokémon","Série de jeux vidéo","Jeu vidéo de combat","Jeu vidéo de rôle","Jeu vidéo de course","Jeu vidéo de sport","Jeu vidéo de tir à la première personne"]},"film":{"l":"🎥 Films, séries, anime, manga","n":0,"c":["Film américain sorti en {1960-2024}","Film français sorti en {1960-2024}","Film britannique sorti en {1980-2024}","Film japonais sorti en {1980-2024}","Film d'animation japonais","Série télévisée américaine","Série télévisée française","Série télévisée britannique","Série d'animation japonaise","Manga","Personnage de manga","Personnage de fiction","Film d'horreur américain","Film de science-fiction américain","Série télévisée d'animation américaine"]},"animal":{"l":"🐺 Animaux","n":0,"c":["Mammifère (nom vernaculaire)","Oiseau (nom vernaculaire)","Poisson (nom vernaculaire)","Reptile (nom vernaculaire)","Insecte (nom vernaculaire)","Araignée (nom vernaculaire)","Amphibien (nom vernaculaire)","Crustacé (nom vernaculaire)","Mollusque (nom vernaculaire)","Requin","Dinosaure","Genre de dinosaures","Race de chiens","Race de chats","Race de chevaux","Lépidoptère (nom vernaculaire)","Coléoptère (nom vernaculaire)","Serpent (nom vernaculaire)","Primate (nom vernaculaire)"]},"plant":{"l":"🌱 Plantes & champignons","n":0,"c":["Plante (nom vernaculaire)","Champignon (nom vernaculaire)","Arbre","Plante ornementale","Arbre fruitier","Plante médicinale","Plante condimentaire","Plante potagère","Fleur","Conifère","Orchidée","Palmier"]},"science":{"l":"🧪 Sciences & médecine","n":0,"c":["Physicien français","Physicien allemand","Physicien américain","Physicien britannique","Mathématicien français","Mathématicien allemand","Mathématicien américain","Astronome français","Astronome américain","Astrophysicien français","Chimiste français","Chimiste allemand","Biologiste français","Médecin français","Médecin américain","Inventeur","Ingénieur français","Prix Nobel de physique","Prix Nobel de médecine","Prix Nobel de chimie","Exoplanète","Constellation","Galaxie"]},"place":{"l":"🏙️ Lieux, villes, monuments","n":0,"c":["Capitale en Europe","Capitale en Asie","Capitale en Afrique","Capitale en Amérique","Pays en Europe","Pays en Afrique","Pays en Asie","Pays en Amérique","Château en France","Musée en France","Stade en France","Cathédrale en France","Pont en France","Gratte-ciel","Île","Volcan","Lac","Montagne","Parc national","Commune du Rhône","Commune de la Loire","Commune de la Gironde","Commune de la Haute-Garonne","Commune du Nord","Commune des Bouches-du-Rhône"]},"vehicle":{"l":"🚗 Voitures, motos, avions, bateaux","n":0,"c":["Automobile Renault","Automobile Peugeot","Automobile Citroën","Automobile Ferrari","Automobile Porsche","Automobile Lamborghini","Automobile BMW","Automobile Mercedes-Benz","Automobile Audi","Automobile Volkswagen","Automobile Ford","Automobile Toyota","Automobile Honda","Automobile Nissan","Automobile Tesla","Automobile Bugatti","Automobile Aston Martin","Motocyclette Honda","Motocyclette Yamaha","Motocyclette Harley-Davidson","Avion de ligne","Avion de chasse","Hélicoptère","Locomotive","Paquebot","Porte-avions","Sous-marin","Voilier","Sonde spatiale","Char de combat"]},"book":{"l":"📚 Livres, écrivains, artistes","n":0,"c":["Écrivain français","Écrivain américain","Écrivain britannique","Écrivain allemand","Écrivain russe","Écrivain japonais","Romancier français","Poète français","Dramaturge français","Auteur de bande dessinée","Dessinateur français de bande dessinée","Mangaka","Roman paru en {1850-2024}","Roman de science-fiction américain","Roman fantastique","Bande dessinée franco-belge","Peintre français","Peintre néerlandais","Peintre italien","Peintre espagnol","Peintre américain","Sculpteur français","Photographe français","Architecte français","Philosophe français","Philosophe allemand","Historien français"]},"hist":{"l":"🏛️ Histoire & personnalités","n":0,"c":["Roi de France","Empereur romain","Pharaon","Président de la République française","Premier ministre français","Personnalité politique française","Personnalité politique américaine","Président des États-Unis","Militaire français","Général français","Résistant français","Explorateur","Pape","Reine de France","Monarque britannique","Dictateur","Tueur en série américain","Tueur en série français","Criminel français","Pirate"]},"sport":{"l":"🏅 Autres sports","n":0,"c":["Basketteur français","Basketteur américain","Joueur de tennis français","Joueur de tennis américain","Joueuse de tennis","Pilote de Formule 1","Pilote de moto","Pilote automobile français","Joueur français de rugby à XV","Cycliste français","Cycliste belge","Boxeur français","Boxeur américain","Judoka français","Nageur français","Athlète français","Athlète américain","Handballeur français","Joueur de baseball","Joueur de hockey sur glace","Joueur de football américain","Golfeur","Skieur alpin","Gymnaste","Escrimeur français","Médaillé olympique"]},"myth":{"l":"🔱 Mythologie & religions","n":0,"c":["Divinité grecque","Divinité romaine","Divinité égyptienne","Divinité nordique","Divinité hindoue","Personnage de la mythologie grecque","Créature fantastique","Créature de la mythologie grecque","Ange","Démon","Saint catholique","Prophète","Personnage biblique","Héros mythologique"]},"food":{"l":"🍔 Cuisine & boissons","n":0,"c":["Fromage","Fromage français","Fromage italien","Cuisine française","Dessert","Pâtisserie","Viennoiserie","Boisson","Cocktail","Vin","Bière","Spiritueux","Confiserie","Fruit","Légume","Épice","Soupe","Sauce","Cuisine japonaise","Cuisine italienne","Cuisine marocaine","Chaîne de restauration rapide"]},"tech":{"l":"💻 Marques, tech & internet","n":0,"c":["Entreprise française","Entreprise américaine","Entreprise japonaise","Marque de vêtements","Marque de luxe","Marque de sport","Réseau social","Site web","Logiciel","Langage de programmation","Système d'exploitation","Console de jeux vidéo","Application mobile","Entreprise de jeux vidéo","Fabricant de téléphones mobiles"]},"creator":{"l":"📺 Créateurs (YouTube / Twitch)","n":0,"c":["Vidéaste web français","Vidéaste web américain","Streameur","Youtubeur"]},"event":{"l":"💥 Événements & drames","n":0,"c":["Attentat en France","Catastrophe naturelle","Catastrophe aérienne","Accident ferroviaire","Naufrage","Séisme","Éruption volcanique","Affaire criminelle française","Affaire criminelle américaine","Bataille de la Seconde Guerre mondiale","Bataille de la Première Guerre mondiale","Massacre","Génocide","Épidémie","Incendie","Scandale politique français"]}};
+const OVRN={};Object.keys(OVR).forEach(t=>OVRN[nz2(t)]=OVR[t]);
+const VIPT=[],VIPR={},ADULT=new Set();
+(()=>{const seen=new Set(),gs=Object.keys(CATALOG);let n=0;
+ for(const t of [7,6,5,4,3,2,1]){const L=gs.map(g=>[g,(CATALOG[g]["t"+t]||"").split("|").filter(Boolean)]);
+  for(let j=0;L.some(x=>j<x[1].length);j++)L.forEach(([g,a])=>{const x=a[j];if(!x)return;const k=nz2(x);if(!k||seen.has(k))return;seen.add(k);VIPR[k]=OVRN[k]??t;VIPT.push({t:x,r:VIPR[k],g,o:1e6-(n++)});if(g==="adult")ADULT.add(k)})}})();
+function withVip(L){const idx=new Map();L.forEach(e=>{if(e.t)idx.set(nz2(e.t),e);if(e.cr&&!e.g)e.g="creator";if(e.src==="film"&&!e.g)e.g="film"});
+ VIPT.forEach(v=>{const e=idx.get(nz2(v.t));if(e){if(!e.cr&&e.src!=="film"){e.r=v.r;e.g=v.g;e.o=v.o}}else{const x={t:v.t,r:v.r,v:0,src:"wiki",g:v.g,o:v.o};L.push(x);idx.set(nz2(v.t),x)}});
+ return L}
+const catList=g=>{const out=[];((CATGROUPS[g]||{}).c||[]).forEach(c=>{const m=/\{(\d+)-(\d+)\}/.exec(c);if(m){for(let y=+m[2];y>=+m[1];y--)out.push(c.replace(m[0],y))}else out.push(c)});return out};
+const randCat=g=>{const L=CATGROUPS[g].c;let c=L[Math.floor(Math.random()*L.length)];const m=/\{(\d+)-(\d+)\}/.exec(c);if(m)c=c.replace(m[0],+m[1]+Math.floor(Math.random()*(+m[2]-+m[1]+1)));return c};
+const rndPrefix=()=>String.fromCharCode(65+Math.floor(Math.random()*26));
+const groupSelectHTML=()=>`<select id="cg" style="background:var(--sf2);border:1px solid #3a2f4d;color:var(--fg);border-radius:9px;padding:0 12px;font:inherit"><option value="">Toutes les catégories</option>${Object.entries(CATGROUPS).map(([k,v])=>`<option value="${k}" ${CG==k?"selected":""}>${v.l}</option>`).join("")}</select>`;
+
 // Migration des anciennes sauvegardes : anciens index → 8 raretés actuelles.
 const OLD_TO_NEW={0:0,1:1,2:2,3:3,4:3,5:4,6:5,7:6,8:6,9:7,10:7};
 // V88/V89 utilisent déjà 8 raretés indexées 0→7 : ne remappe plus une sauvegarde déjà migrée.
@@ -647,7 +691,7 @@ let SO="rare",tab=0,q="",fr=new Set(),page=1,cursors=["r:0"],totalArticles=null,
 const ACCOUNT_RESET_V92="wc_account_reset_v92";
 let ACCOUNT_WAS_RESET_V92=false;
 try{
- if(localStorage.getItem(ACCOUNT_RESET_V92)!=="1"){
+ if(false){
   ["wc_col","wc_money","wc_stock","wc_t0","wc_mk2","wc_mk3","wc_dly","wc_daily2","wc_jackpot","wc_jhist","wc_ach","wc_stats","wc_col_ui","wc_booster_cooldowns_v57","wc_card_case_inv","wc_fusion_v45_reset","wc_money_reset_v42","wc_money_bonus_v55","wc_reset_a"].forEach(k=>localStorage.removeItem(k));
   ACCOUNT_WAS_RESET_V92=true;
   localStorage.setItem(ACCOUNT_RESET_V92,"1");
@@ -658,7 +702,7 @@ try{
    On utilise une nouvelle clé pour forcer le reset même si une ancienne version avait déjà marqué le compte comme réinitialisé. */
 const ACCOUNT_RESET_V105="wc_account_reset_v105_collection_success_stats";
 try{
-  if(localStorage.getItem(ACCOUNT_RESET_V105)!=="1"){
+  if(false){
     ["wc_col","wc_ach","wc_col_ui","wc_stats"].forEach(k=>localStorage.removeItem(k));
     localStorage.setItem(ACCOUNT_RESET_V105,"1");
   }
@@ -679,6 +723,17 @@ const DAILY=[
  {id:"creator",name:"Obtenir 1 carte de créateur",goal:1,reward:100},
  {id:"dupe",name:"Obtenir 1 doublon",goal:1,reward:100},
  {id:"case",name:"Ouvrir 1 Card Case",goal:1,reward:125}
+
+,{id:"daily_extra_01",t:"Collectionneur",d:"Ajoute 3 cartes à ta collection.",goal:3,reward:45}
+,{id:"daily_extra_02",t:"Explorateur",d:"Découvre 2 cartes avec «  ».",goal:2,reward:35}
+,{id:"daily_extra_03",t:"Curieux",d:"Consulte 5 cartes différentes dans Toutes les cartes.",goal:5,reward:40}
+,{id:"daily_extra_04",t:"Chasseur de rareté",d:"Obtiens 1 carte Rare ou supérieure.",goal:1,reward:60}
+,{id:"daily_extra_05",t:"Passionné",d:"Ouvre 2 boosters aujourd’hui.",goal:2,reward:50}
+,{id:"daily_extra_06",t:"Encyclopédiste",d:"Consulte 10 cartes Wikipédia différentes.",goal:10,reward:55}
+
+,{id:"daily_extra_07",t:"Chasseur de doublons",d:"Obtiens 2 exemplaires d’une même carte.",goal:2,reward:50}
+,{id:"daily_extra_08",t:"Collection parfaite",d:"Ajoute 5 cartes différentes à ta collection.",goal:5,reward:65}
+,{id:"daily_extra_09",t:"Petit investisseur",d:"Dépense 500 WikiCo dans la boutique.",goal:500,reward:75}
 ];
 function loadDaily(){
  try{
@@ -785,7 +840,7 @@ function profilePage(){
 
 try{col=JSON.parse(localStorage.getItem("wc_col")||"{}");const s=localStorage.getItem("wc_stock");if(s!==null){stock=+s;t0=+localStorage.getItem("wc_t0")||0}const m=localStorage.getItem("wc_money");if(m!==null)money=+m}catch(e){}
 /* V105 : garde-fou — au premier lancement de cette version, aucune carte/succès/statistique ne doit survivre. */
-if(localStorage.getItem("ACCOUNT_RESET_V105_GUARD")!=="1"){
+if(false){
   try{
     col={};
     localStorage.removeItem("wc_col");
@@ -807,7 +862,7 @@ try{
 }catch(e){}
 // remet les bonnes photos / raretés sur les créateurs déjà possédés et supprime les doublons
 const DUPLICATE_TITLES=new Set(["norman thavaud"]);
-const EXCLUDED_TITLES=new Set(["lizzie","catherine ringer"]);
+const EXCLUDED_TITLES=new Set(["lizzie","catherine ringer","traci lords"]);
 const isExcludedTitle=t=>EXCLUDED_TITLES.has(String(t||"").trim().toLowerCase());
 const isRemovedTitle=t=>isExcludedTitle(t)||DUPLICATE_TITLES.has(String(t||"").trim().toLowerCase());
 // V86 : force le recalcul du classement pour faire apparaître les nouvelles cartes sélectionnées.
@@ -850,8 +905,8 @@ function sync(){if(stock<MAXB){if(!t0)t0=Date.now();const n=Math.floor((Date.now
 const p2=v=>String(v).padStart(2,"0");
 const fmt=ms=>{const s=Math.max(0,Math.ceil(ms/1000)),hh=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return hh?`${hh}h ${p2(m)}min ${p2(x)}s`:`${p2(m)}:${p2(x)}`};
 const ok=p=>p.thumbnail&&!/homonymie/i.test(p.description||"")&&!isRemovedTitle(p.title);
-function rp(p){if(OVR[p.title]!=null)return OVR[p.title];const s=Object.values(p.pageviews||{}).reduce((a,b)=>a+(b||0),0);return boost(p.title,rarOf(s))}
-function mk(p,rf,vf){const r=rf??rp(p),pv=p.pageviews?Object.values(p.pageviews).reduce((a,b)=>a+(b||0),0):vf,c={v:pv,id:p.pageid+"-"+r,pid:"w"+p.pageid,t:p.title,d:p.description||"",img:p.thumbnail.source,r,src:"wiki",nsfw:SEX.test(p.title)||/pornograph|érotique|hentai|sexuel/i.test(p.description||"")};store[c.id]=c;return c}
+function rp(p){if(OVR[p.title]!=null)return OVR[p.title];{const k=nz2(p.title);if(OVRN[k]!=null)return OVRN[k];if(VIPR[k]!=null)return VIPR[k]}const s=Object.values(p.pageviews||{}).reduce((a,b)=>a+(b||0),0);return boost(p.title,rarOf(s))}
+function mk(p,rf,vf){const r=rf??rp(p),pv=p.pageviews?Object.values(p.pageviews).reduce((a,b)=>a+(b||0),0):vf,c={v:pv,id:p.pageid+"-"+r,pid:"w"+p.pageid,t:p.title,d:p.description||"",img:p.thumbnail.source,r,src:"wiki",nsfw:SEX.test(p.title)||ADULT.has(nz2(p.title))||/pornograph|érotique|hentai|sexuel/i.test(p.description||"")};store[c.id]=c;return c}
 function card(c){const [n,cl]=R[c.r];
 return `<div class="card r${c.r} ${c.nsfw?"nsfw":""} ${c.src=="film"?"film-art":""}" style="--c:${cl}" data-id="${c.id}"><div class="in"><span class="bd">${SYM[c.r]}</span>${c.n>1?`<span class="cnt">×${c.n}</span>`:""}<img class="${c.src=="cr"?"creator-art":c.src=="film"?"film-art":""}" src="${c.img}" referrerpolicy="no-referrer" alt="${(c.t||"").replace(/"/g,"&quot;")}"><div class="nm"><span class="t">${c.t}</span><small>${SYM[c.r]} ${n}${c.src=="film"?`<span class="film-badge">🎬 FILM</span>`:""}</small></div></div><i class="foil"></i><i class="tex"></i><i class="glare"></i><i class="spk"></i><i class="gl a"></i><i class="gl b"></i></div>`}
 const ph=t=>"data:image/svg+xml;utf8,"+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'><rect width='4' height='4' fill='#6b21a8'/><text x='2' y='2.9' font-size='2.4' text-anchor='middle' fill='#e9d5ff' font-family='sans-serif'>${(t||"?")[0]}</text></svg>`);
@@ -902,8 +957,9 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
    <div class="sub">Exemplaires : ${own?own.n:0}${c.src=="cr"?" · "+c.plat:""}</div><div style="margin-top:10px">${link}</div>${c.src=="wiki"?`<div class="sub" style="margin-top:8px">Texte de l'article : CC BY-SA 4.0 — crédits sur la page Wikipédia.</div>`:""}`;
   const hist=MK.H.filter(x=>x.r==c.r).slice(0,6),act=MK.A.filter(a=>!a.done&&a.c.pid==c.pid).length;
   const mkt=`<div class="sb2"><div><b>🪙 ${fair(c)}</b><span>Prix estimé</span></div><div><b>${MK.PX[c.r]||"—"}</b><span>Prix moyen ${n}</span></div></div><div class="sub">Dernières ventes (${n}) : ${hist.length?hist.map(x=>x.p+" 🪙").join(" · "):"aucune pour l'instant"}</div><div class="sub" style="margin-top:6px">${act?act+" exemplaire(s) en vente en ce moment.":"Aucun exemplaire en vente en ce moment."}</div>`;
-  M.innerHTML=`<div class="mbox v2"><button class="btn g x" id="mx">✕</button><div class="mtop"><div class="mcard">${card(c)}</div><div class="minfo"><h2>${c.t}</h2><div class="hd"><span class="rchip" style="background:${cl}">${n}</span>${c.src=="film"?`<span class="film-badge">🎬 ${c.year||""}${c.rating?` · ⭐ ${c.rating.toFixed(1)}`:""}</span>`:""}<span class="tabs"><button class="${tabm?"":"on"}" data-m="0">Détails</button><button class="${tabm?"on":""}" data-m="1">Marché</button></span></div>${tabm?mkt:det}</div></div>${own?`<div class="mbot"><button class="btn" id="au">🔨 Mettre aux enchères</button><button class="btn g" id="ds">🗑 Défausser (+${dsc(c)} 🪙)</button></div>`:""}</div>`;
+  M.innerHTML=`<div class="mbox v2"><button class="btn g x" id="mx">✕</button><div class="mtop"><div class="mcard">${card(c)}</div><div class="minfo"><h2>${c.t}</h2><button class="btn g wlbtn ${isW(c)?"on":""}" id="wl">${isW(c)?"⭐ Suivie":"☆ Suivre"}</button><div class="hd"><span class="rchip" style="background:${cl}">${n}</span>${c.src=="film"?`<span class="film-badge">🎬 ${c.year||""}${c.rating?` · ⭐ ${c.rating.toFixed(1)}`:""}</span>`:""}<span class="tabs"><button class="${tabm?"":"on"}" data-m="0">Détails</button><button class="${tabm?"on":""}" data-m="1">Marché</button></span></div>${tabm?mkt:det}</div></div>${own?`<div class="mbot"><button class="btn" id="au">🔨 Mettre aux enchères</button><button class="btn g" id="ds">🗑 Défausser (+${dsc(c)} 🪙)</button></div>`:""}</div>`;
   $("mx").onclick=closeModal;M.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{tabm=+b.dataset.m;draw()});
+  if($("wl"))$("wl").onclick=()=>{toggleW(c);if(tab==3&&!AV.d)paintMk(true);draw()};
   if($("au"))$("au").onclick=()=>openAuction(c.id);
   if($("ds"))$("ds").onclick=()=>{if(!confirm("Défausser « "+c.t+" » pour "+dsc(c)+" 🪙 ?"))return;const e=col[c.id];e.n>1?e.n--:delete col[c.id];gain(dsc(c));closeModal();render()};
   const ti=$("tin");if(ti)ti.onkeydown=e=>{if(e.key=="Enter"&&ti.value.trim()){own.tags=[...(own.tags||[]),ti.value.trim().slice(0,20)];save();draw()}};
@@ -974,6 +1030,12 @@ async function buildPack(minRarity=null){
  const seen=new Set(),pool=[];
  const add=j=>Object.values(j.query?.pages||{}).filter(ok).filter(p=>!isExcludedTitle(p.title)).forEach(p=>{if(!seen.has(p.pageid)){seen.add(p.pageid);pool.push(mk(p))}});
  rs.forEach(add);
+ try{const gs=Object.keys(CATGROUPS),pk=[];for(let k=0;k<6;k++)pk.push(randCat(gs[Math.floor(Math.random()*gs.length)]));
+  const cj=await Promise.all(pk.map(c=>J(API+"generator=categorymembers&gcmtitle="+encodeURIComponent("Catégorie:"+c)+"&gcmtype=page&gcmlimit=50&gcmstartsortkeyprefix="+encodeURIComponent(rndPrefix())).catch(()=>({}))));cj.forEach(add);
+  const vt=[];new Set(rolls.filter(r=>r>=1)).forEach(r=>vt.push(...VIPT.filter(v=>v.r==r&&(v.g!=="adult"||Math.random()<.2)).sort(()=>Math.random()-.5).slice(0,5)));
+  if(vt.length){const {pages,rd}=await wq(APIB+"redirects=1&titles="+encodeURIComponent(vt.slice(0,50).map(v=>v.t).join("|")));const forced={};vt.forEach(v=>{const a=rd[v.t]||v.t;forced[nz2(rd[a]||a)]=v.r});
+   Object.values(pages).filter(ok).forEach(p=>{if(isExcludedTitle(p.title)||seen.has(p.pageid))return;seen.add(p.pageid);pool.push(mk(p,forced[nz2(p.title)]))})}
+ }catch(e){}
  if(rolls.some(r=>r>=2)&&top.length){ // articles très consultés (top mensuel) pour les rangs hauts
   const T=[];for(let r=1;r<=7;r++)T.push(...top.filter(x=>x.r==r).sort(()=>Math.random()-.5).slice(0,5));
   if(T.length)try{add(await(await fetch(API+"titles="+encodeURIComponent(T.map(x=>x.t).join("|")))).json())}catch(e){}}
@@ -1163,13 +1225,14 @@ const APIB=BASE+"prop=pageimages|description&piprop=thumbnail&pithumbsize=400&pi
 let RANK=[],RANKSET=new Set(),FL=[];
 // lot complet : suit les continuations des propriétés (sinon certaines pages perdent leur image)
 const J=async u=>{for(let i=0;i<3;i++){try{const r=await fetch(u);if(r.ok)return await r.json()}catch(e){}await new Promise(r=>setTimeout(r,400*(i+1)))}throw new Error("Wikipédia ne répond pas")};
-async function wq(u){const pages={};let cont={},gen=null;
+async function wq(u){const pages={},rd={};let cont={},gen=null;
  for(let i=0;i<8;i++){const j=await J(u+"&"+new URLSearchParams(cont));
+  (j.query?.normalized||[]).concat(j.query?.redirects||[]).forEach(x=>rd[x.from]=x.to);
   Object.values(j.query?.pages||{}).forEach(p=>{const k=p.pageid??p.title;pages[k]=Object.assign(pages[k]||{},p)});
   const c=j.continue;if(!c)break;
-  if(c.gapcontinue!==undefined||c.gsroffset!==undefined){gen=c.gapcontinue??c.gsroffset;break}
+  if(c.gapcontinue!==undefined||c.gsroffset!==undefined||c.gcmcontinue!==undefined){gen=c.gapcontinue??c.gsroffset??c.gcmcontinue;break}
   cont=c}
- return{pages,next:gen}}
+ return{pages,next:gen,rd}}
 // classement : top des articles les plus vus sur 6 mois + créateurs, du plus rare au plus commun
 async function loadRank(){if(RANK.length)return;
  const filmPromise=loadFilms();
@@ -1190,18 +1253,23 @@ EXTRA.forEach(t=>{sum[t]=Math.max(sum[t]||0,2e5)});
   try{localStorage.setItem("wc_rank6",JSON.stringify({day:today,l:W}))}catch(e){}}
  const films=await filmPromise;
  const cn=new Set(CRE.map(c=>c.t));
- RANK=[...W.filter(x=>!cn.has(x[0])).map(x=>({t:x[0],r:x[1],v:x[2],src:"wiki"})),...CRE.map(c=>({t:c.t,r:c.r,v:1e11,cr:c})),...films].sort((a,b)=>b.r-a.r||b.v-a.v||String(a.t).localeCompare(String(b.t)));
+ RANK=withVip([...W.filter(x=>!cn.has(x[0])).map(x=>({t:x[0],r:x[1],v:x[2],src:"wiki"})),...CRE.map(c=>({t:c.t,r:c.r,v:1e11,cr:c})),...films]).sort((a,b)=>b.r-a.r||(b.o||0)-(a.o||0)||b.v-a.v||String(a.t).localeCompare(String(b.t)));
  RANKSET=new Set(RANK.map(e=>e.t))}
 // curseur : "r:i" = classement, "a:Titre" = reste de Wikipédia A→Z, "s:n" = recherche
 async function collect(cur){let mode=cur[0],val=cur.slice(2),out=[];
- if(mode=="r"&&(SO=="az"||fr.size&&![...fr].some(r=>RANK.some(e=>e.r==r)))){mode="a";val=""}
- const push=c=>{if(!fr.size||fr.has(c.r))out.push(c)};
+ if(mode=="r"&&(SO=="az"||fr.size&&![...fr].some(r=>RANK.some(e=>e.r==r&&(!CG||e.g===CG))))){mode=CG?"c":"a";val=CG?"0|":""}
+ const push=c=>{if(c.pid&&out.some(o=>o.pid===c.pid))return;if(!fr.size||fr.has(c.r))out.push(c)};
  for(let t=0;t<(fr.size?45:14)&&out.length<PS;t++){
-  if(mode=="r"){const i=+val;if(i>=FL.length){if(fr.size&&!fr.has(0))return{out,next:null};mode="a";val="";continue}
+  if(mode=="r"){const i=+val;if(i>=FL.length){if(fr.size&&!fr.has(0))return{out,next:null};mode=CG?"c":"a";val=CG?"0|":"";continue}
    const B=FL.slice(i,i+50),T=B.filter(e=>!e.cr&&e.src!=="film").map(e=>e.t),info={};
-   if(T.length){const {pages}=await wq(APIB+"titles="+encodeURIComponent(T.join("|")));Object.values(pages).forEach(p=>info[p.title]=p)}
-   let k=0;for(;k<B.length&&out.length<PS;k++){const e=B[k];if(e.cr){push(e.cr);continue}if(e.src==="film"){store[e.id]=e;push(e);continue}const p=info[e.t];if(p&&ok(p))push(mk(p,e.r,e.v<1e9?Math.round(e.v):undefined))}
+   let rdm={};if(T.length){const {pages,rd}=await wq(APIB+"redirects=1&titles="+encodeURIComponent(T.join("|")));rdm=rd||{};Object.values(pages).forEach(p=>{info[p.title]=p;info["~"+nz2(p.title)]=p})}
+   let k=0;for(;k<B.length&&out.length<PS;k++){const e=B[k];if(e.cr){push(e.cr);continue}if(e.src==="film"){store[e.id]=e;push(e);continue}let k2=rdm[e.t]||e.t;k2=rdm[k2]||k2;const p=info[k2]||info[e.t]||info["~"+nz2(k2)]||info["~"+nz2(e.t)];if(p&&ok(p))push(mk(p,e.r,e.v>0&&e.v<1e9?Math.round(e.v):undefined))}
    val=i+k}
+  else if(mode=="c"){const cats=catList(CG);let [cis,cont]=val.split("|");const ci=+cis||0;if(ci>=cats.length)return{out,next:null};
+   const need=Math.max(10,PS-out.length);let r={pages:{},next:null};
+   try{r=await wq(API+"generator=categorymembers&gcmtitle="+encodeURIComponent("Catégorie:"+cats[ci])+"&gcmtype=page&gcmlimit="+need+(cont?"&gcmcontinue="+encodeURIComponent(cont):""))}catch(e){}
+   Object.values(r.pages).sort((a,b)=>(a.index||0)-(b.index||0)).forEach(p=>{if(isRemovedTitle(p.title)||RANKSET.has(p.title))return;rawTot++;if(!ok(p))return;imgTot++;push(mk(p))});
+   val=r.next!=null?ci+"|"+r.next:(ci+1)+"|"}
   else{const off=val,u=API+(mode=="s"?"generator=search&gsrlimit=50&gsrsearch="+encodeURIComponent(q)+"&gsroffset="+off:"generator=allpages&gaplimit=50&gapfilterredir=nonredirects"+(off?"&gapfrom="+encodeURIComponent(off):""));
    const {pages,next}=await wq(u),ps=Object.values(pages).sort((a,b)=>a.index-b.index);
    let k=0;for(;k<ps.length&&out.length<PS;k++){const p=ps[k];if(isRemovedTitle(p.title))continue;if(mode=="a"&&SO=="rare"&&RANKSET.has(p.title))continue;rawTot++;if(!ok(p))continue;imgTot++;push(mk(p))}
@@ -1211,19 +1279,19 @@ async function collect(cur){let mode=cur[0],val=cur.slice(2),out=[];
  return{out,next:mode+":"+val}}
 async function all(){
  main.innerHTML=`<h2>Toutes les cartes</h2><div class="sub" id="cnt">Chargement…</div>
- <div class="bar"><input id="q" placeholder="Rechercher un article…" value="${q}"><select id="so" style="background:var(--sf2);border:1px solid #3a2f4d;color:var(--fg);border-radius:9px;padding:0 12px;font:inherit"><option value="rare" ${SO=="rare"?"selected":""}>Du plus rare au plus commun</option><option value="az" ${SO=="az"?"selected":""}>A → Z (toutes les raretés, communes comprises)</option></select></div>
+ <div class="bar"><input id="q" placeholder="Rechercher un article…" value="${q}"><select id="so" style="background:var(--sf2);border:1px solid #3a2f4d;color:var(--fg);border-radius:9px;padding:0 12px;font:inherit"><option value="rare" ${SO=="rare"?"selected":""}>Du plus rare au plus commun</option><option value="az" ${SO=="az"?"selected":""}>A → Z (toutes les raretés, communes comprises)</option></select>${groupSelectHTML()}</div>
  <div class="chips">${R.map((r,i)=>HID.has(i)?"":`<button class="chip ${fr.has(i)?"on":""}" style="background:${r[1]}" data-r="${i}">${r[0]}</button>`).join("")}</div>
  <div id="g" class="grid"><div class="msg">Chargement des 50 cartes…</div></div><div class="pag"><button class="btn g" id="pv">← Précédent</button><span id="pn">Page ${page}</span><button class="btn g" id="nx">Suivant →</button></div>`;
- const reset=()=>{page=1;cursors=[q?"s:0":SO=="az"?"a:":"r:0"]};$("so").onchange=e=>{SO=e.target.value;reset();all()};
+ const reset=()=>{page=1;cursors=[q?"s:0":CG?(SO=="az"?"c:0|":"r:0"):SO=="az"?"a:":"r:0"]};$("so").onchange=e=>{SO=e.target.value;reset();all()};$("cg").onchange=e=>{CG=e.target.value;reset();all()};
  $("q").onkeydown=e=>{if(e.key=="Enter"){q=e.target.value.trim();reset();all()}};
  main.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;fr.has(i)?fr.delete(i):fr.add(i);reset();all()});
  $("pv").onclick=()=>{page--;all();main.scrollTo(0,0)};$("nx").onclick=()=>{page++;all();main.scrollTo(0,0)};
  $("pv").disabled=page<2;$("nx").disabled=true;const cw=main.clientWidth;$("g").style.gridTemplateColumns="repeat("+(cw>=900?8:cw>=560?4:2)+",1fr)";
- try{if(!q&&SO=="rare"){await loadRank();FL=fr.size?RANK.filter(e=>fr.has(e.r)):RANK}else if(q){await loadFilms()}const [r,tot]=await Promise.all([collect(cursors[page-1]),totalOf()]);
+ try{if(!q&&SO=="rare"){await loadRank();const base=CG?RANK.filter(e=>e.g===CG):RANK;FL=fr.size?base.filter(e=>fr.has(e.r)):base}else if(q){await loadFilms()}const [r,tot]=await Promise.all([collect(cursors[page-1]),totalOf()]);
   cursors[page]=r.next;if(q&&page==1){const needle=q.toLowerCase();const local=[...FILMS.filter(f=>(f.t||"").toLowerCase().includes(needle)||(f.baseTitle||"").toLowerCase().includes(needle)),...CRE.filter(c=>c.t.toLowerCase().includes(needle)&&(!fr.size||fr.has(c.r)))];const seen=new Set();r.out=[...local,...r.out].filter(c=>{if(seen.has(c.id))return false;seen.add(c.id);return true}).slice(0,PS)}
   $("g").innerHTML=r.out.length?r.out.map(card).join(""):'<div class="msg">Aucune carte avec image trouvée.</div>';bind($("g"));
   const SH=[.9,.08,.015,.004,.0008,.0003,.00005,.00001],frac=fr.size?Math.max(.0001,[...fr].reduce((s,i)=>s+SH[i],0)):1,rr=rawTot?imgTot/rawTot:.4,tp=(!q&&SO=="rare"&&fr.size&&!fr.has(0))?Math.max(page,Math.ceil(FL.length*.7/PS)):Math.max(page,Math.ceil((q?tot*rr:RANK.length*.8+Math.max(0,tot-RANK.length)*rr)*frac/PS));
-  $("pn").textContent=`Page ${page.toLocaleString("fr-FR")} / ~${tp.toLocaleString("fr-FR")}`;
+  $("pn").textContent=`Page ${page.toLocaleString("fr-FR")} / ~${tp.toLocaleString("fr-FR")}`;if(CG)$("pn").textContent="Page "+page.toLocaleString("fr-FR")+" · "+CATGROUPS[CG].l;
   $("cnt").textContent=`${tot.toLocaleString("fr-FR")} cartes au catalogue · dont ${FILMS.length.toLocaleString("fr-FR")} films avec affiche · ${PS} cartes par page · ${SO=="az"?"ordre alphabétique · toutes les raretés":"classées de la plus rare à la plus commune"}${SO=="rare"&&fr.size?" · "+(fr.has(0)?"filtre actif":FL.length.toLocaleString("fr-FR")+" cartes dans ce filtre"):""}`;
   $("nx").disabled=r.next===null}
  catch(e){console.error(e);$("g").innerHTML='<div class="msg">Impossible de joindre Wikipédia ('+(e&&e.message||e)+'). Ouvre ce fichier directement dans ton navigateur, avec internet. <button class="btn g" id="rt">Réessayer</button></div>';$("rt").onclick=all}}
@@ -1358,6 +1426,62 @@ function simulate(){
  });
  MK.A=MK.A.filter(a=>!a.done);if(ch){save();upM();saveMk()}return ch
 }
+
+/* ===== V100 : liste de souhaits + alertes d'enchères ===== */
+let WL={},WLOG=[],WLU=0,WLV=0;
+try{WL=JSON.parse(localStorage.getItem("wc_wish")||"{}")||{};WLOG=JSON.parse(localStorage.getItem("wc_wish_log")||"[]")||[];WLU=+localStorage.getItem("wc_wish_unread")||0}catch(e){WL={};WLOG=[]}
+const saveWL=()=>{try{localStorage.setItem("wc_wish",JSON.stringify(WL));localStorage.setItem("wc_wish_log",JSON.stringify(WLOG.slice(0,40)));localStorage.setItem("wc_wish_unread",String(WLU))}catch(e){}};
+const isW=c=>!!(c&&WL[c.pid]);
+function wlBadge(){const b=$("t3");if(b)b.innerHTML="🔨 Enchères"+(WLU>0?` <span class="wlb" title="Alertes de ta liste de souhaits">⭐${WLU}</span>`:"")}
+function toggleW(c){if(!c)return false;
+ if(WL[c.pid]){delete WL[c.pid];toast("⭐ « "+c.t+" » retirée de ta liste de souhaits.")}
+ else{const k={...c};delete k.n;WL[c.pid]={c:k,ts:Date.now(),warned:{}};store[c.id]=c;MK.A.forEach(a=>{if(a.c.pid==c.pid)a.wl=1});toast("⭐ « "+c.t+" » ajoutée. Tu seras prévenue dès qu'elle est mise en vente.")}
+ WLV++;saveWL();return isW(c)}
+function wlAlert(a,kind){
+ const w=WL[a.c.pid];if(!w)return;
+ const cur=a.w==null?a.st:a.b;
+ const msg=kind=="soon"?`⏰ « ${a.c.t} » (liste de souhaits) se termine bientôt · ${cur} 🪙`:`⭐ « ${a.c.t} » vient d'être mise en vente · dès ${cur} 🪙`;
+ WLOG.unshift({pid:a.c.pid,t:a.c.t,k:kind,p:cur,ts:Date.now(),aid:a.id});WLOG.length=Math.min(WLOG.length,40);
+ if(!(tab==3&&AV.tab=="w"))WLU++;
+ WLV++;saveWL();wlBadge();toast(msg);try{SFX.reveal(Math.min(3,a.c.r))}catch(e){}
+ try{if(document.hidden&&window.Notification&&Notification.permission=="granted")new Notification("WikiCollect",{body:msg.replace(/^[^ ]+ /,"")})}catch(e){}
+}
+function wlOnListed(a){if(a&&a.s!=ME&&WL[a.c.pid]){a.wl=1;wlAlert(a,"listed")}}
+function wlTick(){
+ const now=Date.now();let ch=0;
+ MK.A.forEach(a=>{if(a.done||a.s==ME||!WL[a.c.pid])return;
+  if(!a.wl){a.wl=1;wlAlert(a,"listed");ch=1}
+  else if(a.end-now<120000&&a.end>now&&!a.wlSoon){a.wlSoon=1;wlAlert(a,"soon");ch=1}});
+ if(ch)saveMk();
+}
+/* une carte suivie finit par apparaître : les acheteurs IA la mettent en vente de temps en temps */
+function wlSpawn(){
+ const now=Date.now();let n=0;
+ Object.values(WL).forEach(w=>{
+  const c=w.c;if(!c||!c.pid)return;
+  if(MK.A.some(a=>!a.done&&a.c.pid==c.pid&&a.s!=ME))return;
+  if(Math.random()>.1)return;
+  const s=PSEUDOS[Math.floor(Math.random()*PSEUDOS.length)],f=fair(c);
+  const d=[300000,420000,600000,900000,1800000,3600000][Math.floor(Math.random()*6)];
+  const m=Math.random(),sf=m<.42?.30+Math.random()*.25:m<.72?.55+Math.random()*.22:m<.9?.77+Math.random()*.23:1+Math.random()*.4;
+  const st=Math.max(1,Math.round(f*sf));store[c.id]=c;
+  const a={id:AID(),c:{...c},s,st,b:st,w:null,n:0,hs:[],cool:{},end:now+d,t:now,ts:now,dur:d,nextBot:now+2000+Math.random()*9000};
+  MK.A.push(a);wlOnListed(a);n++});
+ if(n){saveMk();if(tab==3)paintMk(true)}
+}
+setInterval(()=>{try{wlSpawn()}catch(e){}},20000);
+setInterval(()=>{try{wlTick()}catch(e){}},4000);
+setTimeout(()=>{try{wlBadge();wlTick()}catch(e){}},1500);
+function wishTab(){
+ const L=Object.values(WL).sort((x,y)=>y.ts-x.ts);
+ const sale=pid=>MK.A.find(a=>!a.done&&a.c.pid==pid&&a.s!=ME);
+ const items=L.map(w=>{const c=w.c;store[c.id]=c;const a=sale(c.pid);
+  return `<div class="at" ${a?`data-id="${a.id}" data-auid="${a.id}"`:""}>${card(c)}<div class="as">${a?`<b style="color:#7ee29a">En vente · ${a.w==null?a.st:a.b} 🪙</b><br><span class="cd" data-e="${a.end}"></span>`:`<span style="color:var(--mut)">Pas en vente pour l'instant</span>`}<div class="wll"><button class="btn g wlrm" data-p="${String(c.pid).replace(/"/g,"&quot;")}">Retirer</button></div></div></div>`}).join("");
+ const lg=WLOG.slice(0,12).map(x=>`<div class="off">${x.k=="soon"?"⏰":"⭐"} « ${x.t} » ${x.k=="soon"?"se termine bientôt":"mise en vente"} · <b>${x.p} 🪙</b> <span class="sub" style="margin:0 0 0 auto">${ago(x.ts)}</span></div>`).join("");
+ const perm=window.Notification&&Notification.permission=="default"?`<button class="btn g" id="wlnotif">🔔 Activer les notifications du navigateur</button>`:"";
+ return `<div class="sub" style="margin:0 0 12px">Suis une carte avec le bouton ⭐ sur sa fiche. Tu es prévenue quand elle est mise en vente (et quand son enchère se termine bientôt).</div>${perm}
+ <div class="grid mg">${items||'<div class="msg">Ta liste est vide. Ouvre une carte (Toutes les cartes, Collection…) et clique sur « ⭐ Suivre ».</div>'}</div>
+ <h3 style="margin-top:26px">Alertes récentes</h3>${lg||'<div class="sub">Aucune alerte pour le moment.</div>'}`}
 let filling=false;
 async function refill(){
  if(filling)return;
@@ -1443,7 +1567,7 @@ async function refill(){
     a.last=a.hs[0].ts;
     a.cool[u]=now+4000+Math.random()*9000;
    }
-   MK.A.push(a);
+   MK.A.push(a);try{wlOnListed(a)}catch(e){}
   });
   saveMk()
  }catch(e){console.error(e)}finally{filling=false}
@@ -1468,9 +1592,9 @@ function pickSell(){M.style.display="flex";const L=Object.values(col).sort((a,b)
 // ---- page Enchères ----
 let AV={tab:"b",q:"",sort:"new",fr:new Set(),d:null};
 const tile=a=>{store[a.c.id]=a.c;const cur=a.w==null?a.st:a.b;
- return `<div class="at" data-id="${a.id}" data-auid="${a.id}">${card(a.c)}<div class="ar"><div><small data-au-label="price-label">${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</small><b data-au-price>🪙 ${cur}</b></div><div style="text-align:right"><small>⏱ DURÉE</small><b class="cd" data-e="${a.end}"></b></div></div><div class="as"><span data-au-status>${a.s==ME?"Ta vente":"Vendu par "+a.s}${a.w?` · ${a.w==ME?"<b style='color:#7ee29a'>tu mènes</b>":"👑 "+a.w}`:""}${a.mine&&a.w!=ME?" · <b style='color:#ff9a7a'>surenchéri</b>":""}</span></div></div>`};
+ return `<div class="at" data-id="${a.id}" data-auid="${a.id}">${WL[a.c.pid]?'<div class="wst" title="Dans ta liste de souhaits">⭐</div>':""}${card(a.c)}<div class="ar"><div><small data-au-label="price-label">${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</small><b data-au-price>🪙 ${cur}</b></div><div style="text-align:right"><small>⏱ DURÉE</small><b class="cd" data-e="${a.end}"></b></div></div><div class="as"><span data-au-status>${a.s==ME?"Ta vente":"Vendu par "+a.s}${a.w?` · ${a.w==ME?"<b style='color:#7ee29a'>tu mènes</b>":"👑 "+a.w}`:""}${a.mine&&a.w!=ME?" · <b style='color:#ff9a7a'>surenchéri</b>":""}</span></div></div>`};
 const SORTS={new:["Récemment listées",(x,y)=>y.ts-x.ts],end:["Se termine bientôt",(x,y)=>x.end-y.end],pa:["Prix croissant",(x,y)=>(x.w==null?x.st:x.b)-(y.w==null?y.st:y.b)],pd:["Prix décroissant",(x,y)=>(y.w==null?y.st:y.b)-(x.w==null?x.st:x.b)],rar:["Rareté",(x,y)=>y.c.r-x.c.r]};
-const aucViewSig=()=>AV.tab+"|"+AV.d+"|"+AV.q+"|"+AV.sort+"|"+[...AV.fr].join(",");
+const aucViewSig=()=>WLV+"|"+AV.tab+"|"+AV.d+"|"+AV.q+"|"+AV.sort+"|"+[...AV.fr].join(",");
 let mkViewSig="";
 function paintMk(force){if(!$("ah"))return;const viewSig=aucViewSig();
  if(force||viewSig!==mkViewSig){mkViewSig=viewSig;if(AV.d){detailPage()}else listPage()}
@@ -1490,7 +1614,7 @@ function updateAuctionDom(){
 }
 function listPage(){
  const A=MK.A.filter(a=>!a.done),mineS=A.filter(a=>a.s==ME),mineB=A.filter(a=>a.mine),myH=MK.H.filter(x=>x.s==ME||x.u==ME);
- const tabs=[["b","Parcourir"],["v",`Mes ventes (${mineS.length}/${MAXS})`],["e","Mes enchères"],["g",`Gagnées (${MK.W.length})`],["h",`Historique (${myH.length})`]];
+ const tabs=[["b","Parcourir"],["v",`Mes ventes (${mineS.length}/${MAXS})`],["e","Mes enchères"],["g",`Gagnées (${MK.W.length})`],["h",`Historique (${myH.length})`],["w",`⭐ Souhaits (${Object.keys(WL).length})`]];
  let body="";
  if(AV.tab=="b"){let L=A.filter(a=>a.s!=ME&&(!AV.q||a.c.t.toLowerCase().includes(AV.q.toLowerCase()))&&(!AV.fr.size||AV.fr.has(a.c.r))).sort(SORTS[AV.sort][1]);
   body=`<div class="bar"><input id="aq" placeholder="Rechercher une carte…" value="${AV.q}"><button class="btn" id="ago">🔍 Rechercher</button><select id="asr">${Object.entries(SORTS).map(([k,v])=>`<option value="${k}" ${k==AV.sort?"selected":""}>${v[0]}</option>`).join("")}</select></div>
@@ -1500,22 +1624,26 @@ function listPage(){
  else if(AV.tab=="v")body=`<div class="bar"><button class="btn" id="sell">➕ Mettre une carte aux enchères</button><span class="sub" style="align-self:center;margin:0">Frais de vente 5 % · ${MAXS} ventes max en même temps</span></div><div class="grid mg">${mineS.sort((x,y)=>x.end-y.end).map(a=>tile(a)+"").join("")||'<div class="msg">Aucune vente en cours. Mets une carte de ta collection aux enchères.</div>'}</div>`;
  else if(AV.tab=="e")body=`<div class="grid mg">${mineB.sort((x,y)=>x.end-y.end).map(tile).join("")||'<div class="msg">Tu n\'as misé sur aucune enchère.</div>'}</div>`;
  else if(AV.tab=="g")body=`<div class="grid mg">${MK.W.map(x=>{store[x.c.id]=x.c;return `<div class="at">${card(x.c)}<div class="as">Gagnée pour <b>${x.p} 🪙</b> · ${ago(x.ts)}<br>Vendeur : ${nm(x.s)}</div></div>`}).join("")||'<div class="msg">Tu n\'as encore rien gagné.</div>'}</div>`;
+ else if(AV.tab=="w"){body=wishTab();if(WLU){WLU=0;saveWL();wlBadge()}}
  else body=myH.map(x=>`<div class="off">${x.s==ME?(x.u?`💰 Vendue à <b>${x.u}</b> pour <b>${x.p} 🪙</b>`:"↩ Invendue"):`🛒 Achetée à <b>${nm(x.s)}</b> pour <b>${x.p} 🪙</b>`} · « ${x.c.t} » <b style="color:${R[x.r][1]}">${R[x.r][0]}</b> <span class="sub" style="margin:0">${ago(x.ts)}</span></div>`).join("")||'<div class="sub">Aucun historique.</div>';
  $("ah").innerHTML=`<div class="tabs2">${tabs.map(t=>`<button class="${AV.tab==t[0]?"on":""}" data-t="${t[0]}">${t[1]}</button>`).join("")}</div>${body}`;
  $("ah").querySelectorAll(".tabs2 button").forEach(b=>b.onclick=()=>{AV.tab=b.dataset.t;paintMk(true)});
  if($("aq")){const go=()=>{AV.q=$("aq").value.trim();paintMk(true)};$("aq").onkeydown=e=>{if(e.key=="Enter")go()};$("ago").onclick=go;$("asr").onchange=e=>{AV.sort=e.target.value;paintMk(true)};
   $("ah").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;AV.fr.has(i)?AV.fr.delete(i):AV.fr.add(i);paintMk(true)})}
  if($("sell"))$("sell").onclick=pickSell;
+ $("ah").querySelectorAll(".wlrm").forEach(b=>b.onclick=e=>{e.stopPropagation();const p=b.dataset.p;if(WL[p]){delete WL[p]}else{const k=Object.keys(WL).find(x=>String(x)==p);if(k)delete WL[k]}WLV++;saveWL();paintMk(true)});
+ if($("wlnotif"))$("wlnotif").onclick=()=>{try{Notification.requestPermission().then(()=>paintMk(true))}catch(e){}};
  bind($("ah"),false);$("ah").querySelectorAll(".at").forEach(t=>{const cd=t.querySelector(".card");if(cd)cd.onclick=null;if(t.dataset.id)t.onclick=()=>{AV.d=t.dataset.id;paintMk(true)}})}
 function detailPage(){const a=MK.A.find(x=>x.id==AV.d&&!x.done);
  if(!a){AV.d=null;return listPage()}
  store[a.c.id]=a.c;const mine=a.s==ME,cur=a.w==null?a.st:a.b,nb=nextBid(a),f=fair(a.c),hs=(a.hs||[]).slice().reverse();
  const box=mine?`<div class="abox"><div class="arow"><span>Valeur estimée</span><b>≈ ${f} 🪙 <small style="color:var(--mut)">(${Math.round(f*.8)}–${Math.round(f*1.25)})</small></b></div><div class="arow"><span>Si l'enchère s'arrêtait maintenant</span><b style="color:#7ee29a">${a.w==null?"aucune mise":"+"+Math.round(a.b*.95)+" 🪙 (après 5 % de frais)"}</b></div>${a.n==0?`<button class="btn g" id="acn" style="margin-top:10px">Annuler l'enchère (aucune mise)</button>`:""}</div>`
  :`<div class="abox"><div class="arow"><span>Votre solde : <b style="color:var(--fg)">${money.toLocaleString("fr-FR")}</b> pièces</span><span>Mise minimum : <b style="color:var(--fg)">${nb}</b></span></div><div class="abid">${STP(nb)}<button class="btn" id="abd">Miser</button></div>${a.w==ME?`<div class="sub" style="color:#7ee29a;margin:8px 0 0">Tu mènes avec ${a.b} 🪙 — ta mise actuelle te sera rendue si tu surenchéris.</div>`:""}<div class="sub" style="font-size:11px;margin:10px 0 0">La mise est débitée de votre solde immédiatement. Si vous êtes surenchéri, elle vous est intégralement remboursée. Une mise dans les 20 dernières secondes remet le chronomètre à 1 minute.</div></div>`;
- $("ah").innerHTML=`<div class="bkl" id="abk">← Retour aux enchères</div><div class="ad"><div class="adl">${card(a.c)}</div><div class="adr"><h2 style="margin:0">${a.c.t}</h2><div class="sub" style="margin:4px 0 14px">${mine?"Ta vente":"Mis en vente par <b style='color:var(--ac)'>"+a.s+"</b>"}</div>
+ $("ah").innerHTML=`<div class="bkl" id="abk">← Retour aux enchères</div><div class="ad"><div class="adl">${card(a.c)}</div><div class="adr"><h2 style="margin:0">${a.c.t}</h2><button class="btn g wlbtn ${isW(a.c)?"on":""}" id="wlD" style="margin-top:8px">${isW(a.c)?"⭐ Suivie":"☆ Suivre cette carte"}</button><div class="sub" style="margin:4px 0 14px">${mine?"Ta vente":"Mis en vente par <b style='color:var(--ac)'>"+a.s+"</b>"}</div>
  <div class="abox"><div class="arow"><span>${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</span><b class="big">🪙 ${cur}</b></div>${a.w?`<div class="arow"><span>Meilleur enchérisseur</span><b>${a.w==ME?"Toi":"👑 "+a.w}</b></div>`:""}<div class="arow"><span>🔨 Temps restant</span><b id="atl"></b></div></div>${box}
  <h4 class="lab" style="margin-top:22px">HISTORIQUE DES MISES (${hs.length})</h4>${hs.length?hs.map(x=>`<div class="off"><b>${nm(x.u)}</b> a misé <b>${x.p} 🪙</b> <span class="sub" style="margin:0 0 0 auto">${ago(x.ts)}</span></div>`).join(""):'<div class="sub">Aucune mise placée pour l\'instant.</div>'}</div></div>`;
  $("abk").onclick=()=>{AV.d=null;paintMk(true)};bind($("ah"),false);const cd=$("ah").querySelector(".card");if(cd)cd.onclick=()=>openModal(a.c.id);
+ if($("wlD"))$("wlD").onclick=()=>{toggleW(a.c);paintMk(true)};
  if($("acn"))$("acn").onclick=()=>{MK.A=MK.A.filter(x=>x!==a);addCard(a.c);save();saveMk();toast("Enchère annulée, carte rendue.");AV.d=null;paintMk(true)};
  if($("abd")){wireStp(nb,Math.max(1,Math.round(nb*.05)));$("abd").onclick=()=>{simulate();const b=MK.A.find(x=>x.id==a.id);if(!b){toast("Cette enchère est terminée.");AV.d=null;return paintMk(true)}
   const v=Math.floor(+$("sv").value)||0,mn=nextBid(b);if(v<mn)return toast("Mise trop basse (minimum "+mn+" 🪙).");if(v>money+(b.w==ME?b.b:0))return toast("Pas assez de pièces.");
@@ -1528,24 +1656,7 @@ async function market(){MK.n=main.clientWidth>=1150?12:main.clientWidth>=850?8:m
 setInterval(()=>{try{if(tab!=3)simulate();else {simulate();updateAuctionDom()}}catch(e){}},15000);
 const take=b=>{b=Math.floor(b);if(!(b>=1)||b>money){try{SFX.error()}catch(e){}alert("Mise invalide ou pas assez de pièces.");return 0}money-=b;SFX.bet();WCJ+=Math.max(1,Math.floor(b*.02));bumpDaily("casino",1);save();saveJ();upM();return b};
 const alive=id=>!!$(id);
-function casino(g){
- try{SFX.stopAll()}catch(e){}
- if(g=="roulette")return roulette();if(g=="blackjack")return blackjack();if(g=="slots")return slots();if(g=="mines")return mines();
- if(g=="coin")return coinflip();if(g=="double")return doublegame();if(g=="cardcases")return cardcases();if(g=="upgrade")return cardupgrade();if(g=="crash")return crash();
- main.innerHTML=`<h2>Casino</h2><div class="sub">Mini-jeux à pièces virtuelles 🪙 · tout reste dans WikiCollect</div><div class="jbox" style="margin-bottom:16px"><div class="jnum">${WCJ.toLocaleString("fr-FR")} 🪙</div><div class="jsub">JACKPOT WIKICOLLECT · 2 % des mises alimentent la cagnotte</div><div class="frow" style="justify-content:center;margin-top:10px"><button class="btn" id="jgo">🎯 Tenter le jackpot · 1000 🪙</button><span class="mut" style="font-size:11px">chance rare · test virtuel</span></div><div class="jhist">${WCJL.map(x=>`<span>${x.n} · ${x.p.toLocaleString("fr-FR")} 🪙</span>`).join("")||"<span>Aucun gagnant récent</span>"}</div></div><div class="casino-grid">
-  <div class="cg" data-g="roulette"><div class="ico">🎡</div><div><h3>Roulette</h3><p>Numéros, couleurs, douzaines et colonnes.</p></div><div class="cost">Mise dès 1 🪙</div></div>
-  <div class="cg" data-g="blackjack"><div class="ico">🃏</div><div><h3>Blackjack</h3><p>Contre le croupier, tire ou reste.</p></div><div class="cost">Mise dès 1 🪙</div></div>
-  <div class="cg" data-g="mines"><div class="ico">💣</div><div><h3>Mines</h3><p>Ouvre les cases sûres et encaisse avant la mine.</p></div><div class="cost">Mise dès 1 🪙</div></div>
-  <div class="cg" data-g="slots"><div class="ico">🎰</div><div><h3>Machine à sous</h3><p>Fais tourner les rouleaux et cherche les lignes.</p></div><div class="cost">Mise dès 20 🪙</div></div>
-  <div class="cg" data-g="coin"><div class="ico">🪙</div><div><h3>Pile ou Face</h3><p>Choisis un côté et lance la pièce.</p></div><div class="cost">Gain 2×</div></div>
-  <div class="cg" data-g="double"><div class="ico">✖️</div><div><h3>Double ou rien</h3><p>Mise une somme, commence à ×1 et tente de doubler à chaque étape.</p></div><div class="cost">Risque à chaque clic</div></div>
-  <div class="cg" data-g="upgrade"><div class="ico">⬆️</div><div><h3>Card Upgrade</h3><p>Mise une carte, choisis une cible et tente l’amélioration.</p></div><div class="cost">Carte contre carte</div></div>
-  <div class="cg" data-g="crash"><div class="ico">✈️</div><div><h3>Crash</h3><p>Le multiplicateur monte pendant que l’avion vole. Encaisse avant le crash.</p></div><div class="cost">Mise dès 1 🪙</div></div>
- </div>
- <button class="btn g" id="dly" style="margin-top:22px">🎁 Cadeau quotidien : +200 🪙</button>`;
- main.querySelectorAll(".cg").forEach(e=>e.onclick=()=>casino(e.dataset.g));$("jgo").onclick=()=>{if(money<1000)return alert("Pas assez de pièces.");money-=1000;WCJ+=20;save();saveJ();upM();const win=Math.random()<0.01;if(win){const w=WCJ;WCJ=10000;WCJL.unshift({n:"Toi",p:w,ts:Date.now()});saveJ();gain(w);toast("🏆 JACKPOT : +"+w.toLocaleString("fr-FR")+" 🪙");casino()}else toast("Pas cette fois… le jackpot continue de monter.");};
- $("dly").onclick=()=>{const l=+localStorage.getItem("wc_dly")||0;if(Date.now()-l<864e5)return alert("Reviens dans "+fmt(864e5-(Date.now()-l))+".");try{localStorage.setItem("wc_dly",Date.now())}catch(e){}gain(200)}
-}
+/* V99 : ancienne version de casino() supprimée (elle était écrasée par la suivante) */
 const bk=()=>`<button class="btn g" id="bk" style="margin-bottom:14px">← Retour au casino</button>`;()=>`<button class="btn g" id="bk" style="margin-bottom:14px">← Retour au casino</button>`;
 /* ---------- MINES ---------- */
 function mines(){
@@ -1567,77 +1678,9 @@ function mines(){
  paint()}
 
 /* ---------- PILE OU FACE ---------- */
-function coinflip(){
- let bet=50,choice="pile",busy=false;
- main.innerHTML=`${bk()}<div class="cgame"><h2>🪙 Pile ou Face</h2><div class="sub">Choisis un côté. Une victoire paie 2× la mise.</div><div class="choice-row"><button class="btn g choice sel" data-c="pile">🪙 Pile</button><button class="btn g choice" data-c="face">🔵 Face</button></div><div class="bar"><span class="sub" style="align-self:center">Mise :</span><input id="cfb" type="number" min="1" value="${bet}"><button class="btn" id="cgo">Lancer</button></div><div id="cfr" class="big-result">🪙</div></div>`;
- $("bk").onclick=()=>casino();
- main.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{if(busy)return;choice=b.dataset.c;main.querySelectorAll(".choice").forEach(x=>x.classList.toggle("sel",x===b))});
- $("cgo").onclick=()=>{if(busy)return;SFX.coin();bet=Math.floor(+$ ("cfb").value);if(!take(bet))return;busy=true;$ ("cgo").disabled=true;let n=0;const iv=setInterval(()=>{n++;try{SFX.tick(n)}catch(e){}$("cfr").textContent=Math.random()<.5?"🪙 Pile":"🔵 Face";if(n>12){clearInterval(iv);const r=Math.random()<.5?"pile":"face";if(r==choice){try{SFX.win()}catch(e){}gain(bet*2);$("cfr").innerHTML=`🎉 ${r=="pile"?"🪙 Pile":"🔵 Face"}<div style="font-size:15px;color:#3ddc97">+${bet*2} 🪙</div>`}else{try{SFX.lose()}catch(e){}$("cfr").innerHTML=`❌ ${r=="pile"?"🪙 Pile":"🔵 Face"}<div style="font-size:15px;color:var(--mut)">Perdu · ${bet} 🪙</div>`}busy=false;$ ("cgo").disabled=false}},80)}
-}
+/* V99 : ancienne version de coinflip() supprimée (elle était écrasée par la suivante) */
 /* ---------- DOUBLE OU RIEN ---------- */
-function doublegame(){
- let G=null,busy=false;
- const levels=[1,2,3,4,5,8,12,20];
- const paint=()=>{
-  const mult=G?G.m:1, active=!!G&&!G.over;
-  const next=G?levels[Math.min(levels.length-1,G.i+1)]:2;
-  main.innerHTML=`${bk()}<div class="cgame"><h2>✖️ Double ou rien</h2>
-   <div class="sub">Commence à ×1. À chaque clic, tu peux tenter la prochaine étape. Réussite → tu montes. Échec → tu perds la mise. Encaisse quand tu veux.</div>
-   <div style="display:flex;justify-content:center;margin:22px 0">
-    <div style="width:min(360px,80vw);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#24183b 0,#0f0c16 66%);border:8px solid #2b2340;box-shadow:0 0 0 4px #a855f733,0 0 45px #a855f733">
-     <div style="text-align:center"><div style="font-size:58px;font-weight:950;color:#fff">${G?('×'+mult.toFixed(2)):'×1.00'}</div><div class="sub" style="margin:0">gain potentiel</div><div style="font-size:20px;font-weight:900;color:#ffd23c;margin-top:6px">${G?Math.floor(G.bet*mult).toLocaleString('fr-FR'):0} 🪙</div></div>
-    </div>
-   </div>
-   <div class="bar" style="justify-content:center"><span class="sub" style="align-self:center">Mise :</span><input id="dbet" type="number" min="1" value="${G?G.bet:50}" ${active?'disabled':''}><button class="btn g" id="dstart" ${active?'disabled':''}>Commencer à ×1</button></div>
-   <div class="bar" style="justify-content:center">
-    <button class="btn" id="drisk" ${active?'':'disabled'}>🎲 Tenter ×${next}</button>
-    <button class="btn g" id="dcash" ${active&&G.i>=0?'':'disabled'}>💰 Encaisser ${active?Math.floor(G.bet*G.m).toLocaleString('fr-FR'):''} 🪙</button>
-   </div>
-   <div id="dmsg" class="bjm">${G&&G.msg?G.msg:'À toi de choisir quand t’arrêter.'}</div>
-  </div>`;
-  $("bk").onclick=()=>casino();
-  $("dstart").onclick=start;
-  $("drisk").onclick=risk;
-  $("dcash").onclick=cash;
- };
- const start=()=>{
-  if(G&&!G.over)return;
-  const b=Math.floor(+$("dbet").value);
-  if(!b||b<1||b>money)return alert("Mise invalide ou pas assez de pièces.");
-  if(!take(b))return;
-  G={bet:b,m:1,i:0,over:false,msg:"Tu es à ×1.00. Tu peux encaisser ou tenter la suite."};
-  paint();
- };
- const risk=()=>{
-  if(busy||!G||G.over)return;
-  SFX.suspense(2600);
-  busy=true;
-  const win=Math.random()<0.5;
-  const target=levels[Math.min(levels.length-1,G.i+1)];
-  $("drisk").disabled=true;$("dcash").disabled=true;
-  $("dmsg").textContent="La roue tourne…";
-  setTimeout(()=>{
-   if(win){
-    SFX.win();
-    G.i=Math.min(levels.length-1,G.i+1);
-    G.m=levels[G.i];
-    G.msg=`✅ Réussi · tu passes à ×${G.m.toFixed(2)}.`;
-    if(G.i>=levels.length-1){G.over=true;const w=Math.floor(G.bet*G.m);gain(w);G.msg=`🏆 Maximum atteint · +${w.toLocaleString('fr-FR')} 🪙`; }
-   }else{
-    SFX.lose();
-    G.over=true;G.msg=`💥 Perdu à l’étape ×${target}. Mise perdue : ${G.bet.toLocaleString('fr-FR')} 🪙`;
-   }
-   busy=false;paint();
-  },700);
- };
- const cash=()=>{
-  if(busy||!G||G.over)return;
-  const w=Math.floor(G.bet*G.m);
-  G.over=true;gain(w);G.msg=`✅ Encaissé à ×${G.m.toFixed(2)} · +${w.toLocaleString('fr-FR')} 🪙`;
-  paint();
- };
- paint();
-}
+/* V99 : ancienne version de doublegame() supprimée (elle était écrasée par la suivante) */
 
 /* ---------- CARD UPGRADE ---------- */
 function cardupgrade(){
@@ -2099,27 +2142,7 @@ async function fusionSame(c){
  }
 }
 
-function fusionHTML(A){
- const candidates=A.filter(c=>c.n>=3&&c.r<7).sort((a,b)=>a.r-b.r||a.t.localeCompare(b.t)).slice(0,18);
- return `<div class="fusion">
-  <div class="dhero">
-   <div>
-    <h3 style="margin:0">⚗️ Fusion · 3 cartes identiques</h3>
-    <div class="mut" style="font-size:12px">Comme un reroll : tu sacrifies 3 exemplaires identiques pour obtenir 1 carte aléatoire de la même rareté ou d'une rareté supérieure.</div>
-   </div>
-   <span class="mut" style="font-size:12px">${candidates.length} fusion(s) possible(s)</span>
-  </div>
-  <div class="fmeta">
-   <span>3 mêmes cartes → <strong>1 nouvelle carte</strong></span>
-   <span>Même rareté <strong>70 %</strong></span>
-   <span>+1 rareté <strong>25 %</strong></span>
-   <span>+2 raretés <strong>5 %</strong></span>
-  </div>
-  <div class="frow" style="margin-top:12px">
-   ${candidates.length?candidates.map(c=>`<div class="fcard"><span>${SYM[c.r]} ${c.t}</span><span class="mut">×${c.n} → ${rarityName(c.r)}+</span><button class="btn" data-fuse="${c.id}">Fusionner</button></div>`).join(""):'<div class="mut">Aucun doublon de 3 exemplaires pour le moment.</div>'}
-  </div>
- </div>`;
-}
+/* V99 : ancienne version de fusionHTML() supprimée (elle était écrasée par la suivante) */
 
 /* ===== COLLECTION ===== */
 /* ===== COLLECTION V55 : tags + sélection + suppression + 50 cartes/page ===== */
@@ -3151,6 +3174,322 @@ main{padding:14px 16px 26px!important}
  #ah .bar .btn{flex:0 0 auto}
 }
 </style>
+
+<script>
+/* ===== WIKICOLLECT CATALOG V4.1 — massif, persistant, image-only =====
+   Le moteur est séparé de wc_col / wc_money et reprend exactement où il s'est arrêté.
+   Il ne promet pas artificiellement 3 M : il collecte réellement les cartes trouvées avec image.
+*/
+(()=>{
+  if(window.__WCV41Installed)return; window.__WCV41Installed=true;
+  const DBN='WikiCollectCatalogV41',DBV=3,STORE='cards',META='meta';
+  const API='https://fr.wikipedia.org/w/api.php?format=json&origin=*';
+  const TARGET=3000000,BATCH=100,WAIT=90,MAX_CAT_DEPTH=8;
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const norm=s=>String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const title=s=>String(s||'').replace(/_/g,' ').trim();
+  const bad=/^(liste|portail|homonymie|catégorie|modèle|annexe|fichier|aide|projet|chronologie|bibliographie|discographie|filmographie|sitographie|webographie|navigation):/i;
+  const OV={};
+  [['Pelé',7],['Cristiano Ronaldo',7],['Lionel Messi',7],['Karim Benzema',7],['Kylian Mbappé',7],['Michael Jackson',7],['Paris',7],['Tokyo',7],['New York',7],['Londres',7],['Los Angeles',7],['Albert Einstein',7],['Stephen Hawking',7],['Rayan Cherki',6]].forEach(([x,r])=>OV[norm(x)]=r);
+  const SEEDS=[
+   'Footballeur','Footballeuse','Joueur de football','Joueuse de football','Entraîneur de football','Arbitre de football','Joueur de basket-ball','Joueuse de basket-ball','Joueur de tennis','Joueuse de tennis','Pilote automobile','Pilote de Formule 1','Boxeur','Boxeuse','Arts martiaux mixtes',
+   'Acteur français','Actrice française','Acteur américain','Actrice américaine','Acteur britannique','Actrice britannique','Acteur canadien','Actrice canadienne','Acteur allemand','Actrice allemande','Acteur japonais','Actrice japonaise','Acteur italien','Actrice italienne','Acteur espagnol','Actrice espagnole','Acteur sud-coréen','Actrice sud-coréenne',
+   'Acteur de films pornographiques','Actrice de films pornographiques','Acteur de films pornographiques français','Actrice de films pornographiques française','Acteur de films pornographiques américain','Actrice de films pornographiques américaine','Film pornographique','Film pornographique français','Film pornographique américain','Réalisateur de films pornographiques',
+   'Chanteur français','Chanteuse française','Chanteur américain','Chanteuse américaine','Chanteur britannique','Chanteuse britannique','Groupe musical','K-pop','Groupe de K-pop','Idole sud-coréenne','Chanteur sud-coréen','Chanteuse sud-coréenne','Musicien','Musicienne',
+   'YouTubeur','Youtubeuse','Streamer','Streameuse','Personnalité d Internet','Personnalité du web','Créateur de contenu',
+   'Film français','Film américain','Film britannique','Film japonais','Film sud-coréen','Série télévisée française','Série télévisée américaine','Série télévisée britannique','Série télévisée japonaise','Série télévisée sud-coréenne','Anime','Manga','Jeu vidéo','Personnage de jeu vidéo',
+   'Animal','Insecte','Araignée','Poisson','Oiseau','Reptile','Mammifère','Dinosaure','Plante','Fleur','Arbre','Champignon','Bactérie','Virus','Espèce animale','Espèce végétale',
+   'Astronomie','Étoile','Galaxie','Planète','Exoplanète','Objet céleste','Physicien','Mathématicien','Scientifique','Chimiste','Biologiste','Médecin','Ingénieur',
+   'Écrivain français','Écrivain américain','Écrivain britannique','Poète','Artiste','Peintre','Sculpteur','Photographe','Personnalité historique','Chef d État','Monarque','Empereur','Impératrice','Roi','Reine',
+   'Ville','Capitale','Pays','Commune de France','Monument historique','Architecture','Château','Cathédrale','Église','Musée','Pont','Stade','Aéroport','Gare',
+   'Entreprise','Marque automobile','Automobile','Moto','Train','Avion','Hélicoptère','Bateau','Navire','Technologie','Informatique','Logiciel','Smartphone',
+   'Cuisine française','Plat','Fromage','Dessert','Boisson','Livre','Album musical','Chanson','Compétition sportive','Trophée sportif','Événement historique','Guerre','Catastrophe naturelle','Événement culturel'
+  ];
+  const seeds=[...new Set(SEEDS)]; let dbp=null;
+  const db=()=>dbp||(dbp=new Promise((resolve,reject)=>{const q=indexedDB.open(DBN,DBV);q.onupgradeneeded=()=>{const d=q.result;if(!d.objectStoreNames.contains(STORE)){const st=d.createObjectStore(STORE,{keyPath:'k'});st.createIndex('title','title',{unique:false});st.createIndex('r','r',{unique:false})}if(!d.objectStoreNames.contains(META))d.createObjectStore(META,{keyPath:'k'})};q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)}));
+  const tx=(sn,mode,fn)=>db().then(d=>new Promise((res,rej)=>{const t=d.transaction(sn,mode),st=t.objectStore(sn);let o;try{o=fn(st)}catch(e){rej(e);return}t.oncomplete=()=>res(o);t.onerror=()=>rej(t.error)}));
+  const get=k=>tx(STORE,'readonly',s=>new Promise((r,j)=>{const q=s.get(k);q.onsuccess=()=>r(q.result||null);q.onerror=()=>j(q.error)}));
+  const putMany=a=>a.length?tx(STORE,'readwrite',s=>a.forEach(x=>s.put(x))):Promise.resolve();
+  const metaGet=k=>tx(META,'readonly',s=>new Promise((r,j)=>{const q=s.get(k);q.onsuccess=()=>r(q.result?.v);q.onerror=()=>j(q.error)}));
+  const metaSet=(k,v)=>tx(META,'readwrite',s=>s.put({k,v}));
+  const count=()=>tx(STORE,'readonly',s=>new Promise((r,j)=>{const q=s.count();q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)}));
+  const sample=async(limit=600)=>tx(STORE,'readonly',s=>new Promise((res,rej)=>{
+    const out=[],seen=new Set(); let r=7;
+    const next=()=>{
+      if(out.length>=limit||r<0){res(out);return;}
+      const q=s.index('r').openCursor(IDBKeyRange.only(r),'next');
+      q.onsuccess=e=>{
+        const c=e.target.result;
+        if(!c){r--;next();return;}
+        if(c.value?.img&&!seen.has(c.value.k)){
+          seen.add(c.value.k);
+          out.push({id:'v4-'+c.value.k,pid:'v4-'+c.value.k,t:c.value.title,r:c.value.r,v:c.value.v||0,img:c.value.img,src:'wiki',d:c.value.desc||'',url:c.value.url,cats:c.value.cats||[]});
+        }
+        if(out.length>=limit){res(out);return;}
+        c.continue();
+      };
+      q.onerror=()=>rej(q.error);
+    };
+    next();
+  }));
+  async function api(params){const u=API+'&'+new URLSearchParams(params);for(let n=0;n<4;n++){try{const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}catch(e){if(n===3)throw e;await sleep(500*(n+1))}}}
+  /*
+   * Rareté V4.2 : notoriété réelle avant catégorie.
+   * Les vues sont mesurées sur 30 jours. La portée internationale et
+   * la couverture encyclopédique servent seulement de départage.
+   */
+  const rarity=(t,pv,cats=[],meta={})=>{
+    const forced=OV[norm(t)];
+    if(forced!=null)return forced;
+    const views=Math.max(0,Number(pv)||0);
+    const langs=Math.max(0,Number(meta.langs)||0);
+    const length=Math.max(0,Number(meta.length)||0);
+    let r =
+      views>=3000000 ? 6 :
+      views>=1500000 ? 5 :
+      views>=500000  ? 4 :
+      views>=150000  ? 3 :
+      views>=30000   ? 2 :
+      views>=5000    ? 1 : 0;
+    if(langs>=80 && r>=2) r++;
+    else if(langs>=30 && r>=2) r++;
+    if(length>=120000 && r>=3) r++;
+    return Math.min(6,r);
+  };
+  async function pageInfo(titles){if(!titles.length)return[];const j=await api({action:'query',prop:'pageimages|description|info|pageviews|langlinks',inprop:'url',piprop:'thumbnail',pithumbsize:'500',pilicense:'free',pvipdays:'30',lllimit:'100',titles:titles.join('|'),formatversion:'2'});return j.query?.pages||[]}
+  async function ingest(pages,cats,{refresh=false}={}){
+    const rows=[];
+    for(const p of pages){
+      const t=title(p.title),k=norm(t);
+      if(!p.thumbnail?.source||!k||bad.test(t)||p.missing)continue;
+      const old=await get(k);
+      if(old?.img&&!refresh)continue;
+      const pv=p.pageviews?Object.values(p.pageviews).reduce((a,b)=>a+(Number(b)||0),0):0;
+      const langs=Array.isArray(p.langlinks)?p.langlinks.length:0;
+      const length=Number(p.length)||0;
+      const r=rarity(t,pv,cats,{langs,length});
+      rows.push({
+        ...(old||{}),k,title:t,id:old?.id||'wiki-v41-'+String(p.pageid),
+        r,v:pv,img:p.thumbnail.source,desc:p.description||old?.desc||'',
+        url:p.fullurl||old?.url||('https://fr.wikipedia.org/wiki/'+encodeURIComponent(t.replace(/ /g,'_'))),
+        src:'wiki',cats:[...new Set([...(old?.cats||[]),...cats])],
+        langs,length,pop:Math.round(Math.min(100,
+          Math.log10(1+pv)/7*75 +
+          Math.min(langs,100)/100*15 +
+          Math.min(length,120000)/120000*10
+        )),updatedAt:Date.now()
+      });
+    }
+    if(rows.length)await putMany(rows);
+    return rows;
+  }
+  async function refreshExisting(limit=200){
+    const keys=[];
+    await tx(STORE,'readonly',st=>new Promise((resolve,reject)=>{
+      const cur=st.openCursor();
+      cur.onsuccess=e=>{
+        const c=e.target.result;
+        if(!c||keys.length>=limit){resolve();return;}
+        if(c.value?.img&&c.value?.url)keys.push(c.value.title);
+        c.continue();
+      };
+      cur.onerror=()=>reject(cur.error);
+    }));
+    for(let i=0;i<keys.length;i+=50){
+      try{await ingest(await pageInfo(keys.slice(i,i+50)),['refresh'],{refresh:true})}
+      catch(e){console.warn('refresh batch',e)}
+      await sleep(250);
+    }
+    return keys.length;
+  }
+  let running=false;
+  async function crawlCategory(root,state){
+    state.catQueue=state.catQueue||[];state.doneCats=state.doneCats||{};
+    if(!state.catQueue.length)state.catQueue=[{cat:root,depth:0,cont:''}];
+    while(state.catQueue.length&&(await count())<TARGET){const item=state.catQueue.shift(),ck=norm(item.cat);if(item.depth>MAX_CAT_DEPTH)continue;if(state.doneCats[ck]&&!item.cont)continue;
+      const j=await api({action:'query',list:'categorymembers',cmtitle:'Catégorie:'+item.cat,cmtype:'page|subcat',cmnamespace:'0|14',cmlimit:'500',...(item.cont?{cmcontinue:item.cont}:{})});
+      const pages=[],subs=[];for(const x of Object.values(j.query?.categorymembers||{})){if(x.ns===14){subs.push({cat:x.title.replace(/^Catégorie:/i,''),depth:item.depth+1,cont:''})}else if(x.ns===0)pages.push(x.title)}
+      for(const sub of subs){const sk=norm(sub.cat);if(!state.doneCats[sk]&&sub.depth<=MAX_CAT_DEPTH&&!state.catQueue.some(x=>norm(x.cat)===sk&&!x.cont))state.catQueue.push(sub)}
+      for(let i=0;i<pages.length&&await count()<TARGET;i+=BATCH){try{const rows=await ingest(await pageInfo(pages.slice(i,i+BATCH)),[root,item.cat]);state.added=(state.added||0)+rows.length}catch(e){console.warn('batch',e)}state.processed=(state.processed||0)+Math.min(BATCH,pages.length-i);await metaSet('state',state);await sleep(WAIT)}
+      const next=j.continue?.cmcontinue||'';if(next)state.catQueue.push({cat:item.cat,depth:item.depth,cont:next});else state.doneCats[ck]=1;await metaSet('state',state);
+      console.log('📚',root,'→',await count(),'cartes · file',state.catQueue.length);
+    }
+  }
+  async function run(){if(running)return;running=true;try{await db();let st=await metaGet('state')||{seed:0,added:0,processed:0,catQueue:[],doneCats:{},globalCursor:''};
+    const beforeCol=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('wc_col')||'{}')).length}catch{return -1}})(),beforeMoney=localStorage.getItem('wc_money');
+    console.log('🎴 WikiCollect V4.2 — objectif',TARGET.toLocaleString('fr-FR'),'· collection protégée',beforeCol,'· WikiCo',beforeMoney);
+    try{const refreshed=await refreshExisting(200);console.log('🔄 Rareté/notoriété réévaluées :',refreshed,'cartes')}catch(e){console.warn('refresh rarity',e)}
+    for(;st.seed<seeds.length&&(await count())<TARGET;st.seed++){const root=seeds[st.seed];console.log(`🚀 [${st.seed+1}/${seeds.length}] ${root}`);try{await crawlCategory(root,st)}catch(e){console.warn('Catégorie ignorée/reprise',root,e)}st.catQueue=[];st.doneCats={};await metaSet('state',st)}
+    while((await count())<TARGET){const j=await api({action:'query',list:'allpages',apnamespace:'0',aplimit:'500',...(st.globalCursor?{apcontinue:st.globalCursor}:{})});const titles=(j.query?.allpages||[]).map(x=>x.title);if(!titles.length)break;for(let i=0;i<titles.length&&await count()<TARGET;i+=BATCH){try{const rows=await ingest(await pageInfo(titles.slice(i,i+BATCH)),['Catalogue Wikipédia FR']);st.added=(st.added||0)+rows.length}catch(e){console.warn('allpages',e)}await metaSet('state',st);await sleep(WAIT)}st.globalCursor=j.continue?.apcontinue||'';await metaSet('state',st);if(!st.globalCursor)break}
+    const afterCol=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('wc_col')||'{}')).length}catch{return -1}})();const afterMoney=localStorage.getItem('wc_money');console.log('━━━━━━━━━━━━━━━━━━━━');console.log('✅ Catalogue V4.1 :',(await count()).toLocaleString('fr-FR'),'cartes avec image');console.log('➕ nouvelles cartes :',(st.added||0).toLocaleString('fr-FR'));console.log('🛡️ Collection',beforeCol,'→',afterCol,'· WikiCo',beforeMoney,'→',afterMoney);console.log('💾 Progression persistante dans IndexedDB');
+  }catch(e){console.error('❌ WCV4.1',e)}running=false}
+  async function queryPage(opts={}){
+    const page=Math.max(1,opts.page|0),size=Math.min(50,Math.max(1,opts.size||50)),term=norm(opts.q||''),rs=Array.isArray(opts.rarities)?opts.rarities.map(Number):[],az=opts.sort==='az',skip=(page-1)*size;
+    const make=c=>({id:'v4-'+c.k,pid:'v4-'+c.k,t:c.title,r:c.r,v:c.v||0,pop:c.pop||0,langs:c.langs||0,length:c.length||0,img:c.img,src:'wiki',d:c.desc||'',url:c.url});
+    return tx(STORE,'readonly',s=>new Promise((resolve,reject)=>{
+      const out=[];let matched=0;
+      const accept=c=>!!c?.img&&(!rs.length||rs.includes(c.r))&&(!term||norm(c.title).includes(term));
+      if(az){
+        const cur=s.index('title').openCursor(null,'next');
+        cur.onsuccess=e=>{const c=e.target.result;if(!c){resolve({rows:out,matched});return;}if(accept(c.value)){if(matched>=skip&&out.length<size)out.push(make(c.value));matched++;}if(out.length>=size){resolve({rows:out,matched});return;}c.continue()};
+        cur.onerror=()=>reject(cur.error);return;
+      }
+      const ranks=rs.length?rs:[7,6,5,4,3,2,1,0];let ri=0;
+      const openRank=()=>{
+        if(ri>=ranks.length){resolve({rows:out,matched});return;}
+        const cur=s.index('r').openCursor(IDBKeyRange.only(ranks[ri]),'prev');
+        cur.onsuccess=e=>{const c=e.target.result;if(!c){ri++;openRank();return;}if(accept(c.value)){if(matched>=skip&&out.length<size)out.push(make(c.value));matched++;}if(out.length>=size){resolve({rows:out,matched});return;}c.continue()};
+        cur.onerror=()=>reject(cur.error);
+      };
+      openRank();
+    }));
+  }
+
+  window.wcCatalogV41={start:run,count,progress:async()=>console.table(await metaGet('state')||{}),sample,queryPage,resetProgress:async()=>{await metaSet('state',{seed:0,added:0,processed:0,catQueue:[],doneCats:{},globalCursor:''});console.log('Progression remise à zéro — catalogue conservé.')}};
+  db().catch(()=>{});setTimeout(run,1200);
+})();
+</script>
+<script id="wc-v41-integration">
+/* ===== V4.1 : branche le gros catalogue sur Toutes les cartes + cases + boosters ===== */
+(()=>{
+ if(window.__WCV41Integration)return;window.__WCV41Integration=true;
+ const wait=fn=>setTimeout(fn,1800);
+ const catalogPage=async()=>{
+  /* V4.1 reste actif pour les boosters/cases, tandis que Toutes les cartes
+     réutilise le moteur de pagination Wikipédia complet d'origine. */
+  if(window.__wcOldAll) return window.__wcOldAll();
+ };
+ const oldAll=all;window.__wcOldAll=oldAll;all=catalogPage;
+ const oldLoad=loadCasePool;
+ loadCasePool=async function(need){let pool=await oldLoad(need);try{if(window.wcCatalogV41){const extra=await window.wcCatalogV41.sample(700);const seen=new Set(pool.map(c=>c.id));extra.forEach(c=>{if(c.img&&(!need||c.r>=need)&&!seen.has(c.id)){seen.add(c.id);pool.push(c);store[c.id]=c}})}}catch(e){}return pool};
+ const oldBuild=buildPack;
+ buildPack=async function(minRarity=null){try{const extra=window.wcCatalogV41?await window.wcCatalogV41.sample(900):[];if(extra.length){const old=window.__wcV41ExtraPool||[];const seen=new Set(old.map(c=>c.id));extra.forEach(c=>{if(!seen.has(c.id)){seen.add(c.id);old.push(c);store[c.id]=c}});window.__wcV41ExtraPool=old}}catch(e){}return oldBuild(minRarity)};
+ const oldChoose=typeof chooseCaseCard==='function'?chooseCaseCard:null;
+ wait(()=>{try{if(typeof render==='function'&&typeof tab!=='undefined'&&tab===1)all()}catch(e){}});
+ console.log('🔌 WikiCollect V4.1 connecté : Toutes les cartes / Card Case / boosters utilisent le nouveau catalogue quand disponible.');
+})();
+</script>
+
+<style id="wc-final-features">
+/* WikiCollect — extensions finales : missions/succès sans scroll + stats/sets/labo/découverte */
+.wc-no-scroll-page{height:calc(100vh - 76px);box-sizing:border-box;overflow:hidden!important;padding-bottom:8px!important}
+.wc-no-scroll-page h2{margin:0 0 4px}
+.wc-no-scroll-page .sub{margin-bottom:6px}
+.wc-no-scroll-page .mtimer{margin:6px 0 8px!important}
+.wc-mission-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;max-height:calc(100% - 86px);overflow:hidden}
+.wc-mission-grid .mission{padding:9px!important;min-width:0}
+.wc-mission-grid .mission b{font-size:12px!important}
+.wc-mission-grid .mission small{font-size:10px!important}
+.wc-mission-grid .dbar{margin:7px 0!important;height:6px!important}
+.wc-mission-grid .btn{padding:6px 9px!important;font-size:10px!important}
+.wc-ach-wrap{height:calc(100% - 62px);display:flex;flex-direction:column;min-height:0}
+.wc-ach-wrap .dbox{margin:5px 0!important;padding:8px!important}
+.wc-ach-wrap .bar{margin:4px 0!important}
+.wc-ach-grid{flex:1;min-height:0;overflow:hidden!important;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-content:start}
+.wc-ach-grid .ach{padding:8px!important;min-height:72px!important}
+.wc-ach-grid .aic{font-size:21px!important;width:30px!important}
+.wc-ach-grid .atx b{font-size:11px!important}
+.wc-ach-grid .ad,.wc-ach-grid .ar{font-size:9px!important;line-height:1.2!important}
+.wc-feature-panel{margin:12px 0;padding:14px;border:1px solid #292331;background:linear-gradient(180deg,#14111d,#0f0d15);border-radius:14px}
+.wc-feature-panel h3{margin:0 0 5px;font-size:16px}
+.wc-feature-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.wc-stat{padding:10px;border:1px solid #292331;background:#12101a;border-radius:10px;min-width:0}
+.wc-stat b{display:block;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wc-stat span{display:block;color:#8d8799;font-size:10px;margin-top:3px}
+.wc-rarity-bars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:8px}
+.wc-rarity-bars .rb{font-size:9px;padding:6px;border-radius:8px;background:#12101a;border:1px solid #292331}
+.wc-rarity-bars .rb i{display:block;height:4px;border-radius:99px;background:var(--rc);margin-top:4px;width:var(--rw)}
+.wc-set-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.wc-set{padding:10px;border:1px solid #292331;border-radius:10px;background:#12101a}
+.wc-set b{display:block;font-size:12px}.wc-set small{color:#8d8799;font-size:10px}.wc-set .dbar{margin:7px 0 0!important}
+.wc-discover{display:grid;grid-template-columns:180px 1fr;gap:14px;align-items:center}
+.wc-discover img{width:180px;height:230px;object-fit:cover;border-radius:10px;border:1px solid #393142;background:#17131f}
+.wc-discover-info h3{margin:0 0 5px;font-size:22px}.wc-discover-meta{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0}.wc-pill{display:inline-flex;padding:5px 8px;border:1px solid #393142;border-radius:999px;background:#17131f;font-size:10px;color:#d7d1df}
+.wc-discover-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.wc-lab-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}.wc-lab-card{padding:12px;border:1px solid #292331;border-radius:11px;background:#12101a}
+@media(max-width:1000px){.wc-mission-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wc-ach-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.wc-feature-grid,.wc-set-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wc-lab-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.wc-mission-grid{grid-template-columns:1fr;overflow:auto}.wc-ach-grid{grid-template-columns:repeat(2,minmax(0,1fr));overflow:auto!important}.wc-discover{grid-template-columns:1fr}.wc-discover img{width:140px;height:180px}.wc-feature-grid,.wc-set-grid{grid-template-columns:1fr 1fr}}
+</style>
+<script id="wc-final-features-js">
+(()=>{
+  if(window.__WCFINALFEATURES)return; window.__WCFINALFEATURES=true;
+  const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const availableStore=()=>Object.values(store||{}).filter(c=>c&&c.img);
+  const catalogCount=async()=>{
+    try{if(window.wcCatalogV41&&window.wcCatalogV41.count)return await window.wcCatalogV41.count()}catch(e){}
+    return availableStore().length;
+  };
+  const openCatalogCard=async()=>{
+    try{
+      const db=await new Promise((res,rej)=>{const r=indexedDB.open('WikiCollectCatalogV41');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+      const st=db.transaction('cards','readonly').objectStore('cards');
+      const counts=[];for(let r=0;r<=7;r++)counts[r]=await new Promise(ok=>{const q=st.index('r').count(IDBKeyRange.only(r));q.onsuccess=()=>ok(q.result||0);q.onerror=()=>ok(0)});
+      const total=counts.reduce((a,b)=>a+b,0);if(total){let x=Math.floor(Math.random()*total),rar=0;for(;rar<counts.length;rar++){if(x<counts[rar])break;x-=counts[rar]}
+        const c=await new Promise(ok=>{const q=st.index('r').openCursor(IDBKeyRange.only(rar),'next');let n=x;q.onsuccess=e=>{const cur=e.target.result;if(!cur){ok(null);return}if(n--<=0){const v=cur.value;ok(v?.img?{id:'v4-'+v.k,pid:'v4-'+v.k,t:v.title,r:v.r,v:v.v||0,pop:v.pop||0,img:v.img,src:'wiki',d:v.desc||'',url:v.url,cats:v.cats||[],langs:v.langs||0,length:v.length||0}:null);return}cur.continue()};q.onerror=()=>ok(null)});
+        if(c){store[c.id]=c;return c}
+      }
+    }catch(e){}
+    const L=availableStore();return L.length?L[Math.floor(Math.random()*L.length)]:null;
+  };
+  const discover=async()=>{
+    try{bumpDaily('discover',1)}catch(e){}
+    const host=document.createElement('div');host.id='wcDiscoverOverlay';host.className='modal';host.style.display='flex';host.innerHTML='<div id="wcDiscoverBody" style="min-height:250px;display:grid;place-items:center"><div class="msg">Recherche d’une carte…</div></div></div>';document.body.appendChild(host);
+    const close=()=>host.remove();host.querySelector('#wcDx').onclick=close;
+    const c=await openCatalogCard();const body=host.querySelector('#wcDiscoverBody');
+    if(!c){body.innerHTML='<div class="msg">Aucune carte avec image n’est actuellement disponible.</div>';return}
+    const cat=(c.cats&&c.cats.length?c.cats[0]:(c.src==='cr'?'Créateur':'Wikipédia'));
+    const pop=Number(c.pop||0);const views=Number(c.v||0);
+    body.innerHTML=`<div class="wc-discover"><img src="${esc(c.img)}" referrerpolicy="no-referrer" alt="${esc(c.t)}"><div class="wc-discover-info"><h3>${esc(c.t)}</h3><div class="wc-discover-meta"><span class="wc-pill">${esc(cat)}</span><span class="wc-pill">${esc(rarityName(c.r))}</span><span class="wc-pill">⭐ Popularité ${pop?pop.toFixed(0):'—'}</span><span class="wc-pill">👁 ${views.toLocaleString('fr-FR')} vues Wikipédia</span></div><p class="mut" style="line-height:1.55">${esc(c.d||'Aucune description disponible pour cette carte.')}</p><div class="wc-discover-actions"><button class="btn" id="wcWish">${isW(c)?'⭐ Retirer de ma liste':'⭐ Ajouter à ma liste de souhaits'}</button><button class="btn g" id="wcAll">🌍 Voir dans Toutes les cartes</button><button class="btn g" id="wcAgain">🎲 Une autre carte</button></div></div></div>`;
+    host.querySelector('#wcWish').onclick=()=>{toggleW(c);host.querySelector('#wcWish').textContent=isW(c)?'⭐ Retirer de ma liste':'⭐ Ajouter à ma liste de souhaits'};
+    host.querySelector('#wcAgain').onclick=()=>{close();setTimeout(discover,0)};
+    host.querySelector('#wcAll').onclick=()=>{window.__wcFocusCard=c;tab=1;q='';page=1;close();render()};
+  };
+  window.wcDiscover=discover;
+  const _mission=missionsPage;
+  missionsPage=function(){
+    loadDaily();
+    const done=DAILY.filter(m=>WCQ.c[m.id]).length;
+    main.classList.add('wc-no-scroll-page');
+    const cards=DAILY.map(m=>{const p=WCQ.p[m.id]||0,claimed=!!WCQ.c[m.id],pct=Math.min(100,Math.round(p/m.goal*100));return `<div class="mission"><div style="display:flex;justify-content:space-between;gap:6px;align-items:flex-start"><div><b>${esc(m.name)}</b><small>${p} / ${m.goal}</small></div><b style="color:#ffd23c;font-size:11px">+${m.reward} 🪙</b></div><div class="dbar"><i style="width:${pct}%"></i></div><button class="btn ${claimed||p<m.goal?'g':''}" data-claim="${m.id}" ${claimed||p<m.goal?'disabled':''}>${claimed?'✅ Pris':p>=m.goal?'🎁 Réclamer':'En cours'}</button></div>`}).join('');
+    main.innerHTML=`<h2>🎯 Missions du jour</h2><div class="sub">${done}/${DAILY.length} terminées · les missions se renouvellent chaque jour.</div><div class="mtimer">⏳ Nouvelles missions dans <b id="mt">…</b></div><div class="wc-mission-grid">${cards}</div>`;mTimer();
+    main.querySelectorAll('[data-claim]').forEach(b=>b.onclick=()=>{const m=DAILY.find(x=>x.id===b.dataset.claim);if(!m||WCQ.c[m.id]||(WCQ.p[m.id]||0)<m.goal)return;WCQ.c[m.id]=1;gain(m.reward);try{localStorage.setItem('wc_daily2',JSON.stringify(WCQ))}catch(e){}toast('🎁 Mission terminée : +'+m.reward+' 🪙');missionsPage()});
+  };
+  const _success=succesPage;
+  succesPage=function(){
+    const U=achCheck(),n=ACH.filter(a=>U[a.id]).length,pct=Math.round(n/ACH.length*100),list=ACH.filter(a=>ACHF==='all'||(ACHF==='ok')===!!U[a.id]);
+    main.classList.add('wc-no-scroll-page');
+    main.innerHTML=`<h2>🏆 Succès</h2><div class="sub">${n} / ${ACH.length} débloqués · chaque succès rapporte des pièces.</div><div class="wc-ach-wrap"><div class="dbox"><div style="display:flex;justify-content:space-between"><span>Progression</span><b style="color:#7cf5b0">${pct}%</b></div><div class="dbar" style="margin-top:6px"><i style="width:${pct}%"></i></div></div><div class="bar">${[['all','Tous'],['ok','Débloqués'],['no','À débloquer']].map(([k,l])=>`<button class="btn ${ACHF===k?'':'g'}" data-f="${k}">${l}</button>`).join('')}</div><div class="wc-ach-grid">${list.map(a=>{const ok=!!U[a.id];let v=0;try{v=a.v()}catch(e){}return `<div class="ach ${ok?'':'lock'}"><div class="aic">${a.ic}</div><div class="atx"><b>${esc(a.n)}${ok?' <span class="aok">✔</span>':''}</b><div class="ad">${esc(a.d)}</div><div class="ar">+${a.rw} 🪙${ok?'':' · '+Math.min(Math.floor(v),a.goal).toLocaleString('fr-FR')+' / '+a.goal.toLocaleString('fr-FR')}</div></div></div>`}).join('')||'<div class="msg">Rien à afficher ici.</div>'}</div></div>`;
+    main.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ACHF=b.dataset.f;succesPage()});
+  };
+  /* 8 — Statistiques avancées + Encyclopédie + Collections / Sets */
+  const statsHTML=async()=>{
+    const A=Object.values(col).filter(c=>c&&c.n>0),uniq=A.length,total=A.reduce((s,c)=>s+c.n,0),value=A.reduce((s,c)=>s+fair(c)*c.n,0),cre=A.filter(c=>c.src==='cr').length,dupes=A.filter(c=>c.n>1).length;
+    const counts=R.map((_,i)=>A.filter(c=>c.r===i).reduce((s,c)=>s+c.n,0));
+    const catNames=[['⚽ Football',/foot|football|joueur|joueuse|club/i],['🎵 Musique',/musique|chanteur|chanteuse|groupe|album|chanson|k-pop/i],['🎬 Cinéma & séries',/acteur|actrice|film|série|cinéma|anime|manga/i],['🎮 Jeux vidéo',/jeu vidéo|personnage de jeu|nintendo|playstation|xbox/i],['🐾 Animaux',/animal|mammifère|oiseau|poisson|reptile|insecte|araignée/i],['🔬 Science',/science|physicien|chimie|biolog|astronom|mathématique/i],['🌍 Géographie',/ville|pays|commune|région|géograph|monument/i],['🎥 Créateurs',/youtube|streamer|créateur|twitch/i]];
+    const indexed=await catalogCount();
+    const setCards=catNames.map(([name,re])=>{const av=availableStore().filter(c=>re.test((c.cats||[]).join(' ')+' '+c.t));const owned=new Set(A.filter(c=>re.test((c.cats||[]).join(' ')+' '+c.t)).map(c=>c.id));const pct=av.length?Math.min(100,Math.round(owned.size/av.length*100)):0;return {name,owned:owned.size,total:av.length,pct}});
+    return `<div class="wc-feature-panel"><h3>📊 Statistiques avancées</h3><div class="wc-feature-grid"><div class="wc-stat"><b>${uniq.toLocaleString('fr-FR')}</b><span>Cartes différentes</span></div><div class="wc-stat"><b>${total.toLocaleString('fr-FR')}</b><span>Cartes possédées au total</span></div><div class="wc-stat"><b>${value.toLocaleString('fr-FR')} 🪙</b><span>Valeur estimée</span></div><div class="wc-stat"><b>${cre.toLocaleString('fr-FR')}</b><span>Créateurs dans la collection</span></div><div class="wc-stat"><b>${dupes.toLocaleString('fr-FR')}</b><span>Cartes avec doublons</span></div><div class="wc-stat"><b>${rarityName(A.length?Math.max(...A.map(c=>c.r)):-1)}</b><span>Plus haute rareté</span></div><div class="wc-stat"><b>${indexed.toLocaleString('fr-FR')}</b><span>Cartes actuellement indexées</span></div><div class="wc-stat"><b>${Object.keys(WL).length.toLocaleString('fr-FR')}</b><span>Liste de souhaits</span></div></div><div class="wc-rarity-bars">${R.map((r,i)=>{const n=counts[i]||0,p=total?Math.round(n/total*100):0;return `<div class="rb" style="--rc:${r[1]};--rw:${p}%"><b>${esc(r[0])}</b><span> ${n.toLocaleString('fr-FR')} · ${p}%</span><i></i></div>`}).join('')}</div></div><div class="wc-feature-panel"><h3>🥇 Collections / Sets</h3><div class="sub">Progression calculée sur les cartes actuellement indexées dans ton catalogue.</div><div class="wc-set-grid">${setCards.map(s=>`<div class="wc-set"><b>${s.name}</b><small>${s.owned} / ${s.total} · ${s.pct}%</small><div class="dbar"><i style="width:${s.pct}%"></i></div></div>`).join('')}</div></div><div class="wc-feature-panel"><h3>🥈 Encyclopédie</h3><div class="sub">Pas de faux objectif à 3 millions : WikiCollect suit les cartes que tu peux réellement obtenir avec image.</div><div class="wc-feature-grid"><div class="wc-stat"><b>${indexed.toLocaleString('fr-FR')}</b><span>Cartes disponibles / indexées</span></div><div class="wc-stat"><b>${uniq.toLocaleString('fr-FR')}</b><span>Déjà collectionnées</span></div><div class="wc-stat"><b>${Math.max(0,indexed-uniq).toLocaleString('fr-FR')}</b><span>Encore à découvrir</span></div><div class="wc-stat"><b>${indexed?Math.min(100,(uniq/indexed*100)).toFixed(2):'0.00'}%</b><span>Encyclopédie complétée</span></div></div></div>`;
+  };
+  const appendProfileFeatures=()=>{const holder=document.createElement('div');holder.id='wcProfileFeatures';holder.innerHTML='<div class="msg">Chargement des statistiques…</div>';main.appendChild(holder);statsHTML().then(x=>{if(document.getElementById('wcProfileFeatures'))holder.innerHTML=x}).catch(()=>{holder.innerHTML='<div class="msg">Statistiques momentanément indisponibles.</div>'})};
+  const _profile=profilePage;
+  profilePage=function(){main.classList.remove('wc-no-scroll-page');_profile();appendProfileFeatures();};
+  /* 10 — Laboratoire de cartes + bouton Découvrir dans le classeur */
+  const appendLab=()=>{
+    const A=Object.values(col).filter(c=>c&&c.n>0),ready=A.filter(c=>c.n>=3&&c.r<7).length;
+    const el=document.createElement('div');el.className='wc-feature-panel';el.innerHTML=`<h3>🧪 Laboratoire de cartes</h3><div class="sub">Un espace central pour transformer, améliorer et explorer tes cartes.</div><div class="wc-lab-grid"><div class="wc-lab-card"><b>⚗️ Fusion</b><p class="mut">3 exemplaires identiques → 1 carte améliorée. ${ready} carte(s) sont actuellement prêtes.</p><button class="btn" id="wcLabFusion">⚗️ Ouvrir la fusion</button></div><div class="wc-lab-card"><b>🎲 Découverte</b><p class="mut">Pioche une carte aléatoire parmi les cartes réellement disponibles avec une image.</p></div></div>`;main.insertBefore(el,main.firstChild);el.querySelector('#wcLabFusion').onclick=()=>openFusionPicker();el.querySelector('#wcLabDiscover').onclick=discover;
+  };
+  const _collection=collection;
+  collection=function(){main.classList.remove('wc-no-scroll-page');_collection();appendLab()};
+  const _all=all;
+  all=async function(){await _all();if(window.__wcFocusCard){const c=window.__wcFocusCard;window.__wcFocusCard=null;const box=document.createElement('div');box.className='wc-feature-panel';box.innerHTML=`<div style="display:flex;gap:12px;align-items:center"><img src="${esc(c.img)}" style="width:70px;height:92px;object-fit:cover;border-radius:7px"><div><h3 style="margin:0 0 4px">🎲 Carte découverte : ${esc(c.t)}</h3><div class="mut">${esc(rarityName(c.r))} · ${Number(c.v||0).toLocaleString('fr-FR')} vues Wikipédia</div></div><button class="btn g" id="wcFocusOpen" style="margin-left:auto">Ouvrir la carte</button></div>`;main.insertBefore(box,main.firstChild);box.querySelector('#wcFocusOpen').onclick=()=>openModal(c.id)}};
+  document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#ug');if(b){try{bumpDaily('upgrade',1)}catch(x){}}});
+  const oldDaily=DAILY.slice();
+  [['discover','🎲 Découvreur','Découvrir 1 carte aléatoire',1,75],['wish','⭐ Collectionneur','Ajouter 1 carte à la liste de souhaits',1,75],['upgrade','⬆️ Expérimentateur','Tenter 1 Card Upgrade',1,100]].forEach(([id,name,desc,goal,reward])=>{if(!DAILY.some(m=>m.id===id))DAILY.push({id,name,goal,reward,d:desc})});
+  /* Les missions/succès doivent revenir à leur comportement normal sur les autres onglets. */
+  const clearPageClass=()=>{if(tab!==5&&tab!==8)main.classList.remove('wc-no-scroll-page')};
+  setInterval(clearPageClass,500);
+})();
+</script>
 </body></html>
 
 <style>.lst .grid{gap:18px}.reveal .card{width:138px}.mcard .card{box-shadow:0 18px 34px rgba(0,0,0,.38)}</style>
@@ -3240,3 +3579,58 @@ main{padding:14px 16px 26px!important}
   opacity:.62 !important;
 }
 </style>
+
+<script id="wc-save-ui">
+(function(){
+ const W=window.WCSAVE;if(!W)return;
+ const tryf=f=>{try{f()}catch(e){}};
+ const autosave=()=>{if(W.block)return;tryf(()=>save());tryf(()=>saveMk());tryf(()=>saveBoosterCooldowns());tryf(()=>saveCollectionState());tryf(()=>W.backup())};
+ setInterval(autosave,15000);setTimeout(()=>tryf(()=>W.backup()),4000);
+ document.addEventListener("visibilitychange",()=>{if(document.hidden)autosave()});addEventListener("pagehide",autosave);
+ const hw=document.getElementById("hw");
+ if(hw&&!document.getElementById("svb")){hw.insertAdjacentHTML("afterend",'<button id="svb">💾 Sauvegarde</button>');document.getElementById("svb").onclick=openSave}
+ function openSave(){
+  autosave();
+  let nCards=0,nDiff=0;tryf(()=>{const c=Object.values(col);nDiff=c.length;nCards=c.reduce((s,x)=>s+(x.n||0),0)});
+  const t=W.last?new Date(W.last).toLocaleTimeString("fr-FR"):"en cours…";let le=0;tryf(()=>{le=+localStorage.getItem("wc_lastexport")||0});const les=le?new Date(le).toLocaleDateString("fr-FR",{day:"numeric",month:"long"})+" ("+Math.floor((Date.now()-le)/864e5)+" j)":"jamais";
+  M.style.display="flex";
+  M.innerHTML=`<div class="mbox v2" style="flex-direction:column;max-width:540px"><button class="btn g x" id="mx">✕</button><h2 style="margin:0">💾 Sauvegarde</h2>
+  <div class="sub">Ta progression (cartes, pièces, succès, missions, enchères…) est enregistrée automatiquement toutes les 15 secondes dans ce navigateur, avec une copie de secours. Pour la mettre à l'abri ou la changer d'appareil, exporte-la dans un fichier.</div>
+  <div class="row"><span>Cartes différentes</span><b>${nDiff.toLocaleString("fr-FR")}</b></div><div class="row"><span>Cartes au total</span><b>${nCards.toLocaleString("fr-FR")}</b></div><div class="row"><span>Pièces</span><b>${(typeof money!=="undefined"?money:0).toLocaleString("fr-FR")} 🪙</b></div><div class="row"><span>Dernière copie de secours</span><b>${t}</b></div><div class="row"><span>Dernier export en fichier</span><b>${les}</b></div>
+  <div class="bar" style="margin-top:14px"><button class="btn" id="svx">⬇️ Exporter ma sauvegarde</button><label class="btn g" style="cursor:pointer">⬆️ Importer<input id="svi" type="file" accept=".json,application/json" hidden></label></div><div id="svm" class="sub"></div></div>`;
+  document.getElementById("mx").onclick=closeModal;
+  document.getElementById("svx").onclick=()=>{autosave();const d=W.snap();const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:"application/json"}));a.download="wikicollect-sauvegarde-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},600);tryf(()=>{localStorage.setItem("wc_lastexport",Date.now());localStorage.removeItem("wc_remind_snooze")});document.getElementById("svm").textContent="✅ Sauvegarde exportée ("+Object.keys(d.d).length+" éléments)."};
+  document.getElementById("svi").onchange=async e=>{const f=e.target.files[0];if(!f)return;const m=document.getElementById("svm");
+   try{const j=JSON.parse(await f.text());if(!j||!j.d||typeof j.d!=="object"||!Object.keys(j.d).some(k=>k.startsWith("wc_")))throw 0;
+    const n=Object.keys(JSON.parse(j.d.wc_col||"{}")).length;
+    if(!confirm("Remplacer ta progression actuelle par cette sauvegarde ("+n+" cartes différentes, "+(+j.d.wc_money||0)+" pièces) ?\n(Ta progression actuelle est gardée en copie de secours.)"))return;
+    W.block=true;try{await W.put("before-import",W.snap())}catch(x){}
+    W.keys().forEach(k=>localStorage.removeItem(k));
+    Object.keys(j.d).forEach(k=>{if(typeof j.d[k]==="string")localStorage.setItem(k,j.d[k])});
+    localStorage.setItem("ACCOUNT_RESET_V105_GUARD","1");sessionStorage.setItem("wc_restored","1");location.reload()}
+   catch(err){m.textContent="❌ Fichier invalide : choisis un fichier .json exporté depuis WikiCollect."}}
+ }
+
+ /* V99 : rappel de sauvegarde — la progression n'est que dans ce navigateur, donc on rappelle d'exporter un fichier */
+ (function(){
+  const DAYS=7,SNOOZE=864e5;
+  const css=document.createElement("style");css.textContent="#bkRemind{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9500;width:min(560px,calc(100vw - 24px));display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-radius:16px;background:#1d1432;border:1px solid #a855f7;box-shadow:0 14px 40px rgba(0,0,0,.65);color:#f2ecff;font-size:14px;line-height:1.35;animation:bkR .35s ease-out}#bkRemind b{color:#ffd86b}#bkRemind .bkrb{display:flex;gap:8px;margin-left:auto}@keyframes bkR{from{opacity:0;transform:translate(-50%,20px)}}";document.head.appendChild(css);
+  const prog=()=>{let n=0;tryf(()=>{n=Object.values(col).filter(c=>c&&c.n>0).length});return n};
+  function check(){
+   if(document.getElementById("bkRemind")||document.hidden)return;
+   if(typeof M!=="undefined"&&M.style.display==="flex")return;
+   let le=0,sn=0;tryf(()=>{le=+localStorage.getItem("wc_lastexport")||0;sn=+localStorage.getItem("wc_remind_snooze")||0});
+   const n=prog(),age=le?(Date.now()-le)/864e5:Infinity;
+   if(Date.now()<sn)return;
+   if(le?age<DAYS:n<10)return;   // jamais exporté : on attend 10 cartes différentes ; sinon, rappel après 7 jours
+   const txt=le?"Ta dernière sauvegarde en fichier date de <b>"+Math.floor(age)+" jours</b>. Ta progression ne vit que dans ce navigateur : exporte-la pour ne rien perdre.":"Tu as déjà <b>"+n+" cartes différentes</b> mais aucune sauvegarde en fichier. Si tu vides ton navigateur ou changes d'adresse, tout disparaît.";
+   const d=document.createElement("div");d.id="bkRemind";d.innerHTML='<span>💾 '+txt+'</span><span class="bkrb"><button class="btn" id="bkrGo">Sauvegarder</button><button class="btn g" id="bkrLater">Plus tard</button></span>';
+   document.body.appendChild(d);
+   document.getElementById("bkrGo").onclick=()=>{d.remove();openSave()};
+   document.getElementById("bkrLater").onclick=()=>{tryf(()=>localStorage.setItem("wc_remind_snooze",Date.now()+SNOOZE));d.remove()};
+  }
+  setTimeout(check,9000);setInterval(check,5*60*1000);
+  window.wcBackupCheck=check;
+ })();
+})();
+</script>
