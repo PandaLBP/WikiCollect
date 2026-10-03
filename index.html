@@ -1236,16 +1236,24 @@ function packs(){
 }
 async function getTop(){if(topCache)return topCache;
  try{const d=new Date(),y=d.getMonth()?d.getFullYear():d.getFullYear()-1,m=d.getMonth()||12;
-  const j=await(await fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/top/fr.wikipedia/all-access/${y}/${p2(m)}/all-days`)).json(),dim=new Date(y,m,0).getDate();
-  topCache=j.items[0].articles.filter(a=>!/:/.test(a.article)&&a.article!="Accueil"&&!isRemovedTitle(a.article.replace(/_/g," "))).map(a=>({t:a.article.replace(/_/g," "),r:OVR[a.article.replace(/_/g," ")]??boost(a.article.replace(/_/g," "),rarOf(a.views))}))}
- catch(e){topCache=[]}return topCache}
+  const rr=await fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/top/fr.wikipedia/all-access/${y}/${p2(m)}/all-days`,{cache:"no-store"});
+  if(!rr.ok)throw new Error("pageviews "+rr.status);
+  const j=await rr.json();
+  topCache=(j.items?.[0]?.articles||[]).filter(a=>!/:/.test(a.article)&&a.article!=="Accueil"&&!isRemovedTitle(a.article.replace(/_/g," "))).map(a=>({t:a.article.replace(/_/g," "),r:OVR[a.article.replace(/_/g," ")]??boost(a.article.replace(/_/g," "),rarOf(a.views))}));
+ }catch(e){topCache=[]}return topCache}
 const CRATE=.03; // chance qu'une carte d'un booster soit un créateur (≈ 26 % des boosters en contiennent un)
 async function buildPack(minRarity=null){
  const rollCount=minRarity!=null?9:10; const rolls=Array.from({length:rollCount},()=>pick(Math.random())).sort((a,b)=>a-b); // 10 cartes au total, dont 1 garantie pour les boosters spéciaux
- const [top,...rs]=await Promise.all([getTop(),...[0,1,2,3].map(()=>fetch(API+"generator=random&grnnamespace=0&grnlimit=50").then(r=>r.json()))]);
+ // Les appels Wikimedia peuvent être temporairement limités (429), indisponibles ou bloqués par un réseau.
+ // On ne doit jamais perdre l'ouverture du booster dans ce cas : on utilise alors les créateurs locaux comme filet de sécurité.
+ const top=await getTop();
+ const genResults=await Promise.allSettled([0,1,2,3].map(()=>fetch(API+"generator=random&grnnamespace=0&grnlimit=50",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("wiki "+r.status);return r.json()})));
+ const rs=genResults.filter(x=>x.status==="fulfilled").map(x=>x.value);
  const seen=new Set(),pool=[];
- const add=j=>Object.values(j.query?.pages||{}).filter(ok).filter(p=>!isExcludedTitle(p.title)).forEach(p=>{if(!seen.has(p.pageid)){seen.add(p.pageid);pool.push(mk(p))}});
+ const add=j=>Object.values(j?.query?.pages||{}).filter(ok).filter(p=>!isExcludedTitle(p.title)).forEach(p=>{if(!seen.has(p.pageid)){seen.add(p.pageid);pool.push(mk(p))}});
  rs.forEach(add);
+ // Filet de sécurité hors réseau : le catalogue des créateurs est déjà embarqué dans le site.
+ const fallbackPool=CRE.filter(c=>c&&c.pid&&!isExcludedTitle(c.t)).map(c=>({...c}));
  if(rolls.some(r=>r>=2)&&top.length){ // articles très consultés (top mensuel) pour les rangs hauts
   const T=[];for(let r=1;r<=7;r++)T.push(...top.filter(x=>x.r==r).sort(()=>Math.random()-.5).slice(0,5));
   if(T.length)try{add(await(await fetch(API+"titles="+encodeURIComponent(T.map(x=>x.t).join("|")))).json())}catch(e){}}
@@ -1278,8 +1286,17 @@ async function buildPack(minRarity=null){
    if(cc.length){const c=cc[Math.floor(Math.random()*cc.length)];used.add(c.pid);res.push(c);return}}
   const order=[];for(let i=rt;i>=0;i--)order.push(i);for(let i=rt+1;i<=7;i++)order.push(i);
   for(const r of order){const cs=pool.filter(c=>c.r==r&&!used.has(c.pid));if(cs.length){const c=cs[Math.floor(Math.random()*cs.length)];used.add(c.pid);res.push(c);break}}});
- if(res.length<10)throw 0;
- return res.sort((a,b)=>a.r-b.r)}
+ // Si Wikimedia n'a fourni aucune carte (ou pas assez), complète avec le catalogue local des créateurs.
+ if(res.length<10){
+  const available=fallbackPool.filter(c=>!used.has(c.pid)).sort(()=>Math.random()-.5);
+  for(const c of available){
+   if(res.length>=10)break;
+   used.add(c.pid);res.push(c);
+  }
+ }
+ // Dernier filet de sécurité : le catalogue embarqué contient largement assez de créateurs pour former un booster.
+ if(res.length<10)throw new Error("catalogue local insuffisant");
+ return res.slice(0,10).sort((a,b)=>a.r-b.r)}
 function tear(force,offer,slotIndex=-1){clearInterval(timer);
  main.innerHTML=`<h2>${force!=null?"Booster test · "+R[force][0]:offer?offer.name:"Ouvre ton booster"}</h2><div class="sub">✂️ Découpe le sachet : attrape la ligne en pointillés et fais glisser les ciseaux de gauche à droite</div><div class="stage">${packHTML()}</div>`;
  const pk=main.querySelector(".pack");pk.insertAdjacentHTML("beforeend",'<div class="tz"><span>✂️ Fais glisser pour découper</span></div><div class="tl"></div>');
