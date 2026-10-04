@@ -1513,7 +1513,7 @@ async function loadRank(){if(RANK.length)return;
   const sum={},nm={};
   js.forEach(j=>(j&&j.items?j.items[0].articles:[]).forEach(a=>{if(/:/.test(a.article)||a.article=="Accueil")return;const t=a.article.replace(/_/g," ");sum[t]=(sum[t]||0)+a.views;nm[t]=(nm[t]||0)+1}));
   const dd={},days=Array.from({length:30},(_,k)=>{const x=new Date(Date.now()-(k+2)*864e5);return x.getFullYear()+"/"+p2(x.getMonth()+1)+"/"+p2(x.getDate())});
-  for(let k=0;k<days.length;k+=10){const dj=await Promise.all(days.slice(k,k+10).map(u=>fetch("https://wikimedia.org/api/rest_v1/metrics/pageviews/top/fr.wikipedia/all-access/"+u).then(r=>r.json()).catch(()=>null)));
+  for(let k=0;k<days.length;k+=30){const dj=await Promise.all(days.slice(k,k+30).map(u=>fetch("https://wikimedia.org/api/rest_v1/metrics/pageviews/top/fr.wikipedia/all-access/"+u).then(r=>r.json()).catch(()=>null)));
    dj.forEach(j=>(j&&j.items?j.items[0].articles:[]).forEach(a=>{if(/:/.test(a.article)||a.article=="Accueil")return;const t=a.article.replace(/_/g," ");dd[t]=(dd[t]||0)+a.views}))}
   // Les titres forcés doivent rester dans le classement, mais ne doivent surtout pas recevoir 1 000 milliards de vues fictives.
 // La rareté est forcée par OVR ; les vues affichées restent celles réellement récupérées, ou « — » si absentes.
@@ -3866,6 +3866,10 @@ main{padding:14px 16px 26px!important}
   if(window.__wcOldAll) return window.__wcOldAll();
  };
  const oldAll=all;window.__wcOldAll=oldAll;all=catalogPage;
+ /* V121 : mémoire des pages déjà vues + préchargement silencieux de la page suivante (Toutes les cartes) */
+ {const _collect=collect,MEM=new Map(),TTL=6e5,ctx=()=>[SO,CG,q,[...fr].sort().join()].join("¦");
+  const run=(cur,c)=>{const k=c+"¦"+cur,e=MEM.get(k);if(e&&Date.now()-e.t<TTL)return e.p;const p=_collect(cur);MEM.set(k,{t:Date.now(),p});p.catch(()=>MEM.delete(k));if(MEM.size>14)MEM.delete(MEM.keys().next().value);return p};
+  collect=function(cur){const c=ctx(),p=run(cur,c);p.then(r=>{if(r&&r.next&&ctx()===c&&tab===1)setTimeout(()=>{if(ctx()===c&&tab===1)run(r.next,c)},300)}).catch(()=>{});return p}}
  const oldLoad=loadCasePool;
  loadCasePool=async function(need){let pool=await oldLoad(need);try{if(window.wcCatalogV41){const extra=await window.wcCatalogV41.sample(700);const seen=new Set(pool.map(c=>c.id));extra.forEach(c=>{if(c.img&&(!need||c.r>=need)&&!seen.has(c.id)){seen.add(c.id);pool.push(c);store[c.id]=c}})}}catch(e){}return pool};
  const oldBuild=buildPack;
