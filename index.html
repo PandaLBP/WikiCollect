@@ -2466,8 +2466,27 @@ function collection(){
  Object.values(col).forEach(c=>{c.tags=Array.isArray(c.tags)?c.tags.filter(Boolean).slice(0,8):[];store[c.id]=c});
  const A=Object.values(col).filter(c=>c&&c.n>0);
  const term=(colSearch||"").trim().toLowerCase();
+ const normSearch=v=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’']/g,"'").replace(/[-_/(),.:;!?]+/g," ").replace(/\s+/g," ").trim();
+ const searchAliases={
+   "actrice porno":["actrice pornographique","actrice de films pornographiques","acteur pornographique","actrice porno","pornographie","film pornographique"],
+   "acteur porno":["acteur pornographique","acteur de films pornographiques","actrice pornographique","pornographie","film pornographique"],
+   "voiture":["voiture","automobile","automobiles","modele de voiture","modèle de voiture","constructeur automobile"],
+   "film":["film","cinema","cinéma","long metrage","long-métrage","film de"],
+   "serie":["serie televisee","série télévisée","serie télévisée","serie","série","television","télévision"],
+   "jeu video":["jeu video","jeu vidéo","jeux video","jeux vidéo","jeu electronique","jeu électronique"],
+   "scorpion":["scorpion","scorpions"],
+   "serpent":["serpent","serpents","ophidien","ophidiens"],
+   "araignee":["araignee","araignées","araignee","araignées"],
+   "oiseau":["oiseau","oiseaux"],
+   "poisson":["poisson","poissons"],
+   "dinosaure":["dinosaure","dinosaures"]
+ };
+ const searchParts=term?((searchAliases[term]||[term]).map(normSearch).filter(Boolean)):[];
  let L=A.filter(c=>!fr.size||fr.has(c.r));
- if(term)L=L.filter(c=>c.t.toLowerCase().includes(term));
+ if(searchParts.length)L=L.filter(c=>{
+   const hay=normSearch([c.t,c.category,c.type,c.kind,c.genre,c.subcategory].filter(Boolean).join(" "));
+   return searchParts.some(q=>hay.includes(q));
+ });
  if(colTagFilter===UNTAGGED_FILTER)L=L.filter(c=>(c.tags||[]).length===0);
  else if(colTagFilter)L=L.filter(c=>(c.tags||[]).includes(colTagFilter));
  if(colSort==="az")L.sort((a,b)=>a.t.localeCompare(b.t,"fr"));
