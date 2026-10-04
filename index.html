@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WikiCollect · V117</title>
+<title>WikiCollect · V119</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <style>
@@ -1020,6 +1020,8 @@ try{
 const CANONICAL_TITLES={"Sophie Reine":"Sophie Rain"};
 const canonicalTitle=t=>CANONICAL_TITLES[String(t||"")]||t;
 const SPECIAL_ADULT_CARD={id:"special-sweetie-fox-7",pid:"special-sweetie-fox",t:"Sweetie Fox",d:"Créatrice de contenu et modèle connue sous le nom Sweetie Fox",img:"https://commons.wikimedia.org/wiki/Special:Redirect/file/Brave_3TXywBiVqq.png?width=500",r:7,src:"wiki",nsfw:true,v:900000};
+try{store[SPECIAL_ADULT_CARD.id]=SPECIAL_ADULT_CARD}catch(e){}
+const isSweetie=t=>String(t||"").normalize("NFD").replace(/[^a-zA-Z0-9]/g,"").toLowerCase()==="sweetiefox";
 const ok=p=>p.thumbnail&&!noImageTitle(p.title)&&!/homonymie/i.test(p.description||"")&&!isRemovedTitle(p.title);
 function rp(p){
  if(OVR[p.title]!=null)return OVR[p.title];
@@ -1066,7 +1068,7 @@ function bind(root,rm=true){root.querySelectorAll(".card").forEach(e=>{const c=s
   while(i<L.length-1){i++;if(await preloadSwap(L[i]))return}
   if(c.src=="cr"){const u=await creatorWikiImage(c);if(u&&await preloadSwap(u))return}
   if(!c.imgs&&n<3){n++;const u=c.img+(c.img.includes("?")?"&":"?")+"r="+n;if(await preloadSwap(u))return}
-  dead=true;img.classList.remove("img-loading");if(rm)e.remove();else img.src=ph(c.t)
+  dead=true;img.classList.remove("img-loading");if(rm&&c.pid!==SPECIAL_ADULT_CARD.pid)e.remove();else img.src=ph(c.t)
  };
  img.onload=()=>{img.classList.remove("img-loading");img.dataset.ready="1";if(!img.src.startsWith("data:"))c.img=img.currentSrc||img.src};
  img.onerror=fail;
@@ -1198,6 +1200,7 @@ async function buildPack(minRarity=null){
   const vt=[],dr=new Set(rolls.filter(r=>r>=1)),vper=Math.max(5,Math.min(16,Math.floor(48/Math.max(1,dr.size))));dr.forEach(r=>vt.push(...VIPT.filter(v=>v.r==r&&(v.g!=="adult"||Math.random()<.2)).sort(()=>Math.random()-.5).slice(0,vper)));
   if(vt.length){const {pages,rd}=await wq(APIB+"redirects=1&titles="+encodeURIComponent(vt.slice(0,50).map(v=>v.t).join("|")));const forced={};vt.forEach(v=>{const a=rd[v.t]||v.t;forced[nz2(rd[a]||a)]=v.r});
    Object.values(pages).filter(ok).forEach(p=>{if(isExcludedTitle(p.title)||seen.has(p.pageid))return;seen.add(p.pageid);const c=mk(p,forced[nz2(p.title)]);SRC.set(c,"vip");pool.push(c)})}
+  if(vt.some(v=>isSweetie(v.t))&&!pool.some(c=>c.pid===SPECIAL_ADULT_CARD.pid)){const c={...SPECIAL_ADULT_CARD};SRC.set(c,"vip");pool.push(c)}
  }catch(e){}
  try{if(window.wcCatalogV41&&window.wcCatalogV41.randomSample){const need={};rolls.forEach(r=>{need[r]=(need[r]||0)+1});const counts={};Object.keys(need).forEach(r=>{counts[r]=Math.max(12,need[r]*10)});
   const extra=await window.wcCatalogV41.randomSample(counts);extra.forEach(c=>{if(!seen.has(c.pid)&&!isExcludedTitle(c.t)){seen.add(c.pid);SRC.set(c,"cat");store[c.id]=c;pool.push(c)}})}}catch(e){}
@@ -1539,17 +1542,17 @@ async function collect(cur){let mode=cur[0],val=cur.slice(2),out=[];
   if(mode=="r"){const i=+val;if(i>=FL.length){if(fr.size&&!fr.has(0))return{out,next:null};mode=CG?"c":"a";val=CG?"0|":"";continue}
    const B=FL.slice(i,i+50),T=B.filter(e=>!e.cr&&e.src!=="film").map(e=>e.t),info={};
    let rdm={};if(T.length){const {pages,rd}=await wq(APIB+"redirects=1&titles="+encodeURIComponent(T.join("|")));rdm=rd||{};Object.values(pages).forEach(p=>{info[p.title]=p;info["~"+nz2(p.title)]=p})}
-   let k=0;for(;k<B.length&&out.length<PS;k++){const e=B[k];if(e.cr){push(e.cr);continue}if(e.src==="film"){store[e.id]=e;push(e);continue}let k2=rdm[e.t]||e.t;k2=rdm[k2]||k2;const p=info[k2]||info[e.t]||info["~"+nz2(k2)]||info["~"+nz2(e.t)];if(p&&ok(p))push(mk(p,e.r,e.v>0&&e.v<1e9?Math.round(e.v):undefined))}
+   let k=0;for(;k<B.length&&out.length<PS;k++){const e=B[k];if(isSweetie(e.t)){push({...SPECIAL_ADULT_CARD});continue}if(e.cr){push(e.cr);continue}if(e.src==="film"){store[e.id]=e;push(e);continue}let k2=rdm[e.t]||e.t;k2=rdm[k2]||k2;const p=info[k2]||info[e.t]||info["~"+nz2(k2)]||info["~"+nz2(e.t)];if(p&&ok(p))push(mk(p,e.r,e.v>0&&e.v<1e9?Math.round(e.v):undefined))}
    val=i+k}
   else if(mode=="c"){const cats=catList(CG);let [cis,cont]=val.split("|");const ci=+cis||0;
    if(CG==="adult"&&ci===0&&+cis===0){push(SPECIAL_ADULT_CARD);}if(ci>=cats.length)return{out,next:null};
    const need=Math.max(10,PS-out.length);let r={pages:{},next:null};
    try{r=await wq(API+"generator=categorymembers&gcmtitle="+encodeURIComponent("Catégorie:"+cats[ci])+"&gcmtype=page&gcmlimit="+need+(cont?"&gcmcontinue="+encodeURIComponent(cont):""))}catch(e){}
-   Object.values(r.pages).sort((a,b)=>(a.index||0)-(b.index||0)).forEach(p=>{if(isRemovedTitle(p.title)||RANKSET.has(p.title))return;rawTot++;if(!ok(p))return;imgTot++;push(mk(p))});
+   Object.values(r.pages).sort((a,b)=>(a.index||0)-(b.index||0)).forEach(p=>{if(isSweetie(p.title)){push({...SPECIAL_ADULT_CARD});return}if(isRemovedTitle(p.title)||RANKSET.has(p.title))return;rawTot++;if(!ok(p))return;imgTot++;push(mk(p))});
    val=r.next!=null?ci+"|"+r.next:(ci+1)+"|"}
   else{const off=val,u=API+(mode=="s"?"generator=search&gsrlimit=50&gsrsearch="+encodeURIComponent(q)+"&gsroffset="+off:"generator=allpages&gaplimit=50&gapfilterredir=nonredirects"+(off?"&gapfrom="+encodeURIComponent(off):""));
    const {pages,next}=await wq(u),ps=Object.values(pages).sort((a,b)=>a.index-b.index);
-   let k=0;for(;k<ps.length&&out.length<PS;k++){const p=ps[k];if(isRemovedTitle(p.title))continue;if(mode=="a"&&SO=="rare"&&RANKSET.has(p.title))continue;rawTot++;if(!ok(p))continue;imgTot++;push(mk(p))}
+   let k=0;for(;k<ps.length&&out.length<PS;k++){const p=ps[k];if(isSweetie(p.title)){push({...SPECIAL_ADULT_CARD});continue}if(isRemovedTitle(p.title))continue;if(mode=="a"&&SO=="rare"&&RANKSET.has(p.title))continue;rawTot++;if(!ok(p))continue;imgTot++;push(mk(p))}
    if(k<ps.length)val=mode=="s"?+off+k:ps[k].title;
    else{if(next===null||next===undefined)return{out,next:null};val=next}}}
  if(mode=="r"&&fr.size&&!fr.has(0)&&+val>=FL.length)return{out,next:null};
@@ -2572,7 +2575,7 @@ function collection(){
   <div class="bkNav"><button class="btn g" id="bkPrev" ${bkIdx<=0?"disabled":""}>◀ Page précédente</button><span>${single||bkIdx+1>=np?"Page "+(bkIdx+1):"Pages "+(bkIdx+1)+"–"+Math.min(bkIdx+2,np)} / ${np} · ${L.length} cartes</span><button class="btn g" id="bkNext" ${bkIdx+step>=np?"disabled":""}>Page suivante ▶</button></div>${L.length?"":'<div class="msg">Aucune carte ne correspond à ta recherche ou à tes filtres.</div>'}</div>`;
  const visItems=colView==="binder"?L.slice(bkIdx*per,(bkIdx+step)*per):pageItems,allVis2=visItems.length>0&&visItems.every(c=>selHas(c.id));
  main.innerHTML=`<div class="colHead"><div><h2>📚 Ma collection</h2><div class="sub">${A.length} cartes différentes · ${A.reduce((s,c)=>s+c.n,0)} au total · ${L.length} dans le filtre</div></div></div>
-  ${fusionHTML(A)}
+  <!-- V118 : bandeau « Fusion · style reroll » retiré (la fusion reste dans le Laboratoire de cartes) -->
   <div class="colTools">
    <div class="colToolTop"><input id="colSearch" placeholder="🔍 Rechercher : un nom, un thème (scorpion, serpent, film, jeu vidéo, streamer…)" value="${colSearch.replace(/"/g,"&quot;")}"><select id="colSort"><option value="rar" ${colSort==="rar"?"selected":""}>Plus rares d'abord</option><option value="az" ${colSort==="az"?"selected":""}>A → Z</option><option value="count" ${colSort==="count"?"selected":""}>Plus de doublons</option><option value="recent" ${colSort==="recent"?"selected":""}>Plus récentes</option></select></div>
    <div class="colTagCreate"><span class="lab" style="margin:0">🏷 Étiquettes</span>${(()=>{const cnt=t=>A.filter(c=>(c.tags||[]).includes(t)).length,nt=A.filter(c=>!(c.tags||[]).length).length;
