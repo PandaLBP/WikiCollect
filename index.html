@@ -596,7 +596,30 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 @media(max-width:820px){main{padding-top:58px!important}.mny{top:8px!important;right:8px!important}.soundCtl{gap:4px}.soundCtl #volSlider{width:82px;min-width:82px;max-width:82px;flex-basis:82px}}
 .navSoundBottom{margin:0!important;align-self:stretch!important;flex:0 0 auto!important}
 .navMoneyBottom{position:static!important;top:auto!important;right:auto!important;z-index:auto!important;pointer-events:none!important;white-space:nowrap!important;margin:4px 0 0 0!important;align-self:stretch!important;display:flex!important;justify-content:center!important;box-sizing:border-box!important}
-</style></head><body>
+</style>
+<style id="v109-tags">
+.tpill{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 12px;border-radius:9px;border:1.5px solid var(--tag-color,#a855f7);background:color-mix(in srgb,var(--tag-color,#a855f7) 22%,#0b0912);color:#fff;font-weight:700;font-size:13px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tpill i{font-style:normal;cursor:pointer;opacity:.7;margin-left:2px}.tpill i:hover{opacity:1}
+.tdot{width:10px;height:10px;border-radius:50%;background:var(--tag-color,#a855f7);flex:none;display:inline-block}
+.tcb{margin-top:8px}.tcb .tin{margin-top:0}.tcb .tin:focus{outline:none;border-color:#22c55e;box-shadow:0 0 0 2px #22c55e55}
+.tdd{margin-top:6px;max-height:230px;overflow:auto;border:1px solid #3a2f4d;border-radius:12px;background:#0b0912;padding:4px}
+.tdd[hidden]{display:none}
+.tdd button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:0;border-radius:8px;color:var(--fg);padding:9px 10px;font:inherit;font-size:14px;cursor:pointer}
+.tdd button:hover,.tdd button.hl{background:#1c3a2b}
+.tdd .tnew{color:#7ee29a}
+.tfdd{position:relative;display:inline-block;min-width:220px;max-width:100%}
+.tfbtn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:#0b0912;border:1.5px solid #3a2f4d;border-radius:12px;padding:6px 10px;cursor:pointer;color:var(--fg);font:inherit}
+.tfbtn:hover,.tfdd.open .tfbtn{border-color:#22c55e}
+.tfbtn .chev{opacity:.7;transition:transform .15s}.tfdd.open .chev{transform:rotate(180deg)}
+.tflist{position:absolute;z-index:60;top:calc(100% + 6px);left:0;min-width:100%;width:max-content;max-width:min(92vw,420px);max-height:340px;overflow:auto;background:#17131f;border:1px solid #3a2f4d;border-radius:12px;padding:6px;box-shadow:0 14px 40px #000a;display:none}
+.tfdd.open .tflist{display:block}
+.tflist .tfi{display:block;width:100%;text-align:left;background:transparent;border:0;border-radius:9px;padding:6px 6px;margin:0;cursor:pointer;color:var(--fg);font:inherit;font-weight:800}
+.tflist .tfi:hover,.tflist .tfi.on{background:#241c33}
+.tflist .tfi .tpill{display:flex;width:100%}
+.tflist .tfi .tcount{margin-left:auto;opacity:.85}
+.tflist .tfi.plain{padding:10px 12px}
+</style>
+</head><body>
 <nav><h1>Wiki<span>Collect</span></h1><button id="t0" class="on">🎁 Boosters</button><button id="t1">🌍 Toutes les cartes</button><button id="t2">📚 Collection</button><button id="t3">🔨 Enchères</button><button id="t4">🎰 Casino</button>
 <button id="t5">🎯 Missions du jour</button><button id="t6">🔥 Événement du jour</button><button id="t7">👤 Profil</button><button id="t8">🏆 Succès</button><button id="hw">❓ Comment ça marche</button><div class="sp"></div><div class="soundCtl navSoundBottom"><button id="soundToggle" title="Activer / couper les sons">🔊 Sons</button><input id="volSlider" type="range" min="0" max="100" step="1" title="Volume des sons"></div><div id="mn" class="mny navMoneyBottom"></div></nav>
 <main id="main"></main>
@@ -1025,7 +1048,7 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
  const url=c.src=="wiki"?"https://fr.wikipedia.org/wiki/"+encodeURIComponent(c.t.replace(/ /g,"_")):c.src=="film"?(c.url||null):(c.url||(CRE.find(x=>x.pid==c.pid)||{}).url);
  const link=url?`<a class="lnk" target="_blank" rel="noopener" href="${url}">${c.src=="wiki"?"Voir l'article sur Wikipédia":c.src=="film"?"Voir la fiche IMDb":"Voir la chaîne "+c.plat} →</a>`:"",own=col[c.id];
  const draw=()=>{
-  const det=`<p style="line-height:1.55;margin:0 0 6px">${desc}</p><label class="lab">ÉTIQUETTES</label><div class="tgs">${(own&&own.tags||[]).map(t=>`<span class="tg">${t}<i data-t="${t}">×</i></span>`).join("")}</div>${own?`<input id="tin" class="tin" placeholder="Ajouter une étiquette…">`:""}
+  const det=`<p style="line-height:1.55;margin:0 0 6px">${desc}</p><label class="lab">ÉTIQUETTES</label><div class="tgs">${((col[c.id]||own||{}).tags||[]).map((t,ti)=>`<span class="tpill" style="--tag-color:${tagColor(t,ti)}">${tagLabel(t)}<i data-t="${t.replace(/"/g,"&quot;")}">×</i></span>`).join("")}</div>${own?`<div class="tcb"><input id="tin" class="tin" placeholder="Ajouter une étiquette…" autocomplete="off"><div class="tdd" id="tdd" hidden></div></div>`:""}
    <div class="sb2"><div><b>🪙 ${fair(c)}</b><span>Valeur estimée</span></div><div><b>👁 ${c.v!=null?Math.round(c.v).toLocaleString("fr-FR"):"—"}</b><span>${c.src=="film"?"Votes IMDb":"Vues / mois"}</span></div></div>
    <div class="sub">Exemplaires : ${own?own.n:0}${c.src=="cr"?" · "+c.plat:""}</div><div style="margin-top:10px">${link}</div>${c.src=="wiki"?`<div class="sub" style="margin-top:8px">Texte de l'article : CC BY-SA 4.0 — crédits sur la page Wikipédia.</div>`:""}`;
   const hist=MK.H.filter(x=>x.r==c.r).slice(0,6),act=MK.A.filter(a=>!a.done&&a.c.pid==c.pid).length;
@@ -1035,8 +1058,23 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
   if($("wl"))$("wl").onclick=()=>{toggleW(c);if(tab==3&&!AV.d)paintMk(true);draw()};
   if($("au"))$("au").onclick=()=>openAuction(c.id);
   if($("ds"))$("ds").onclick=()=>{if(!confirm("Défausser « "+c.t+" » pour "+dsc(c)+" 🪙 ?"))return;const e=col[c.id];e.n>1?e.n--:delete col[c.id];gain(dsc(c));closeModal();render()};
-  const ti=$("tin");if(ti)ti.onkeydown=e=>{if(e.key=="Enter"&&ti.value.trim()){own.tags=[...(own.tags||[]),ti.value.trim().slice(0,20)];save();draw()}};
-  M.querySelectorAll(".tg i").forEach(i=>i.onclick=()=>{own.tags=own.tags.filter(x=>x!=i.dataset.t);save();draw()});
+  const ti=$("tin"),dd=$("tdd");
+  if(ti&&dd){
+   const addT=raw=>{const o=col[c.id]||own,t=cleanTag(raw);if(!t)return;o.tags=o.tags||[];if(o.tags.includes(t)){toast("Déjà sur cette carte.");return}if(o.tags.length>=8){toast("8 étiquettes maximum par carte.");return}
+    o.tags.push(t);save();try{if(tab==2)collection()}catch(e){}draw();const n=$("tin");if(n)n.focus()};
+   let hl=-1,items=[];
+   const paint=()=>{const q=ti.value.trim().toLowerCase(),have=new Set((col[c.id]||own).tags||[]),all=colTags(),list=all.filter(t=>!have.has(t)&&(!q||t.toLowerCase().includes(q)));
+    items=list.map(t=>({t,n:0}));const exact=all.some(t=>t.toLowerCase()==q);
+    dd.innerHTML=list.map((t,i)=>`<button type="button" data-v="${t.replace(/"/g,"&quot;")}" class="${i==hl?"hl":""}"><span class="tdot" style="--tag-color:${tagColor(t,all.indexOf(t))}"></span>${tagLabel(t)}</button>`).join("")+(q&&!exact?`<button type="button" class="tnew" data-v="${ti.value.trim().replace(/"/g,"&quot;")}">➕ Créer « ${ti.value.trim().replace(/</g,"&lt;")} »</button>`:"");
+    dd.hidden=!dd.innerHTML};
+   ti.onfocus=()=>{hl=-1;paint()};ti.oninput=()=>{hl=-1;paint()};
+   dd.onmousedown=e=>{const b=e.target.closest("button[data-v]");if(b){e.preventDefault();addT(b.dataset.v)}};
+   ti.onkeydown=e=>{const bs=[...dd.querySelectorAll("button[data-v]")];
+    if(e.key=="ArrowDown"||e.key=="ArrowUp"){e.preventDefault();if(!bs.length)return;hl=(hl+(e.key=="ArrowDown"?1:-1)+bs.length)%bs.length;bs.forEach((b,i)=>b.classList.toggle("hl",i==hl));bs[hl].scrollIntoView({block:"nearest"})}
+    else if(e.key=="Enter"){e.preventDefault();if(hl>=0&&bs[hl])addT(bs[hl].dataset.v);else if(ti.value.trim())addT(ti.value)}
+    else if(e.key=="Escape"){dd.hidden=true}};
+   ti.onblur=()=>setTimeout(()=>{dd.hidden=true},120)}
+  M.querySelectorAll(".tgs i").forEach(i=>i.onclick=()=>{const o=col[c.id]||own;o.tags=(o.tags||[]).filter(x=>x!=i.dataset.t);save();try{if(tab==2)collection()}catch(e){}draw()});
   const im=M.querySelector("img");if(im)im.onerror=()=>{im.src=ph(c.t)}};
  draw();
  if(c.src=="wiki"){try{const j=await(await fetch("https://fr.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(c.t))).json();if(M.style.display=="flex"&&j.extract&&store[id]===c){desc=j.extract;draw()}}catch(e){}}}
@@ -2362,7 +2400,7 @@ const colTags=()=>{
  Object.values(col).forEach(c=>(c.tags||[]).forEach(t=>s.add(t)));
  return orderedColTags([...s]);
 };
-const cleanTag=t=>(t||"").trim().replace(/\s+/g," ").slice(0,24);
+const cleanTag=t=>(t||"").trim().replace(/\s+/g," ").slice(0,40);
 const colTagOrder=()=>{try{const x=JSON.parse(localStorage.getItem("wc_col_tag_order")||"[]");return Array.isArray(x)?x.map(cleanTag).filter(Boolean):[]}catch(e){return []}};
 const saveColTagOrder=order=>{try{localStorage.setItem("wc_col_tag_order",JSON.stringify([...new Set(order.map(cleanTag).filter(Boolean))]))}catch(e){}};
 const orderedColTags=tags=>{const clean=[...new Set(tags.map(cleanTag).filter(Boolean))],saved=colTagOrder(),set=new Set(clean),out=[...saved.filter(t=>set.has(t)),...clean.filter(t=>!saved.includes(t)).sort((a,b)=>a.localeCompare(b,"fr"))];if(out.length!==saved.length||out.some((x,i)=>x!==saved[i]))saveColTagOrder(out);return out};
@@ -2370,6 +2408,7 @@ const TAG_COLORS=["#a855f7","#3b82f6","#22c55e","#f59e0b","#ef4444","#ec4899","#
 const validTagColor=c=>/^#[0-9a-fA-F]{6}$/.test(c||"")?c:"#a855f7";
 const tagMeta=()=>{try{const x=JSON.parse(localStorage.getItem("wc_col_tag_meta")||"{}");return x&&typeof x==="object"?x:{}}catch(e){return {}}};
 const saveTagMeta=m=>{try{localStorage.setItem("wc_col_tag_meta",JSON.stringify(m))}catch(e){}};
+const tagLabel=t=>{const x=String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");return /^\d+\s*-/.test(t)?"#"+x:x};
 const tagColor=(t,i=0)=>validTagColor(tagMeta()[t]||TAG_COLORS[i%TAG_COLORS.length]);
 const setTagColor=(t,c)=>{const m=tagMeta();m[t]=validTagColor(c);saveTagMeta(m)};
 function saveCollectionState(){try{localStorage.setItem("wc_col_ui",JSON.stringify({tag:colTagFilter,q:colSearch,sort:colSort,page:colPage}))}catch(e){}}
@@ -2410,7 +2449,11 @@ function collection(){
   ${fusionHTML(A)}
   <div class="colTools">
    <div class="colToolTop"><input id="colSearch" placeholder="🔍 Rechercher dans ma collection…" value="${colSearch.replace(/"/g,"&quot;")}"><select id="colSort"><option value="rar" ${colSort==="rar"?"selected":""}>Plus rares d'abord</option><option value="az" ${colSort==="az"?"selected":""}>A → Z</option><option value="count" ${colSort==="count"?"selected":""}>Plus de doublons</option><option value="recent" ${colSort==="recent"?"selected":""}>Plus récentes</option></select></div>
-   <div class="colTagCreate"><span class="lab" style="margin:0">🏷 Étiquettes</span><button class="tagFilter ${!colTagFilter?"on":""}" data-tag-filter="">📚 Toutes</button><button class="tagFilter ${colTagFilter===UNTAGGED_FILTER?"on":""}" data-tag-filter="${UNTAGGED_FILTER}">🆕 Sans étiquette</button>${tags.map((t,ti)=>{const tc=tagColor(t,ti);return `<button class="tagFilter ${colTagFilter===t?"on":""}" data-tag-filter="${escAttr(t)}" style="--tag-color:${tc};border-color:${tc};color:${tc}">🏷 ${escAttr(t)}</button>`}).join("")}<input id="newTag" maxlength="24" placeholder="Créer une étiquette…"><input id="newTagColor" type="color" value="${tagColor("",tags.length)}" title="Couleur de la nouvelle étiquette" aria-label="Couleur de la nouvelle étiquette" style="width:44px;min-width:44px;height:42px;padding:3px;border-radius:10px"><button class="btn g" id="addTag">Ajouter</button><button class="btn g" id="manageTags">⚙️ Gérer</button></div>
+   <div class="colTagCreate"><span class="lab" style="margin:0">🏷 Étiquettes</span>${(()=>{const cnt=t=>A.filter(c=>(c.tags||[]).includes(t)).length,nt=A.filter(c=>!(c.tags||[]).length).length;
+   const cur=colTagFilter===UNTAGGED_FILTER?`<span class="tpill" style="--tag-color:#6b6588">Sans étiquette (${nt})</span>`:colTagFilter&&tags.includes(colTagFilter)?`<span class="tpill" style="--tag-color:${tagColor(colTagFilter,tags.indexOf(colTagFilter))}">${tagLabel(colTagFilter)}</span>`:`<b style="padding:4px 4px">Toutes les étiquettes</b>`;
+   return `<div class="tfdd" id="tfdd"><button type="button" class="tfbtn" id="tfbtn">${cur}<span class="chev">⌃</span></button><div class="tflist">
+   <button type="button" class="tfi plain ${!colTagFilter?"on":""}" data-tag-filter="">Toutes les étiquettes</button><button type="button" class="tfi plain ${colTagFilter===UNTAGGED_FILTER?"on":""}" data-tag-filter="${UNTAGGED_FILTER}">Sans étiquette <span style="opacity:.7">(${nt})</span></button>
+   ${tags.map((t,ti)=>`<button type="button" class="tfi ${colTagFilter===t?"on":""}" data-tag-filter="${escAttr(t)}"><span class="tpill" style="--tag-color:${tagColor(t,ti)}">${tagLabel(t)}<span class="tcount">(${cnt(t)})</span></span></button>`).join("")}</div></div>`})()}<input id="newTag" maxlength="40" placeholder="Créer une étiquette…"><input id="newTagColor" type="color" value="${tagColor("",tags.length)}" title="Couleur de la nouvelle étiquette" aria-label="Couleur de la nouvelle étiquette" style="width:44px;min-width:44px;height:42px;padding:3px;border-radius:10px"><button class="btn g" id="addTag">Ajouter</button><button class="btn g" id="manageTags">⚙️ Gérer</button></div>
    <div class="colActions"><button class="btn g" id="selectPage">${allVis2?"☐ Désélectionner la page":"☑ Sélectionner toute la page"}</button><button class="btn g" id="clearSel">✕ Effacer sélection</button><button class="btn g" id="multiTag">🏷 Plusieurs étiquettes</button><button class="btn g" id="delSelected">🗑 Supprimer la sélection</button></div>
    <div class="colHint">Classeur : « Toutes » affiche tout, une étiquette affiche uniquement ses cartes, et « Sans étiquette » affiche les cartes non classées. 50 cartes maximum par page.</div>
   </div>
@@ -2430,6 +2473,7 @@ function collection(){
  main.querySelector("#selectPage").onclick=()=>{if(allVis2)visItems.forEach(c=>selDel(c.id));else visItems.forEach(c=>selAdd(c.id));collection()};
  main.querySelector("#clearSel").onclick=()=>{selClear();collection()};
  main.querySelectorAll("[data-pick]").forEach(b=>b.onclick=e=>{e.stopPropagation();const id=selKey(b.dataset.pick);selHas(id)?selDel(id):selAdd(id);collection()});
+ {const dd=$("tfdd"),bt=$("tfbtn");if(bt)bt.onclick=e=>{e.stopPropagation();dd.classList.toggle("open")};if(!window.__tfOut){window.__tfOut=1;document.addEventListener("click",e=>{const d=document.getElementById("tfdd");if(d&&!d.contains(e.target))d.classList.remove("open")})}}
  main.querySelectorAll("[data-tag-filter]").forEach(b=>b.onclick=()=>{colTagFilter=b.dataset.tagFilter||"";colPage=1;colSelected.clear();saveCollectionState();collection()});
  const tagTarget=()=>colSelected.size?[...colSelected]:visItems.map(c=>c.id);
  const persistTagNames=names=>{const clean=[...new Set(names.map(cleanTag).filter(Boolean))];try{localStorage.setItem("wc_col_tags",JSON.stringify(clean))}catch(e){};saveColTagOrder([...colTagOrder().filter(t=>clean.includes(t)),...clean.filter(t=>!colTagOrder().includes(t))])};
