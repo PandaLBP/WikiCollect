@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WikiCollect</title>
+<title>WikiCollect · V111</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <style>
@@ -618,6 +618,18 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 .tflist .tfi .tpill{display:flex;width:100%}
 .tflist .tfi .tcount{margin-left:auto;opacity:.85}
 .tflist .tfi.plain{padding:10px 12px}
+.ownb{position:absolute;top:9px;right:6px;z-index:6;background:#16a34a;color:#fff;font-size:10px;font-weight:900;letter-spacing:.04em;padding:2px 8px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 6px #0008;pointer-events:none}
+.card.isown{outline:2px solid #22c55e;outline-offset:1px}
+#aown.on{border-color:#22c55e;color:#86efac}
+.ownline{display:inline-block;margin:0 0 12px;padding:5px 12px;border-radius:9px;background:#16a34a33;border:1px solid #22c55e;color:#86efac;font-weight:800;font-size:13px}
+/* V110 : performances — les animations lumineuses des cartes ne tournent plus en continu dans les grilles
+   (box-shadow / background-position animés = repaint de chaque carte à chaque image). Elles se lancent au survol,
+   et restent actives dans les fiches, les ouvertures de boosters et les walkouts. */
+#g .card,#g .card *,#g .card::before,#g .card::after,#g .card *::before,#g .card *::after,
+.colTile .card,.colTile .card *,.colTile .card::before,.colTile .card::after,.colTile .card *::before,.colTile .card *::after,
+.at .card,.at .card *,.at .card::before,.at .card::after,.at .card *::before,.at .card *::after{animation-play-state:paused!important}
+#g .card:hover,#g .card:hover *,#g .card:hover::before,#g .card:hover::after,#g .card:hover *::before,#g .card:hover *::after,
+.colTile .card:hover,.colTile .card:hover *,.colTile .card:hover::before,.colTile .card:hover::after,.colTile .card:hover *::before,.colTile .card:hover *::after{animation-play-state:running!important}
 .mbox.tagManager{flex-direction:column;align-items:stretch;gap:6px;padding:26px 26px 20px;max-width:760px}
 .tagManager h2{margin:0 36px 0 0;font-size:22px}.tagManager>.sub{margin:0 0 6px}
 .tagManager .multiTagList{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin:10px 0 6px;max-height:52vh;overflow:auto;padding:2px}
@@ -1745,6 +1757,15 @@ function wishTab(){
  return `<div class="sub" style="margin:0 0 12px">Suis une carte avec le bouton ⭐ sur sa fiche. Tu es prévenue quand elle est mise en vente (et quand son enchère se termine bientôt).</div>${perm}
  <div class="grid mg">${items||'<div class="msg">Ta liste est vide. Ouvre une carte (Toutes les cartes, Collection…) et clique sur « ⭐ Suivre ».</div>'}</div>
  <h3 style="margin-top:26px">Alertes récentes</h3>${lg||'<div class="sub">Aucune alerte pour le moment.</div>'}`}
+
+/* ===== V111 : repère « déjà à toi » dans Toutes les cartes et Enchères ===== */
+let _own={t:0,m:null};
+function ownMap(){const now=Date.now();if(_own.m&&now-_own.t<1500)return _own.m;const m=new Map();
+ Object.values(col).forEach(c=>{if(!c||!(c.n>0))return;const k=[c.id,c.pid,c.t?"t:"+String(c.t).toLowerCase():null];k.forEach(x=>{if(x)m.set(x,(m.get(x)||0)+c.n)})});_own={t:now,m};return m}
+function ownN(c){if(!c)return 0;const m=ownMap();return Math.max(m.get(c.id)||0,c.pid?m.get(c.pid)||0:0,c.t?m.get("t:"+String(c.t).toLowerCase())||0:0)}
+function markOwned(root){if(!root)return;_own.t=0;root.querySelectorAll(".card").forEach(e=>{if(e.classList.contains("isown"))return;const c=store[e.dataset.id],n=ownN(c);if(!n)return;
+ e.classList.add("isown");const inn=e.querySelector(".in");if(inn&&!inn.querySelector(".ownb")){const b=document.createElement("span");b.className="ownb";b.textContent="✓ POSSÉDÉE"+(n>1?" ×"+n:"");inn.appendChild(b)}})}
+{const _bind=bind;bind=function(root,rm){const r=_bind.apply(this,arguments);try{if(root&&((root.id=="g"&&tab==1)||(root.id=="ah"&&tab==3)))markOwned(root)}catch(e){}return r}}
 let filling=false;
 async function refill(){
  if(filling)return;
@@ -1853,11 +1874,11 @@ function pickSell(){M.style.display="flex";const L=Object.values(col).sort((a,b)
  M.innerHTML=`<div class="mbox v2 auc"><button class="btn g x" id="mx">✕</button><h2 style="margin:0">Choisis une carte à vendre</h2><div class="grid lg" id="pk" style="--n:4">${L.length?L.map(card).join(""):'<div class="msg">Ta collection est vide.</div>'}</div></div>`;$("mx").onclick=closeModal;
  bind($("pk"),false);$("pk").querySelectorAll(".card").forEach(e=>e.onclick=()=>{closeModal();openAuction(e.dataset.id)})}
 // ---- page Enchères ----
-let AV={tab:"b",q:"",sort:"new",fr:new Set(),d:null};
+let AV={tab:"b",q:"",sort:"new",fr:new Set(),d:null,hideOwn:false};
 const tile=a=>{store[a.c.id]=a.c;const cur=a.w==null?a.st:a.b;
  return `<div class="at" data-id="${a.id}" data-auid="${a.id}">${WL[a.c.pid]?'<div class="wst" title="Dans ta liste de souhaits">⭐</div>':""}${card(a.c)}<div class="ar"><div><small data-au-label="price-label">${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</small><b data-au-price>🪙 ${cur}</b></div><div style="text-align:right"><small>⏱ DURÉE</small><b class="cd" data-e="${a.end}"></b></div></div><div class="as"><span data-au-status>${a.s==ME?"Ta vente":"Vendu par "+a.s}${a.w?` · ${a.w==ME?"<b style='color:#7ee29a'>tu mènes</b>":"👑 "+a.w}`:""}${a.mine&&a.w!=ME?" · <b style='color:#ff9a7a'>surenchéri</b>":""}</span></div></div>`};
 const SORTS={new:["Récemment listées",(x,y)=>y.ts-x.ts],end:["Se termine bientôt",(x,y)=>x.end-y.end],pa:["Prix croissant",(x,y)=>(x.w==null?x.st:x.b)-(y.w==null?y.st:y.b)],pd:["Prix décroissant",(x,y)=>(y.w==null?y.st:y.b)-(x.w==null?x.st:x.b)],rar:["Rareté",(x,y)=>y.c.r-x.c.r]};
-const aucViewSig=()=>WLV+"|"+AV.tab+"|"+AV.d+"|"+AV.q+"|"+AV.sort+"|"+[...AV.fr].join(",");
+const aucViewSig=()=>WLV+"|"+(AV.hideOwn?1:0)+"|"+AV.tab+"|"+AV.d+"|"+AV.q+"|"+AV.sort+"|"+[...AV.fr].join(",");
 let mkViewSig="";
 function paintMk(force){if(!$("ah"))return;const viewSig=aucViewSig();
  if(force||viewSig!==mkViewSig){mkViewSig=viewSig;if(AV.d){detailPage()}else listPage()}
@@ -1879,8 +1900,8 @@ function listPage(){
  const A=MK.A.filter(a=>!a.done),mineS=A.filter(a=>a.s==ME),mineB=A.filter(a=>a.mine),myH=MK.H.filter(x=>x.s==ME||x.u==ME);
  const tabs=[["b","Parcourir"],["v",`Mes ventes (${mineS.length}/${MAXS})`],["e","Mes enchères"],["g",`Gagnées (${MK.W.length})`],["h",`Historique (${myH.length})`],["w",`⭐ Souhaits (${Object.keys(WL).length})`]];
  let body="";
- if(AV.tab=="b"){let L=A.filter(a=>a.s!=ME&&(!AV.q||a.c.t.toLowerCase().includes(AV.q.toLowerCase()))&&(!AV.fr.size||AV.fr.has(a.c.r))).sort(SORTS[AV.sort][1]);
-  body=`<div class="bar"><input id="aq" placeholder="Rechercher une carte…" value="${AV.q}"><button class="btn" id="ago">🔍 Rechercher</button><select id="asr">${Object.entries(SORTS).map(([k,v])=>`<option value="${k}" ${k==AV.sort?"selected":""}>${v[0]}</option>`).join("")}</select></div>
+ if(AV.tab=="b"){let L=A.filter(a=>a.s!=ME&&(!AV.q||a.c.t.toLowerCase().includes(AV.q.toLowerCase()))&&(!AV.fr.size||AV.fr.has(a.c.r))&&(!AV.hideOwn||!ownN(a.c))).sort(SORTS[AV.sort][1]);
+  body=`<div class="bar"><input id="aq" placeholder="Rechercher une carte…" value="${AV.q}"><button class="btn" id="ago">🔍 Rechercher</button><button class="btn g ${AV.hideOwn?"on":""}" id="aown" title="Cache les cartes que tu possèdes déjà">${AV.hideOwn?"✓ ":""}Masquer celles que j'ai déjà</button><select id="asr">${Object.entries(SORTS).map(([k,v])=>`<option value="${k}" ${k==AV.sort?"selected":""}>${v[0]}</option>`).join("")}</select></div>
   <div class="chips">${R.map((r,i)=>HID.has(i)?"":`<button class="chip ${AV.fr.has(i)?"on":""}" style="background:${r[1]}" data-r="${i}">${SYM[i]} ${r[0]}</button>`).join("")}</div>
   <div class="grid mg">${L.length?L.map(tile).join(""):'<div class="msg">Aucune enchère ne correspond.</div>'}</div>
   <h3 style="margin-top:26px">Dernières ventes</h3>${MK.H.filter(x=>x.u).slice(0,10).map(x=>`<div class="off">${x.c.t} · <b style="color:${R[x.r][1]}">${R[x.r][0]}</b> · <b>${x.p} 🪙</b> · ${nm(x.u)} <span class="sub" style="margin:0">(vendeur : ${nm(x.s)} · ${ago(x.ts)})</span></div>`).join("")||'<div class="sub">Aucune vente pour le moment.</div>'}`}
@@ -1891,7 +1912,7 @@ function listPage(){
  else body=myH.map(x=>`<div class="off">${x.s==ME?(x.u?`💰 Vendue à <b>${x.u}</b> pour <b>${x.p} 🪙</b>`:"↩ Invendue"):`🛒 Achetée à <b>${nm(x.s)}</b> pour <b>${x.p} 🪙</b>`} · « ${x.c.t} » <b style="color:${R[x.r][1]}">${R[x.r][0]}</b> <span class="sub" style="margin:0">${ago(x.ts)}</span></div>`).join("")||'<div class="sub">Aucun historique.</div>';
  $("ah").innerHTML=`<div class="tabs2">${tabs.map(t=>`<button class="${AV.tab==t[0]?"on":""}" data-t="${t[0]}">${t[1]}</button>`).join("")}</div>${body}`;
  $("ah").querySelectorAll(".tabs2 button").forEach(b=>b.onclick=()=>{AV.tab=b.dataset.t;paintMk(true)});
- if($("aq")){const go=()=>{AV.q=$("aq").value.trim();paintMk(true)};$("aq").onkeydown=e=>{if(e.key=="Enter")go()};$("ago").onclick=go;$("asr").onchange=e=>{AV.sort=e.target.value;paintMk(true)};
+ if($("aq")){const go=()=>{AV.q=$("aq").value.trim();paintMk(true)};$("aq").onkeydown=e=>{if(e.key=="Enter")go()};$("ago").onclick=go;$("aown").onclick=()=>{AV.hideOwn=!AV.hideOwn;paintMk(true)};$("asr").onchange=e=>{AV.sort=e.target.value;paintMk(true)};
   $("ah").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;AV.fr.has(i)?AV.fr.delete(i):AV.fr.add(i);paintMk(true)})}
  if($("sell"))$("sell").onclick=pickSell;
  $("ah").querySelectorAll(".wlrm").forEach(b=>b.onclick=e=>{e.stopPropagation();const p=b.dataset.p;if(WL[p]){delete WL[p]}else{const k=Object.keys(WL).find(x=>String(x)==p);if(k)delete WL[k]}WLV++;saveWL();paintMk(true)});
@@ -1902,7 +1923,7 @@ function detailPage(){const a=MK.A.find(x=>x.id==AV.d&&!x.done);
  store[a.c.id]=a.c;const mine=a.s==ME,cur=a.w==null?a.st:a.b,nb=nextBid(a),f=fair(a.c),hs=(a.hs||[]).slice().reverse();
  const box=mine?`<div class="abox"><div class="arow"><span>Valeur estimée</span><b>≈ ${f} 🪙 <small style="color:var(--mut)">(${Math.round(f*.8)}–${Math.round(f*1.25)})</small></b></div><div class="arow"><span>Si l'enchère s'arrêtait maintenant</span><b style="color:#7ee29a">${a.w==null?"aucune mise":"+"+Math.round(a.b*.95)+" 🪙 (après 5 % de frais)"}</b></div>${a.n==0?`<button class="btn g" id="acn" style="margin-top:10px">Annuler l'enchère (aucune mise)</button>`:""}</div>`
  :`<div class="abox"><div class="arow"><span>Votre solde : <b style="color:var(--fg)">${money.toLocaleString("fr-FR")}</b> pièces</span><span>Mise minimum : <b style="color:var(--fg)">${nb}</b></span></div><div class="abid">${STP(nb)}<button class="btn" id="abd">Miser</button></div>${a.w==ME?`<div class="sub" style="color:#7ee29a;margin:8px 0 0">Tu mènes avec ${a.b} 🪙 — ta mise actuelle te sera rendue si tu surenchéris.</div>`:""}<div class="sub" style="font-size:11px;margin:10px 0 0">La mise est débitée de votre solde immédiatement. Si vous êtes surenchéri, elle vous est intégralement remboursée. Une mise dans les 20 dernières secondes remet le chronomètre à 1 minute.</div></div>`;
- $("ah").innerHTML=`<div class="bkl" id="abk">← Retour aux enchères</div><div class="ad"><div class="adl">${card(a.c)}</div><div class="adr"><h2 style="margin:0">${a.c.t}</h2><button class="btn g wlbtn ${isW(a.c)?"on":""}" id="wlD" style="margin-top:8px">${isW(a.c)?"⭐ Suivie":"☆ Suivre cette carte"}</button><div class="sub" style="margin:4px 0 14px">${mine?"Ta vente":"Mis en vente par <b style='color:var(--ac)'>"+a.s+"</b>"}</div>
+ $("ah").innerHTML=`<div class="bkl" id="abk">← Retour aux enchères</div><div class="ad"><div class="adl">${card(a.c)}</div><div class="adr"><h2 style="margin:0">${a.c.t}</h2>${ownN(a.c)?`<div class="ownline">✓ Tu as déjà cette carte (×${ownN(a.c)})</div><br>`:""}<button class="btn g wlbtn ${isW(a.c)?"on":""}" id="wlD" style="margin-top:8px">${isW(a.c)?"⭐ Suivie":"☆ Suivre cette carte"}</button><div class="sub" style="margin:4px 0 14px">${mine?"Ta vente":"Mis en vente par <b style='color:var(--ac)'>"+a.s+"</b>"}</div>
  <div class="abox"><div class="arow"><span>${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</span><b class="big">🪙 ${cur}</b></div>${a.w?`<div class="arow"><span>Meilleur enchérisseur</span><b>${a.w==ME?"Toi":"👑 "+a.w}</b></div>`:""}<div class="arow"><span>🔨 Temps restant</span><b id="atl"></b></div></div>${box}
  <h4 class="lab" style="margin-top:22px">HISTORIQUE DES MISES (${hs.length})</h4>${hs.length?hs.map(x=>`<div class="off"><b>${nm(x.u)}</b> a misé <b>${x.p} 🪙</b> <span class="sub" style="margin:0 0 0 auto">${ago(x.ts)}</span></div>`).join(""):'<div class="sub">Aucune mise placée pour l\'instant.</div>'}</div></div>`;
  $("abk").onclick=()=>{AV.d=null;paintMk(true)};bind($("ah"),false);const cd=$("ah").querySelector(".card");if(cd)cd.onclick=()=>openModal(a.c.id);
