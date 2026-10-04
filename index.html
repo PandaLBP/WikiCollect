@@ -618,6 +618,17 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 .tflist .tfi .tpill{display:flex;width:100%}
 .tflist .tfi .tcount{margin-left:auto;opacity:.85}
 .tflist .tfi.plain{padding:10px 12px}
+.mbox.tagManager{flex-direction:column;align-items:stretch;gap:6px;padding:26px 26px 20px;max-width:760px}
+.tagManager h2{margin:0 36px 0 0;font-size:22px}.tagManager>.sub{margin:0 0 6px}
+.tagManager .multiTagList{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin:10px 0 6px;max-height:52vh;overflow:auto;padding:2px}
+.multiTagItem{position:relative;gap:10px!important;padding:10px 12px!important;border:1.5px solid color-mix(in srgb,var(--tag-color,#a855f7) 55%,#2b2238)!important;background:#0f0b17!important;border-radius:10px;cursor:pointer;color:#fff;font-weight:700;font-size:14px}
+.multiTagItem:hover{background:color-mix(in srgb,var(--tag-color,#a855f7) 14%,#0f0b17)!important}
+.multiTagItem:has(input:checked){background:color-mix(in srgb,var(--tag-color,#a855f7) 28%,#0f0b17)!important;border-color:var(--tag-color,#a855f7)!important}
+.multiTagItem input{width:18px!important;min-width:0!important;padding:0!important;border:0!important;background:none!important;height:18px!important;accent-color:var(--tag-color,#a855f7);flex:none;margin:0}
+.multiTagItem{justify-content:flex-start!important}.multiTagItem .mtn{flex:1}.multiTagItem .tdot{order:-1}.multiTagItem input{order:-2}.multiTagItem .mtn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tagManager .tagMgrColor{flex:none;min-width:0;width:44px;padding:2px}.tagManager .tagMgrInput{flex:1 1 200px;min-width:160px}.tagManager .tagMgrRow{flex-wrap:wrap}.tagManager .tagMgrRow .btn{width:auto;white-space:nowrap;padding:8px 12px}.tagManager .tagMgrInput{flex:1 1 150px;min-width:120px}
+.mtfoot{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px;padding-top:12px;border-top:1px solid #2b2238}
+.mtfoot .btn{width:auto;min-width:110px;height:auto;padding:10px 18px}
 </style>
 </head><body>
 <nav><h1>Wiki<span>Collect</span></h1><button id="t0" class="on">🎁 Boosters</button><button id="t1">🌍 Toutes les cartes</button><button id="t2">📚 Collection</button><button id="t3">🔨 Enchères</button><button id="t4">🎰 Casino</button>
@@ -2510,11 +2521,12 @@ function collection(){
  main.querySelector("#multiTag").onclick=()=>{
   const cur=colTags(),target=tagTarget();
   if(!target.length)return toast("Sélectionne au moins une carte.");
-  const choices=cur.map((t,i)=>{const tc=tagColor(t,i);return `<label class="multiTagItem" style="--tag-color:${tc};border-color:${tc};background:${tc}14"><input type="checkbox" value="${escAttr(t)}"> <span style="color:${tc}">🏷 ${escAttr(t)}</span></label>`}).join("");
+  const choices=cur.map((t,i)=>{const tc=tagColor(t,i);return `<label class="multiTagItem" style="--tag-color:${tc}"><input type="checkbox" value="${escAttr(t)}"><span class="tdot"></span><span class="mtn">${tagLabel(t)}</span></label>`}).join("");
   M.style.display="flex";
-  M.innerHTML=`<div class="mbox tagManager"><button class="btn g x" id="multiTagClose">✕</button><h2>🏷 Ajouter plusieurs étiquettes</h2><div class="sub">${target.length} carte(s) ciblée(s) · tu peux cocher plusieurs étiquettes.</div><div class="multiTagList">${choices||'<div class="sub">Crée d’abord une étiquette.</div>'}</div><div class="bar" style="justify-content:flex-end"><button class="btn g" id="multiTagClose2">Annuler</button><button class="btn" id="applyMultiTags" ${cur.length?"":"disabled"}>Appliquer</button></div></div>`;
+  M.innerHTML=`<div class="mbox tagManager"><button class="btn g x" id="multiTagClose">✕</button><h2>🏷 Ajouter plusieurs étiquettes</h2><div class="sub">${target.length} carte${target.length>1?"s":""} ciblée${target.length>1?"s":""} · coche une ou plusieurs étiquettes à ajouter.</div><div class="multiTagList">${choices||'<div class="sub">Crée d’abord une étiquette.</div>'}</div><div class="mtfoot"><span class="sub" id="mtcount" style="margin:0 auto 0 0">0 sélectionnée</span><button class="btn g" id="multiTagClose2">Annuler</button><button class="btn" id="applyMultiTags" ${cur.length?"":"disabled"}>Appliquer</button></div></div>`;
   const close=()=>{M.style.display="none";M.innerHTML=""};
   $("multiTagClose").onclick=close;$("multiTagClose2").onclick=close;
+  M.querySelectorAll(".multiTagItem input").forEach(i=>i.onchange=()=>{const n=M.querySelectorAll(".multiTagItem input:checked").length;$("mtcount").textContent=n+" sélectionnée"+(n>1?"s":"")});
   const ap=$("applyMultiTags");
   if(ap)ap.onclick=()=>{
     const chosen=[...M.querySelectorAll(".multiTagItem input:checked")].map(x=>x.value);
