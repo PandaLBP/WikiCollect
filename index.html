@@ -1162,10 +1162,23 @@ async function getTop(){if(topCache)return topCache;
 const CRATE=.03; // chance qu'une carte d'un booster soit un créateur (≈ 26 % des boosters en contiennent un)
 async function buildPack(minRarity=null){
  const rollCount=minRarity!=null?9:10; const rolls=Array.from({length:rollCount},()=>pick(Math.random())).sort((a,b)=>a-b); // 10 cartes au total, dont 1 garantie pour les boosters spéciaux
- const [top,...rs]=await Promise.all([getTop(),...[0,1,2,3].map(()=>fetch(API+"generator=random&grnnamespace=0&grnlimit=50").then(r=>r.json()))]);
+ const top=await getTop().catch(()=>[]);
+ const randomResults=await Promise.all([0,1,2,3].map(()=>
+  fetch(API+"generator=random&grnnamespace=0&grnlimit=50")
+   .then(r=>{if(!r.ok)throw new Error("Wikipedia HTTP "+r.status);return r.json()})
+   .catch(()=>null)
+ ));
  const seen=new Set(),pool=[];
- const add=j=>Object.values(j.query?.pages||{}).filter(ok).filter(p=>!isExcludedTitle(p.title)).forEach(p=>{if(!seen.has(p.pageid)){seen.add(p.pageid);pool.push(mk(p))}});
- rs.forEach(add);
+ const add=j=>Object.values(j?.query?.pages||{}).filter(ok).filter(p=>!isExcludedTitle(p.title)).forEach(p=>{if(!seen.has(p.pageid)){seen.add(p.pageid);pool.push(mk(p))}});
+ randomResults.filter(Boolean).forEach(add);
+ // Secours : si Wikipédia refuse les requêtes depuis un fichier local, on utilise les cartes
+ // déjà réellement présentes dans la collection. On ne crée aucune fausse carte.
+ if(pool.length<10){
+  Object.values(col||{}).filter(c=>c&&c.img&&typeof c.img==="string"&&!noImageTitle(c.t)&&!isExcludedTitle(c.t)).forEach(c=>{
+   const pid=c.pid||("col-"+c.id);
+   if(!seen.has(pid)){seen.add(pid);pool.push({...c,pid,src:c.src||"wiki"})}
+  });
+ }
  try{const gs=Object.keys(CATGROUPS),pk=[];for(let k=0;k<6;k++)pk.push(randCat(gs[Math.floor(Math.random()*gs.length)]));
   const cj=await Promise.all(pk.map(c=>J(API+"generator=categorymembers&gcmtitle="+encodeURIComponent("Catégorie:"+c)+"&gcmtype=page&gcmlimit=50&gcmstartsortkeyprefix="+encodeURIComponent(rndPrefix())).catch(()=>({}))));cj.forEach(add);
   const vt=[];new Set(rolls.filter(r=>r>=1)).forEach(r=>vt.push(...VIPT.filter(v=>v.r==r&&(v.g!=="adult"||Math.random()<.2)).sort(()=>Math.random()-.5).slice(0,5)));
@@ -2528,8 +2541,19 @@ function collection(){
   <div class="pag" style="${colView==="binder"?"display:none":""}"><button class="btn g" id="colPrev" ${colPage<=1?"disabled":""}>← Précédent</button><span>Page <b>${colPage}</b> / <b>${totalPages}</b> · ${pageItems.length} cartes affichées</span><button class="btn g" id="colNext" ${colPage>=totalPages?"disabled":""}>Suivant →</button></div>`;
 
  main.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;fr.has(i)?fr.delete(i):fr.add(i);colPage=1;colSelected.clear();collection()});
- main.querySelector("#colSearch").oninput=e=>{colSearch=e.target.value;colPage=1;colSelected.clear();saveCollectionState();};
- main.querySelector("#colSearch").onkeydown=e=>{if(e.key==="Enter")collection()};
+ let colSearchTimer=null;
+ main.querySelector("#colSearch").oninput=e=>{
+   colSearch=e.target.value;colPage=1;colSelected.clear();saveCollectionState();
+   clearTimeout(colSearchTimer);
+   const input=e.target;
+   colSearchTimer=setTimeout(()=>{
+     const pos=input.selectionStart;
+     collection();
+     const ni=$("colSearch");
+     if(ni){ni.focus();try{ni.setSelectionRange(pos,pos)}catch(_){}}
+   },140);
+ };
+ main.querySelector("#colSearch").onkeydown=e=>{if(e.key==="Enter"){clearTimeout(colSearchTimer);collection()}};
  main.querySelector("#colSort").onchange=e=>{colSort=e.target.value;colPage=1;colSelected.clear();collection()};
  const bkP=$("bkPrev"),bkN=$("bkNext");
  const turn=d=>{const sp=document.querySelector(".bkSpread"),go=()=>{bkIdx=Math.max(0,bkIdx+d*step);bkAnim=d>0?"N":"P";saveBk();collection()};if(!sp){go();return}sp.classList.add(d>0?"leaveN":"leaveP");setTimeout(go,230)};
