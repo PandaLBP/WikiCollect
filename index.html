@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WikiCollect · V113</title>
+<title>WikiCollect · V115</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <style>
@@ -1654,7 +1654,9 @@ try{
  saveMk();
 }catch(e){}
 const fair=c=>Math.max(1,Math.round(price(c)*.6+(MK.PX[c.r]||price(c))*.4));
-const dsc=c=>Math.max(1,Math.round(price(c)*.15));
+/* V114 : toute carte défaussée rapporte 10 🪙, quelle que soit sa rareté */
+const DISCARD_VALUE=10;
+const dsc=c=>DISCARD_VALUE;
 const SNIPE_MS=20000,RESET_MS=60000;
 const nextBid=a=>a.w==null?a.st:Math.max(a.b+1,Math.ceil(a.b*1.05)),AID=()=>"a"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const nm=u=>u==ME?"Toi":u,ago=ts=>{const s=Math.max(0,Math.round((Date.now()-ts)/1e3));return s<60?"il y a "+s+" s":s<3600?"il y a "+Math.floor(s/60)+" min":s<86400?"il y a "+Math.floor(s/3600)+" h":"il y a "+Math.floor(s/86400)+" j"};
@@ -2481,33 +2483,56 @@ const tagColor=(t,i=0)=>validTagColor(tagMeta()[t]||TAG_COLORS[i%TAG_COLORS.leng
 const setTagColor=(t,c)=>{const m=tagMeta();m[t]=validTagColor(c);saveTagMeta(m)};
 function saveCollectionState(){try{localStorage.setItem("wc_col_ui",JSON.stringify({tag:colTagFilter,q:colSearch,sort:colSort,page:colPage}))}catch(e){}}
 try{const u=JSON.parse(localStorage.getItem("wc_col_ui")||"null");if(u){colTagFilter=u.tag||"";colSearch=u.q||"";colSort=u.sort||"rar";colPage=Math.max(1,+u.page||1)}}catch(e){}
+/* ===== V115 : recherche dans la Collection par nom ET par thème (animal, film, jeu vidéo, streamer…) ===== */
+const SQ_STOP=new Set(["de","du","des","la","le","les","un","une","et","en","au","aux","d","l","a"]);
+const sqNorm=v=>String(v||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+const sqStem=w=>w.length>3?w.replace(/[sx]$/,""):w;
+/* chaque thème : mots-clés tapés par la joueuse + ce qu'on cherche dans la description Wikipédia / le type de carte */
+const SQ_THEMES=[
+ {k:["animal","animaux","bete","faune"],re:/\b(espece|animal|mammifere|oiseau|reptile|poisson|insecte|arachnide|serpent|lezard|requin|chat|chien|cheval|felin|rongeur|crustace|amphibien|grenouille|araignee|scorpion|dinosaure|primate|baleine|dauphin|loup|ours|singe)/},
+ {k:["reptile","reptiles"],re:/\b(reptile|serpent|lezard|tortue|crocodile|alligator|varan|cobra|vipere|python|couleuvre|iguane|gecko|cameleon)/},
+ {k:["insecte","insectes","bestiole"],re:/\b(insecte|arachnide|araignee|scorpion|papillon|abeille|fourmi|coleoptere|moustique|guepe|mouche|libellule|criquet|cafard|scarabee)/},
+ {k:["oiseau","oiseaux"],re:/\b(oiseau|passereau|rapace|perroquet|aigle|hibou|chouette|pingouin|manchot|canard|corbeau|faucon)/},
+ {k:["poisson","poissons","marin"],re:/\b(poisson|requin|raie|thon|saumon|baleine|dauphin|crustace|mollusque|pieuvre|meduse|corail)/},
+ {k:["dinosaure","dinosaures","dino"],re:/\b(dinosaure|saurien|tyrannosaure|raptor|diplodocus|theropode)/},
+ {k:["plante","plantes","fleur","fleurs","arbre","arbres","vegetal"],re:/\b(plante|fleur|arbre|champignon|espece vegetale|genre botanique|famille botanique|arbuste|fruit|legume)/},
+ {k:["film","films","cinema"],src:"film",re:/\b(film|cinema|long metrage|realisateur)\b/},
+ {k:["serie","series","tv","television"],re:/\b(serie televisee|serie d animation|serie tv|sitcom|telenovela|feuilleton)/},
+ {k:["anime","animes","manga","mangas"],re:/\b(anime|manga|dessin anime|animation japonaise)/},
+ {k:["jeu video","jeux video","jv","gaming","gamer","videoludique","console"],re:/\b(jeu video|jeux video|videoludique|jeu de role|jeu de combat|jeu de plateforme|jeu de course|jeu de tir|jeu d aventure|console de jeu|personnage de jeu)/},
+ {k:["streamer","streamers","streameur","streameuse","youtubeur","youtubeurs","youtubeuse","youtube","twitch","createur","createurs","influenceur","influenceuse","tiktokeur"],src:"cr",re:/\b(streamer|streameur|streameuse|youtubeur|youtubeuse|influenceu|createur de contenu|creatrice de contenu|vlogueur|tiktokeu|personnalite d internet|vtubeur)/},
+ {k:["sport","sports","sportif","sportive","foot","football","footballeur","basket","tennis","rugby"],re:/\b(football|footballeur|basket|tennis|rugby|sportif|sportive|athlete|cycliste|pilote|boxeur|nageur|olympique|handball|judoka|golfeur|champion)/},
+ {k:["musique","chanteur","chanteuse","musicien","rappeur","rappeuse","groupe","artiste"],re:/\b(chanteu|chanteuse|musici|rappeu|compositeur|groupe de musique|groupe musical|album|chanson|dj\b|auteur compositeur|interprete)/},
+ {k:["acteur","actrice","acteurs","actrices","comedien","realisateur"],re:/\b(acteur|actrice|realisateur|realisatrice|comedien|comedienne)/},
+ {k:["pays","ville","villes","capitale","region","commune"],re:/\b(pays|ville|capitale|commune|etat|region|departement|ile|province|archipel)/},
+ {k:["histoire","roi","reine","empereur","monarque","president","guerre","politique","politicien"],re:/\b(roi|reine|empereur|imperatrice|monarque|president|chef d etat|premier ministre|guerre|bataille|homme politique|femme politique|dictateur)/},
+ {k:["science","scientifique","physicien","chimiste","mathematicien","medecin","inventeur"],re:/\b(physicien|chimiste|mathematicien|biologiste|scientifique|astronome|medecin|inventeur|ingenieur|chercheur)/},
+ {k:["nourriture","plat","cuisine","fromage","dessert","boisson","aliment"],re:/\b(plat|fromage|dessert|boisson|cuisine|aliment|specialite culinaire|gateau|vin|biere)/},
+ {k:["voiture","voitures","auto","automobile","vehicule","moto","avion","bateau","train"],re:/\b(voiture|automobile|constructeur|moto|avion|bateau|navire|train|helicoptere|vehicule)/},
+ {k:["monument","monuments","chateau","cathedrale","eglise","musee","pont","stade"],re:/\b(monument|chateau|cathedrale|eglise|musee|pont|stade|tour|palais|basilique)/}
+];
+const SQ_THEME_BY_WORD=(()=>{const m=new Map();SQ_THEMES.forEach(t=>t.k.forEach(k=>{const n=sqNorm(k);m.set(n,t);m.set(n.split(" ").map(sqStem).join(" "),t)}));return m})();
+const sqCache=new WeakMap();
+function sqHay(c){let h=sqCache.get(c);if(h!==undefined)return h;
+ h=" "+sqNorm([c.t,c.d,c.desc,c.genres,c.plat,c.year,c.category,c.type,c.kind,c.genre,c.subcategory,c.src=="film"?"film cinema":"",c.src=="cr"?"streamer youtubeur createur "+(c.plat||""):""].filter(Boolean).join(" "));
+ try{sqCache.set(c,h)}catch(e){}return h}
+function sqParse(q){const raw=String(q||"").trim();if(!raw)return null;
+ const n=sqNorm(raw),words=n.split(" ").filter(w=>w&&!SQ_STOP.has(w)).map(sqStem);if(!words.length)return null;
+ const phrase=words.join(" "),themePhrase=SQ_THEME_BY_WORD.get(phrase)||null;
+ return{words,themePhrase,perWord:words.map(w=>SQ_THEME_BY_WORD.get(w)||null)}}
+function sqMatch(c,q){const h=sqHay(c)+" "+sqNorm((c.tags||[]).join(" "));
+ const th=t=>t&&((t.src&&c.src===t.src)||t.re.test(h));
+ if(q.themePhrase&&th(q.themePhrase))return true;
+ return q.words.every((w,i)=>h.includes(" "+w)||th(q.perWord[i]))}
 function collection(){
  try{const s=JSON.parse(localStorage.getItem("wc_col")||"null");if(s){col=s;hyd()}}catch(e){}
  colSelected=new Set([...colSelected].map(selKey));
  Object.values(col).forEach(c=>{c.tags=Array.isArray(c.tags)?c.tags.filter(Boolean).slice(0,8):[];store[c.id]=c});
  const A=Object.values(col).filter(c=>c&&c.n>0);
  const term=(colSearch||"").trim().toLowerCase();
- const normSearch=v=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’']/g,"'").replace(/[-_/(),.:;!?]+/g," ").replace(/\s+/g," ").trim();
- const searchAliases={
-   "actrice porno":["actrice pornographique","actrice de films pornographiques","acteur pornographique","actrice porno","pornographie","film pornographique"],
-   "acteur porno":["acteur pornographique","acteur de films pornographiques","actrice pornographique","pornographie","film pornographique"],
-   "voiture":["voiture","automobile","automobiles","modele de voiture","modèle de voiture","constructeur automobile"],
-   "film":["film","cinema","cinéma","long metrage","long-métrage","film de"],
-   "serie":["serie televisee","série télévisée","serie télévisée","serie","série","television","télévision"],
-   "jeu video":["jeu video","jeu vidéo","jeux video","jeux vidéo","jeu electronique","jeu électronique"],
-   "scorpion":["scorpion","scorpions"],
-   "serpent":["serpent","serpents","ophidien","ophidiens"],
-   "araignee":["araignee","araignées","araignee","araignées"],
-   "oiseau":["oiseau","oiseaux"],
-   "poisson":["poisson","poissons"],
-   "dinosaure":["dinosaure","dinosaures"]
- };
- const searchParts=term?((searchAliases[term]||[term]).map(normSearch).filter(Boolean)):[];
+ const sq=sqParse(colSearch);
  let L=A.filter(c=>!fr.size||fr.has(c.r));
- if(searchParts.length)L=L.filter(c=>{
-   const hay=normSearch([c.t,c.category,c.type,c.kind,c.genre,c.subcategory].filter(Boolean).join(" "));
-   return searchParts.some(q=>hay.includes(q));
- });
+ if(sq)L=L.filter(c=>sqMatch(c,sq));
  if(colTagFilter===UNTAGGED_FILTER)L=L.filter(c=>(c.tags||[]).length===0);
  else if(colTagFilter)L=L.filter(c=>(c.tags||[]).includes(colTagFilter));
  if(colSort==="az")L.sort((a,b)=>a.t.localeCompare(b.t,"fr"));
@@ -2535,7 +2560,7 @@ function collection(){
  main.innerHTML=`<div class="colHead"><div><h2>📚 Ma collection</h2><div class="sub">${A.length} cartes différentes · ${A.reduce((s,c)=>s+c.n,0)} au total · ${L.length} dans le filtre</div></div></div>
   ${fusionHTML(A)}
   <div class="colTools">
-   <div class="colToolTop"><input id="colSearch" placeholder="🔍 Rechercher dans ma collection…" value="${colSearch.replace(/"/g,"&quot;")}"><select id="colSort"><option value="rar" ${colSort==="rar"?"selected":""}>Plus rares d'abord</option><option value="az" ${colSort==="az"?"selected":""}>A → Z</option><option value="count" ${colSort==="count"?"selected":""}>Plus de doublons</option><option value="recent" ${colSort==="recent"?"selected":""}>Plus récentes</option></select></div>
+   <div class="colToolTop"><input id="colSearch" placeholder="🔍 Rechercher : un nom, un thème (scorpion, serpent, film, jeu vidéo, streamer…)" value="${colSearch.replace(/"/g,"&quot;")}"><select id="colSort"><option value="rar" ${colSort==="rar"?"selected":""}>Plus rares d'abord</option><option value="az" ${colSort==="az"?"selected":""}>A → Z</option><option value="count" ${colSort==="count"?"selected":""}>Plus de doublons</option><option value="recent" ${colSort==="recent"?"selected":""}>Plus récentes</option></select></div>
    <div class="colTagCreate"><span class="lab" style="margin:0">🏷 Étiquettes</span>${(()=>{const cnt=t=>A.filter(c=>(c.tags||[]).includes(t)).length,nt=A.filter(c=>!(c.tags||[]).length).length;
    const cur=colTagFilter===UNTAGGED_FILTER?`<span class="tpill" style="--tag-color:#6b6588">Sans étiquette (${nt})</span>`:colTagFilter&&tags.includes(colTagFilter)?`<span class="tpill" style="--tag-color:${tagColor(colTagFilter,tags.indexOf(colTagFilter))}">${tagLabel(colTagFilter)}</span>`:`<b style="padding:4px 4px">Toutes les étiquettes</b>`;
    return `<div class="tfdd" id="tfdd"><button type="button" class="tfbtn" id="tfbtn">${cur}<span class="chev">⌃</span></button><div class="tflist">
