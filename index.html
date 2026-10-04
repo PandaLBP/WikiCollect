@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WikiCollect · V111</title>
+<title>WikiCollect · V112</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <style>
@@ -1709,6 +1709,7 @@ const saveWL=()=>{try{localStorage.setItem("wc_wish",JSON.stringify(WL));localSt
 const isW=c=>!!(c&&WL[c.pid]);
 function wlBadge(){const b=$("t3");if(b)b.innerHTML="🔨 Enchères"+(WLU>0?` <span class="wlb" title="Alertes de ta liste de souhaits">⭐${WLU}</span>`:"")}
 function toggleW(c){if(!c)return false;
+ if(!WL[c.pid]&&ownN(c)>0){toast("Tu as déjà « "+c.t+" » : pas besoin de la suivre.");return false}
  if(WL[c.pid]){delete WL[c.pid];toast("⭐ « "+c.t+" » retirée de ta liste de souhaits.")}
  else{const k={...c};delete k.n;WL[c.pid]={c:k,ts:Date.now(),warned:{}};store[c.id]=c;MK.A.forEach(a=>{if(a.c.pid==c.pid)a.wl=1});toast("⭐ « "+c.t+" » ajoutée. Tu seras prévenue dès qu'elle est mise en vente.")}
  WLV++;saveWL();return isW(c)}
@@ -1722,7 +1723,12 @@ function wlAlert(a,kind){
  try{if(document.hidden&&window.Notification&&Notification.permission=="granted")new Notification("WikiCollect",{body:msg.replace(/^[^ ]+ /,"")})}catch(e){}
 }
 function wlOnListed(a){if(a&&a.s!=ME&&WL[a.c.pid]){a.wl=1;wlAlert(a,"listed")}}
+/* V112 : une carte de la liste de souhaits qu'on obtient (booster, enchère, fusion…) en est retirée automatiquement */
+function wlPrune(){let ch=0;try{_own.t=0}catch(e){}
+ Object.keys(WL).forEach(k=>{const w=WL[k];if(w&&w.c&&ownN(w.c)>0){delete WL[k];ch++;WLOG.unshift({pid:k,t:w.c.t,k:"got",p:0,ts:Date.now()});toast(`🎉 Tu as obtenu « ${w.c.t} » : retirée de ta liste de souhaits.`)}});
+ if(ch){WLOG.length=Math.min(WLOG.length,40);WLV++;saveWL();try{if(tab==3)paintMk(true)}catch(e){}}return ch}
 function wlTick(){
+ wlPrune();
  const now=Date.now();let ch=0;
  MK.A.forEach(a=>{if(a.done||a.s==ME||!WL[a.c.pid])return;
   if(!a.wl){a.wl=1;wlAlert(a,"listed");ch=1}
@@ -1748,11 +1754,12 @@ setInterval(()=>{try{wlSpawn()}catch(e){}},20000);
 setInterval(()=>{try{wlTick()}catch(e){}},4000);
 setTimeout(()=>{try{wlBadge();wlTick()}catch(e){}},1500);
 function wishTab(){
+ wlPrune();
  const L=Object.values(WL).sort((x,y)=>y.ts-x.ts);
  const sale=pid=>MK.A.find(a=>!a.done&&a.c.pid==pid&&a.s!=ME);
  const items=L.map(w=>{const c=w.c;store[c.id]=c;const a=sale(c.pid);
   return `<div class="at" ${a?`data-id="${a.id}" data-auid="${a.id}"`:""}>${card(c)}<div class="as">${a?`<b style="color:#7ee29a">En vente · ${a.w==null?a.st:a.b} 🪙</b><br><span class="cd" data-e="${a.end}"></span>`:`<span style="color:var(--mut)">Pas en vente pour l'instant</span>`}<div class="wll"><button class="btn g wlrm" data-p="${String(c.pid).replace(/"/g,"&quot;")}">Retirer</button></div></div></div>`}).join("");
- const lg=WLOG.slice(0,12).map(x=>`<div class="off">${x.k=="soon"?"⏰":"⭐"} « ${x.t} » ${x.k=="soon"?"se termine bientôt":"mise en vente"} · <b>${x.p} 🪙</b> <span class="sub" style="margin:0 0 0 auto">${ago(x.ts)}</span></div>`).join("");
+ const lg=WLOG.slice(0,12).map(x=>`<div class="off">${x.k=="got"?"✅":x.k=="soon"?"⏰":"⭐"} « ${x.t} » ${x.k=="got"?"obtenue — retirée de ta liste":x.k=="soon"?"se termine bientôt":"mise en vente"}${x.k=="got"?"":` · <b>${x.p} 🪙</b>`} <span class="sub" style="margin:0 0 0 auto">${ago(x.ts)}</span></div>`).join("");
  const perm=window.Notification&&Notification.permission=="default"?`<button class="btn g" id="wlnotif">🔔 Activer les notifications du navigateur</button>`:"";
  return `<div class="sub" style="margin:0 0 12px">Suis une carte avec le bouton ⭐ sur sa fiche. Tu es prévenue quand elle est mise en vente (et quand son enchère se termine bientôt).</div>${perm}
  <div class="grid mg">${items||'<div class="msg">Ta liste est vide. Ouvre une carte (Toutes les cartes, Collection…) et clique sur « ⭐ Suivre ».</div>'}</div>
