@@ -2664,6 +2664,10 @@ function collection(){
   });
  };
 
+ {const ds=main.querySelector("#delSelected");if(ds)ds.onclick=()=>{const ids=[...colSelected].map(selKey).filter(id=>col[id]&&col[id].n>0);if(!ids.length)return toast("Sélectionne d'abord des cartes.");
+  const copies=ids.reduce((a,id)=>a+col[id].n,0),gainT=copies*DISCARD_VALUE;
+  if(!confirm("Défausser "+ids.length+" carte"+(ids.length>1?"s":"")+" ("+copies+" exemplaire"+(copies>1?"s":"")+" au total, tous les exemplaires de chaque carte sélectionnée) pour "+gainT.toLocaleString("fr-FR")+" 🪙 ?\n\nIrréversible."))return;
+  ids.forEach(id=>delete col[id]);colSelected.clear();gain(gainT);save();toast("🗑 "+ids.length+" carte"+(ids.length>1?"s":"")+" défaussée"+(ids.length>1?"s":"")+" : +"+gainT.toLocaleString("fr-FR")+" 🪙");collection()}}
  {const sa=main.querySelector("#selAllFilter");if(sa)sa.onclick=()=>{const all=L.length>0&&L.every(c=>selHas(c.id));if(all)L.forEach(c=>selDel(c.id));else L.forEach(c=>selAdd(c.id));collection()}}
  main.querySelector("#rmTags").onclick=()=>{
   const target=tagTarget();if(!target.length)return toast("Aucune carte à traiter.");
