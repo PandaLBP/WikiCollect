@@ -1161,64 +1161,57 @@ async function getTop(){if(topCache)return topCache;
  catch(e){topCache=[]}return topCache}
 const CRATE=.03; // chance qu'une carte d'un booster soit un créateur (≈ 26 % des boosters en contiennent un)
 async function buildPack(minRarity=null){
- const rollCount=minRarity!=null?9:10; const rolls=Array.from({length:rollCount},()=>pick(Math.random())).sort((a,b)=>a-b); // 10 cartes au total, dont 1 garantie pour les boosters spéciaux
- const top=await getTop().catch(()=>[]);
- const randomResults=await Promise.all([0,1,2,3].map(()=>
-  fetch(API+"generator=random&grnnamespace=0&grnlimit=50")
-   .then(r=>{if(!r.ok)throw new Error("Wikipedia HTTP "+r.status);return r.json()})
-   .catch(()=>null)
- ));
- const seen=new Set(),pool=[];
- const add=j=>Object.values(j?.query?.pages||{}).filter(ok).filter(p=>!isExcludedTitle(p.title)).forEach(p=>{if(!seen.has(p.pageid)){seen.add(p.pageid);pool.push(mk(p))}});
- randomResults.filter(Boolean).forEach(add);
- // Secours : si Wikipédia refuse les requêtes depuis un fichier local, on utilise les cartes
- // déjà réellement présentes dans la collection. On ne crée aucune fausse carte.
- if(pool.length<10){
-  Object.values(col||{}).filter(c=>c&&c.img&&typeof c.img==="string"&&!noImageTitle(c.t)&&!isExcludedTitle(c.t)).forEach(c=>{
-   const pid=c.pid||("col-"+c.id);
-   if(!seen.has(pid)){seen.add(pid);pool.push({...c,pid,src:c.src||"wiki"})}
-  });
- }
- try{const gs=Object.keys(CATGROUPS),pk=[];for(let k=0;k<6;k++)pk.push(randCat(gs[Math.floor(Math.random()*gs.length)]));
-  const cj=await Promise.all(pk.map(c=>J(API+"generator=categorymembers&gcmtitle="+encodeURIComponent("Catégorie:"+c)+"&gcmtype=page&gcmlimit=50&gcmstartsortkeyprefix="+encodeURIComponent(rndPrefix())).catch(()=>({}))));cj.forEach(add);
-  const vt=[];new Set(rolls.filter(r=>r>=1)).forEach(r=>vt.push(...VIPT.filter(v=>v.r==r&&(v.g!=="adult"||Math.random()<.2)).sort(()=>Math.random()-.5).slice(0,5)));
-  if(vt.length){const {pages,rd}=await wq(APIB+"redirects=1&titles="+encodeURIComponent(vt.slice(0,50).map(v=>v.t).join("|")));const forced={};vt.forEach(v=>{const a=rd[v.t]||v.t;forced[nz2(rd[a]||a)]=v.r});
-   Object.values(pages).filter(ok).forEach(p=>{if(isExcludedTitle(p.title)||seen.has(p.pageid))return;seen.add(p.pageid);pool.push(mk(p,forced[nz2(p.title)]))})}
- }catch(e){}
- if(rolls.some(r=>r>=2)&&top.length){ // articles très consultés (top mensuel) pour les rangs hauts
-  const T=[];for(let r=1;r<=7;r++)T.push(...top.filter(x=>x.r==r).sort(()=>Math.random()-.5).slice(0,5));
-  if(T.length)try{add(await(await fetch(API+"titles="+encodeURIComponent(T.map(x=>x.t).join("|")))).json())}catch(e){}}
- const used=new Set(),res=[];
- if(minRarity!=null){
-  const creatorCand=CRE.filter(c=>c.r>=minRarity);
-  let guaranteed=creatorCand.length?creatorCand[Math.floor(Math.random()*creatorCand.length)]:null;
-  if(!guaranteed){const wc=pool.filter(c=>c.r>=minRarity&&!used.has(c.pid));if(wc.length)guaranteed=wc[Math.floor(Math.random()*wc.length)];}
-  if(!guaranteed&&top.length){const TT=top.filter(x=>x.r>=minRarity).sort(()=>Math.random()-.5).slice(0,12);if(TT.length)try{const jj=await (await fetch(API+"titles="+encodeURIComponent(TT.map(x=>x.t).join("|")))).json();add(jj);const wc=pool.filter(c=>c.r>=minRarity&&!used.has(c.pid));if(wc.length)guaranteed=wc[Math.floor(Math.random()*wc.length)];}catch(e){}}
-  if(guaranteed){
-   // Dans le Booster Légendaire, l'emplacement garanti peut devenir un Légendaire holo full art.
-   if(minRarity===6 && Math.random()<LEGEND_HFA_BOOSTER_CHANCE){
-    const graal=creatorCand.filter(c=>c.r>=7).concat(pool.filter(c=>c.r===7&&!used.has(c.pid)));
-    if(graal.length) guaranteed=graal[Math.floor(Math.random()*graal.length)];
-    else if(top.length){
-     const TG=top.filter(x=>x.r===7).sort(()=>Math.random()-.5).slice(0,12);
-     if(TG.length)try{
-      const jj=await (await fetch(API+"titles="+encodeURIComponent(TG.map(x=>x.t).join("|")))).json();
-      add(jj);
-      const wc=pool.filter(c=>c.r===7&&!used.has(c.pid));
-      if(wc.length) guaranteed=wc[Math.floor(Math.random()*wc.length)];
-     }catch(e){}
+  /*
+   * Booster V2 : une seule source = le catalogue réellement disponible.
+   * Aucune catégorie, aucun CRE, aucun top Wikipédia ni liste VIP n'est injecté.
+   * La rareté décide seulement du niveau demandé, puis la carte est tirée au hasard
+   * dans TOUTES les cartes de ce niveau.
+   */
+  const recentKey='wc_booster_recent_v2';
+  let recent=[];
+  try{recent=JSON.parse(localStorage.getItem(recentKey)||'[]');if(!Array.isArray(recent))recent=[]}catch(e){recent=[]}
+  const used=new Set(),res=[];
+  const recentSet=new Set(recent);
+  const draw=async(wanted)=>{
+    const excluded=[...used,...recentSet];
+    let c=null;
+    for(let attempt=0;attempt<8&&!c;attempt++){
+      c=await window.__wcCatalogRandomCard?.(wanted,excluded);
+      if(c && !used.has(c.pid)){break}
+      c=null;
     }
-   }
-   used.add(guaranteed.pid);res.push(guaranteed)
+    // Si l'anti-répétition est trop restrictive, on retombe sur le catalogue complet.
+    if(!c){
+      for(let attempt=0;attempt<8&&!c;attempt++){
+        c=await window.__wcCatalogRandomCard?.(wanted,[...used]);
+        if(c && !used.has(c.pid))break;
+        c=null;
+      }
+    }
+    if(!c)throw new Error('Catalogue WikiCollect vide ou indisponible');
+    used.add(c.pid);
+    res.push(c);
+  };
+
+  // Booster spécial : une carte garantie au minimum au rang demandé.
+  if(minRarity!=null){
+    const guaranteedR=Math.max(0,Math.min(7,Number(minRarity)||0));
+    await draw(guaranteedR);
   }
- }
- [...rolls].reverse().forEach(rt=>{
-  if(Math.random()<CRATE){const cs=CRE.filter(c=>!used.has(c.pid)),dm=Math.min(...cs.map(c=>Math.abs(c.r-rt))),cc=cs.filter(c=>Math.abs(c.r-rt)==dm);
-   if(cc.length){const c=cc[Math.floor(Math.random()*cc.length)];used.add(c.pid);res.push(c);return}}
-  const order=[];for(let i=rt;i>=0;i--)order.push(i);for(let i=rt+1;i<=7;i++)order.push(i);
-  for(const r of order){const cs=pool.filter(c=>c.r==r&&!used.has(c.pid));if(cs.length){const c=cs[Math.floor(Math.random()*cs.length)];used.add(c.pid);res.push(c);break}}});
- if(res.length<10)throw 0;
- return res.sort((a,b)=>a.r-b.r)}
+
+  // Les autres emplacements suivent exactement les probabilités globales de rareté.
+  while(res.length<10){
+    await draw(pick(Math.random()));
+  }
+
+  // Mémorise seulement les derniers boosters : pas de grosse donnée en localStorage.
+  try{
+    const next=[...res.map(c=>c.pid),...recent.filter(x=>!used.has(x))].slice(0,50);
+    localStorage.setItem(recentKey,JSON.stringify(next));
+  }catch(e){}
+
+  return res.sort((a,b)=>a.r-b.r);
+}
 function tear(force,offer,slotIndex=-1){clearInterval(timer);
  main.innerHTML=`<h2>${force!=null?"Booster test · "+R[force][0]:offer?offer.name:"Ouvre ton booster"}</h2><div class="sub">✂️ Découpe le sachet : attrape la ligne en pointillés et fais glisser les ciseaux de gauche à droite</div><div class="stage">${packHTML()}</div>`;
  const pk=main.querySelector(".pack");pk.insertAdjacentHTML("beforeend",'<div class="tz"><span>✂️ Fais glisser pour découper</span></div><div class="tl"></div>');
@@ -2541,19 +2534,8 @@ function collection(){
   <div class="pag" style="${colView==="binder"?"display:none":""}"><button class="btn g" id="colPrev" ${colPage<=1?"disabled":""}>← Précédent</button><span>Page <b>${colPage}</b> / <b>${totalPages}</b> · ${pageItems.length} cartes affichées</span><button class="btn g" id="colNext" ${colPage>=totalPages?"disabled":""}>Suivant →</button></div>`;
 
  main.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;fr.has(i)?fr.delete(i):fr.add(i);colPage=1;colSelected.clear();collection()});
- let colSearchTimer=null;
- main.querySelector("#colSearch").oninput=e=>{
-   colSearch=e.target.value;colPage=1;colSelected.clear();saveCollectionState();
-   clearTimeout(colSearchTimer);
-   const input=e.target;
-   colSearchTimer=setTimeout(()=>{
-     const pos=input.selectionStart;
-     collection();
-     const ni=$("colSearch");
-     if(ni){ni.focus();try{ni.setSelectionRange(pos,pos)}catch(_){}}
-   },140);
- };
- main.querySelector("#colSearch").onkeydown=e=>{if(e.key==="Enter"){clearTimeout(colSearchTimer);collection()}};
+ main.querySelector("#colSearch").oninput=e=>{colSearch=e.target.value;colPage=1;colSelected.clear();saveCollectionState();};
+ main.querySelector("#colSearch").onkeydown=e=>{if(e.key==="Enter")collection()};
  main.querySelector("#colSort").onchange=e=>{colSort=e.target.value;colPage=1;colSelected.clear();collection()};
  const bkP=$("bkPrev"),bkN=$("bkNext");
  const turn=d=>{const sp=document.querySelector(".bkSpread"),go=()=>{bkIdx=Math.max(0,bkIdx+d*step);bkAnim=d>0?"N":"P";saveBk();collection()};if(!sp){go();return}sp.classList.add(d>0?"leaveN":"leaveP");setTimeout(go,230)};
@@ -3658,6 +3640,50 @@ main{padding:14px 16px 26px!important}
     };
     next();
   }));
+  // Tirage réellement aléatoire dans le catalogue complet, sans privilégier les cartes hautes raretés.
+  // On choisit un offset aléatoire dans l'index de rareté puis on avance directement le curseur.
+  const randomCard=async(r,exclude=[])=>tx(STORE,'readonly',s=>new Promise((resolve,reject)=>{
+    const wanted=Math.max(0,Math.min(7,Number(r)||0)),skipSet=new Set(exclude||[]);
+    const tryRank=(rank)=>{
+      const idx=s.index('r');
+      const countReq=idx.count(IDBKeyRange.only(rank));
+      countReq.onsuccess=()=>{
+        const n=countReq.result||0;
+        if(!n){
+          if(rank>0) tryRank(rank-1); else if(wanted<7) tryRank(wanted+1); else resolve(null);
+          return;
+        }
+        const cur=idx.openCursor(IDBKeyRange.only(rank),'next');
+        let pos=Math.floor(Math.random()*n), skipped=0;
+        cur.onsuccess=e=>{
+          const c=e.target.result;
+          if(!c){resolve(null);return}
+          if(skipped++<pos){c.continue();return}
+          const v=c.value;
+          if(v?.img && !skipSet.has(v.k)){
+            resolve({id:'v4-'+v.k,pid:'v4-'+v.k,t:v.title,r:v.r,v:v.v||0,img:v.img,src:'wiki',d:v.desc||'',url:v.url,cats:v.cats||[]});
+            return;
+          }
+          // Si la carte tirée est déjà utilisée/récente, on continue dans cet index.
+          const start=skipped;
+          const seek=()=>{
+            const q=e.target.result;
+            if(!q){resolve(null);return}
+            const x=q.value;
+            if(x?.img && !skipSet.has(x.k)){resolve({id:'v4-'+x.k,pid:'v4-'+x.k,t:x.title,r:x.r,v:x.v||0,img:x.img,src:'wiki',d:x.desc||'',url:x.url,cats:x.cats||[]});return}
+            q.continue();
+          };
+          seek();
+        };
+        cur.onerror=()=>reject(cur.error);
+      };
+      countReq.onerror=()=>reject(countReq.error);
+    };
+    tryRank(wanted);
+  }));
+  // Exposé uniquement pour le moteur des boosters/cases.
+  window.__wcCatalogRandomCard=randomCard;
+
   async function api(params){
    const u=new URL(API);Object.entries(params||{}).forEach(([k,v])=>u.searchParams.set(k,v));u.searchParams.set("origin","*");
    let last=null;
