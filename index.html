@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WikiCollect · V130</title>
+<title>WikiCollect · V131</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <style>
@@ -3781,24 +3781,21 @@ main{padding:14px 16px 26px!important}
    * Les vues sont mesurées sur 30 jours. La portée internationale et
    * la couverture encyclopédique servent seulement de départage.
    */
+  /* V131 : la rareté ne dépend plus seulement des vues. Score de notoriété sur 100 :
+     vues (45) + nombre de langues où l'article existe (30) + taille de l'article (10) + poids historique (15 : monarques, scientifiques, philosophes, inventeurs, explorateurs, guerres, révolutions…). */
+  const HIST_RE=/monarque|empereur|pharaon|\broi\b|\breine\b|\bpape\b|philosoph|scientifique|inventeur|explorateur|prix nobel|r[ée]volution|\bguerre\b|conqu[ée]r|r[ée]sistant|dictateur|fondateur|chef d.[ée]tat|pr[ée]sident|g[ée]n[ée]ral|math[ée]maticien|physicien|d[ée]couvr/i;
+  const notoriety=(t,pv,cats=[],meta={})=>{
+    const views=Math.max(0,Number(pv)||0),langs=Math.max(0,Number(meta.langs)||0),length=Math.max(0,Number(meta.length)||0);
+    const sv=Math.max(0,Math.min(1,(Math.log10(1+views)-3)/3.5));
+    const hist=HIST_RE.test(String(t)+' '+(Array.isArray(cats)?cats.join(' '):''))?1:0;
+    return sv*45+Math.min(langs,100)/100*30+Math.min(length,150000)/150000*10+hist*15;
+  };
   const rarity=(t,pv,cats=[],meta={})=>{
     const forced=OV[norm(t)];
     if(forced!=null)return forced;
     try{const ff=forcedRarity(t);if(ff!=null)return ff}catch(e){}
-    const views=Math.max(0,Number(pv)||0);
-    const langs=Math.max(0,Number(meta.langs)||0);
-    const length=Math.max(0,Number(meta.length)||0);
-    let r =
-      views>=3000000 ? 6 :
-      views>=1500000 ? 5 :
-      views>=500000  ? 4 :
-      views>=150000  ? 3 :
-      views>=30000   ? 2 :
-      views>=5000    ? 1 : 0;
-    if(langs>=80 && r>=2) r++;
-    else if(langs>=30 && r>=2) r++;
-    if(length>=120000 && r>=3) r++;
-    return Math.min(6,r);
+    const s=notoriety(t,pv,cats,meta);
+    return s>=88?6:s>=74?5:s>=60?4:s>=46?3:s>=32?2:s>=18?1:0;
   };
   async function pageInfo(titles){if(!titles.length)return[];const j=await api({action:'query',prop:'pageimages|description|info|pageviews|langlinks',inprop:'url',piprop:'thumbnail',pithumbsize:'500',pilicense:'free',pvipdays:'30',lllimit:'100',titles:titles.join('|'),formatversion:'2'});return j.query?.pages||[]}
   async function ingest(pages,cats,{refresh=false}={}){
@@ -3821,7 +3818,7 @@ main{padding:14px 16px 26px!important}
           Math.log10(1+pv)/7*75 +
           Math.min(langs,100)/100*15 +
           Math.min(length,120000)/120000*10
-        )),updatedAt:Date.now()
+        )),updatedAt:Date.now(),rv:2
       });
     }
     if(rows.length)await putMany(rows);
@@ -3834,7 +3831,7 @@ main{padding:14px 16px 26px!important}
       cur.onsuccess=e=>{
         const c=e.target.result;
         if(!c||keys.length>=limit){resolve();return;}
-        if(c.value?.img&&c.value?.url)keys.push(c.value.title);
+        if(c.value?.img&&c.value?.url&&(c.value.rv||0)<2)keys.push(c.value.title);
         c.continue();
       };
       cur.onerror=()=>reject(cur.error);
@@ -3862,7 +3859,7 @@ main{padding:14px 16px 26px!important}
   async function run(){if(running)return;running=true;try{await db();let st=await metaGet('state')||{seed:0,added:0,processed:0,catQueue:[],doneCats:{},globalCursor:''};
     const beforeCol=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('wc_col')||'{}')).length}catch{return -1}})(),beforeMoney=localStorage.getItem('wc_money');
     console.log('🎴 WikiCollect V4.2 — objectif',TARGET.toLocaleString('fr-FR'),'· collection protégée',beforeCol,'· WikiCo',beforeMoney);
-    try{const refreshed=await refreshExisting(200);console.log('🔄 Rareté/notoriété réévaluées :',refreshed,'cartes')}catch(e){console.warn('refresh rarity',e)}
+    try{const refreshed=await refreshExisting(600);console.log('🔄 Rareté/notoriété réévaluées :',refreshed,'cartes')}catch(e){console.warn('refresh rarity',e)}
     for(;st.seed<seeds.length&&(await count())<TARGET;st.seed++){const root=seeds[st.seed];console.log(`🚀 [${st.seed+1}/${seeds.length}] ${root}`);for(let at=0;at<3;at++){try{await crawlCategory(root,st);break}catch(e){if(at<2){await sleep(8000*(at+1))}else console.info('ℹ️ Catalogue : catégorie « '+root+' » passée (réseau instable), reprise au prochain lancement.')}}st.catQueue=[];st.doneCats={};await metaSet('state',st)}
     while((await count())<TARGET){const j=await api({action:'query',list:'allpages',apnamespace:'0',aplimit:'500',...(st.globalCursor?{apcontinue:st.globalCursor}:{})});const titles=(j.query?.allpages||[]).map(x=>x.title);if(!titles.length)break;for(let i=0;i<titles.length&&await count()<TARGET;i+=BATCH){try{const rows=await ingest(await pageInfo(titles.slice(i,i+BATCH)),['Catalogue Wikipédia FR']);st.added=(st.added||0)+rows.length}catch(e){console.warn('allpages',e)}await metaSet('state',st);await sleep(WAIT)}st.globalCursor=j.continue?.apcontinue||'';await metaSet('state',st);if(!st.globalCursor)break}
     const afterCol=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('wc_col')||'{}')).length}catch{return -1}})();const afterMoney=localStorage.getItem('wc_money');console.log('━━━━━━━━━━━━━━━━━━━━');console.log('✅ Catalogue V4.1 :',(await count()).toLocaleString('fr-FR'),'cartes avec image');console.log('➕ nouvelles cartes :',(st.added||0).toLocaleString('fr-FR'));console.log('🛡️ Collection',beforeCol,'→',afterCol,'· WikiCo',beforeMoney,'→',afterMoney);console.log('💾 Progression persistante dans IndexedDB');
