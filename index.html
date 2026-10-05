@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>WikiCollect · V125</title>
+<title>WikiCollect · V127</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317131f%22%2F%3E%0A%3Ctext%20x%3D%227%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%20fill%3D%22%23a855f7%22%3EW%3C%2Ftext%3E%0A%3Ctext%20x%3D%2237%22%20y%3D%2247%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2225%22%20font-weight%3D%22900%22%20fill%3D%22%23f1eef7%22%3EC%3C%2Ftext%3E%0A%3C%2Fsvg%3E">
 <style>
@@ -954,7 +954,7 @@ if(false){
   }catch(e){}
 }
 let SAVEFAIL=false;
-const save=()=>{try{localStorage.setItem("wc_rarity_schema","v92");
+const save=()=>{try{try{stampRecent()}catch(e){}localStorage.setItem("wc_rarity_schema","v92");
  const strip=(k,v)=>typeof v=="string"&&v.startsWith("data:image/jpeg")?undefined:v,slim=(k,v)=>k==="d"?undefined:strip(k,v);
  try{localStorage.setItem("wc_col",JSON.stringify(col,strip));SAVEFAIL=false}
  catch(e){try{localStorage.setItem("wc_col",JSON.stringify(col,slim));SAVEFAIL=false}catch(e2){if(!SAVEFAIL){SAVEFAIL=true;try{toast("⚠️ Stockage du navigateur plein : tes nouvelles cartes ne sont PAS sauvegardées. Exporte ta sauvegarde (Profil) et libère de la place.")}catch(x){}}}}
@@ -1831,6 +1831,11 @@ function dedupCol(){return 0; /* V125 : désactivé (les doublons sont voulus) *
   a.slice(1).forEach(o=>{keep.n+=o.n;const t=[...new Set([...(keep.tags||[]),...(o.tags||[])])].slice(0,8);if(t.length)keep.tags=t;if(!keep.img&&o.img)keep.img=o.img;delete col[o.id];ch++})});
  if(ch){_orr.t=0;_own.t=0;try{save()}catch(e){}try{toast("🧹 "+ch+" doublon"+(ch>1?"s":"")+" de cartes fusionné"+(ch>1?"s":"")+" (une seule carte par article)")}catch(e){}}return ch}
 try{dedupCol()}catch(e){console.warn("dedupCol",e)}
+/* V126 : « Plus récentes d'abord » = vraiment l'ordre d'obtention. Chaque carte reçoit une date quand elle arrive (ou quand un nouvel exemplaire arrive). */
+let _ln=null;
+function stampRecent(){if(!_ln)return;const now=Date.now();let k=0;Object.keys(col).forEach(id=>{const c=col[id];if(!c)return;const n=c.n||0,p=_ln[id];if(p===undefined||n>p)c.addedAt=now+(k++);_ln[id]=n});Object.keys(_ln).forEach(id=>{if(!col[id])delete _ln[id]})}
+function stampInit(){const ids=Object.keys(col),base=Date.now()-1e9;_ln={};ids.forEach((id,i)=>{const c=col[id];if(!c)return;if(!c.addedAt)c.addedAt=base+i;_ln[id]=c.n||0})}
+try{stampInit()}catch(e){console.warn("stampInit",e)}
 {const _col=collection;collection=function(){try{dedupCol()}catch(e){}return _col.apply(this,arguments)}}
 let filling=false;
 async function refill(){
@@ -2815,7 +2820,7 @@ function slots(){
 
 /* Global interaction layer */
 (function(){
- const rip=e=>{const b=e.target.closest&&e.target.closest(".btn,.choice,.cg,.mc,.case-tab,.fpCard");if(!b||b.disabled)return;const r=b.getBoundingClientRect();b.style.position=b.style.position||"relative";b.style.overflow="hidden";const s=document.createElement("i");s.className="rippleFx";const d=Math.max(r.width,r.height)*.55;s.style.width=s.style.height=d+"px";s.style.left=(e.clientX-r.left-d/2)+"px";s.style.top=(e.clientY-r.top-d/2)+"px";b.appendChild(s);setTimeout(()=>s.remove(),700)};
+ const rip=e=>{const b=e.target.closest&&e.target.closest(".btn,.choice,.cg,.mc,.case-tab,.fpCard");if(!b||b.disabled)return;const r=b.getBoundingClientRect();if(getComputedStyle(b).position==="static")b.style.position="relative";b.style.overflow="hidden";const s=document.createElement("i");s.className="rippleFx";const d=Math.max(r.width,r.height)*.55;s.style.width=s.style.height=d+"px";s.style.left=(e.clientX-r.left-d/2)+"px";s.style.top=(e.clientY-r.top-d/2)+"px";b.appendChild(s);setTimeout(()=>s.remove(),700)};
  document.addEventListener("pointerdown",rip,{passive:true});
  document.addEventListener("pointermove",e=>{const c=e.target.closest&&e.target.closest(".cg,.game-tile,.cgame,.case-tab,.fpCard");if(!c)return;const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform=`perspective(850px) rotateX(${(-y*4).toFixed(2)}deg) rotateY(${(x*5).toFixed(2)}deg) translateY(-2px)`},{passive:true});
  document.addEventListener("pointerout",e=>{const c=e.target.closest&&e.target.closest(".cg,.game-tile,.cgame,.case-tab,.fpCard");if(c&&!c.contains(e.relatedTarget))c.style.transform=""});
