@@ -1823,9 +1823,9 @@ function markOwned(root){if(!root)return;_own.t=0;root.querySelectorAll(".card")
 /* V122 : une seule carte par article. Même article = même rareté (celle que tu possèdes déjà), et les doubles existants sont fusionnés. */
 const dkey=c=>nz2(c&&c.t).replace(/\bier\b/g,"1er").replace(/\bpremier\b/g,"1er");
 let _orr={t:0,m:null};
-function ownedRar(pid,title){const now=Date.now();if(!_orr.m||now-_orr.t>1500){const m=new Map();Object.values(col).forEach(c=>{if(!c||!(c.n>0)||c.src==="film"||c.src==="cr")return;const r=+c.r;[c.pid,"t:"+dkey(c)].forEach(k=>{if(k&&!(m.get(k)>=r))m.set(k,r)})});_orr={t:now,m}}
+function ownedRar(pid,title){return null; /* V125 : désactivé (les doublons sont voulus) */ const now=Date.now();if(!_orr.m||now-_orr.t>1500){const m=new Map();Object.values(col).forEach(c=>{if(!c||!(c.n>0)||c.src==="film"||c.src==="cr")return;const r=+c.r;[c.pid,"t:"+dkey(c)].forEach(k=>{if(k&&!(m.get(k)>=r))m.set(k,r)})});_orr={t:now,m}}
  const a=_orr.m.get(pid),b=_orr.m.get("t:"+dkey({t:title}));return a!=null?a:b}
-function dedupCol(){let ch=0;const g=new Map();
+function dedupCol(){return 0; /* V125 : désactivé (les doublons sont voulus) */ let ch=0;const g=new Map();
  Object.values(col).forEach(c=>{if(!c||!(c.n>0)||c.src==="film"||c.src==="cr")return;const k=dkey(c);if(!k)return;if(!g.has(k))g.set(k,[]);g.get(k).push(c)});
  g.forEach(a=>{if(a.length<2)return;a.sort((x,y)=>(+y.r-+x.r)||(y.n-x.n));const keep=a[0];
   a.slice(1).forEach(o=>{keep.n+=o.n;const t=[...new Set([...(keep.tags||[]),...(o.tags||[])])].slice(0,8);if(t.length)keep.tags=t;if(!keep.img&&o.img)keep.img=o.img;delete col[o.id];ch++})});
