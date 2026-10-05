@@ -953,7 +953,12 @@ if(false){
     localStorage.setItem("ACCOUNT_RESET_V105_GUARD","1");
   }catch(e){}
 }
-const save=()=>{try{localStorage.setItem("wc_rarity_schema","v92");localStorage.setItem("wc_col",JSON.stringify(col,(k,v)=>typeof v=="string"&&v.startsWith("data:image/jpeg")?undefined:v));localStorage.setItem("wc_stock",stock);localStorage.setItem("wc_t0",t0);localStorage.setItem("wc_money",money);saveBoosterCooldowns()}catch(e){}};
+let SAVEFAIL=false;
+const save=()=>{try{localStorage.setItem("wc_rarity_schema","v92");
+ const strip=(k,v)=>typeof v=="string"&&v.startsWith("data:image/jpeg")?undefined:v,slim=(k,v)=>k==="d"?undefined:strip(k,v);
+ try{localStorage.setItem("wc_col",JSON.stringify(col,strip));SAVEFAIL=false}
+ catch(e){try{localStorage.setItem("wc_col",JSON.stringify(col,slim));SAVEFAIL=false}catch(e2){if(!SAVEFAIL){SAVEFAIL=true;try{toast("⚠️ Stockage du navigateur plein : tes nouvelles cartes ne sont PAS sauvegardées. Exporte ta sauvegarde (Profil) et libère de la place.")}catch(x){}}}}
+ localStorage.setItem("wc_stock",stock);localStorage.setItem("wc_t0",t0);localStorage.setItem("wc_money",money);saveBoosterCooldowns()}catch(e){}};
 // V87 : Kameto canonique = créateur Twitch @kamet0 avec sa vraie photo de profil.
 // L'ancienne carte Wikipédia « Kameto » est la mauvaise variante pour ce jeu : on la retire du catalogue et de la collection,
 // puis on conserve/restaure uniquement la carte créateur correcte.
@@ -2554,7 +2559,7 @@ function sqMatch(c,q){const h=sqHay(c)+" "+sqNorm((c.tags||[]).join(" "));
  if(q.themePhrase&&th(q.themePhrase))return true;
  return q.words.every((w,i)=>h.includes(" "+w)||th(q.perWord[i]))}
 function collection(){
- try{const s=JSON.parse(localStorage.getItem("wc_col")||"null");if(s){col=s;hyd()}}catch(e){}
+ try{const s=SAVEFAIL?null:JSON.parse(localStorage.getItem("wc_col")||"null");if(s){col=s;hyd()}}catch(e){}
  colSelected=new Set([...colSelected].map(selKey));
  Object.values(col).forEach(c=>{c.tags=Array.isArray(c.tags)?c.tags.filter(Boolean).slice(0,8):[];store[c.id]=c});
  const A=Object.values(col).filter(c=>c&&c.n>0);
