@@ -1,0 +1,15 @@
+WikiCollect V133 — structure du projet
+
+index.html        page principale (juste la structure + chargement des fichiers)
+css/style.css     tous les styles
+js/restore.js     récupération automatique de la sauvegarde si le navigateur a été vidé
+js/data.js        grosses données : catalogue, catégories, photos, carte spéciale
+js/game.js        le jeu (boosters, collection, enchères, casino, missions...)
+js/catalog.js     robot qui construit le gros catalogue (Wikipédia + Wikidata) + diagnostic
+js/features.js    Découvrir, statistiques, laboratoire/fusion
+js/login.js       récompenses de connexion et paliers de collection
+js/sound.js       sons
+js/saveui.js      export / import de la sauvegarde
+
+Pour mettre à jour GitHub Pages : envoie TOUT le contenu (index.html + dossiers css et js) à la racine du dépôt.
+Le "?v=133" dans index.html force le navigateur à recharger les fichiers modifiés : change-le à chaque mise à jour.
