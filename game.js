@@ -711,6 +711,18 @@ const CAT_RARITY_META={
 };
 const CAT_STATS={};
 const _catNorm=x=>nz2(x);
+let _CGI=null,_CGIn=-1;
+function catGroupOf(t){
+  const n=Object.keys(CATALOG||{}).length;
+  if(!_CGI||_CGIn!==n){_CGI=new Map();_CGIn=n;
+    for(const [g,z] of Object.entries(CATALOG||{})){
+      for(const k of [7,6,5,4,3,2,1,0]){
+        for(const x of String(z["t"+k]||"").split("|")){if(!x)continue;const key=_catNorm(x);if(key&&!_CGI.has(key))_CGI.set(key,g)}
+      }
+    }
+  }
+  return _CGI.get(_catNorm(t))||null;
+}
 function inferCardCategory(e){
   if(e?.g && CAT_RARITY_META[e.g]) return e.g;
   if(e?.cr) return "creator";
@@ -719,12 +731,8 @@ function inferCardCategory(e){
   const d=String(e?.d||"").toLowerCase();
   const hay=t+" "+d;
   // Prefer explicit CATALOG membership: it is curated with real Wikipedia titles.
-  for(const [g,z] of Object.entries(CATALOG||{})){
-    for(const k of [7,6,5,4,3,2,1,0]){
-      const a=String(z["t"+k]||"").split("|").filter(Boolean);
-      if(a.some(x=>_catNorm(x)===_catNorm(e.t))) return g;
-    }
-  }
+  // (index construit une seule fois : avant, chaque article reparcourait tout le catalogue → plusieurs dizaines de secondes de gel)
+  {const g=catGroupOf(e.t);if(g)return g}
   // Stronger/specific domains first.
   const order=["adult","creator","anime","space","foot","sport","vehicle","game","film","music","animal","plant","science","place","book","hist","myth","food","tech","event","act"];
   for(const g of order){
@@ -880,7 +888,7 @@ async function all(){
  main.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;fr.has(i)?fr.delete(i):fr.add(i);reset();all()});
  $("pv").onclick=()=>{page--;all();main.scrollTo(0,0)};$("nx").onclick=()=>{page++;all();main.scrollTo(0,0)};
  $("pv").disabled=page<2;$("nx").disabled=true;const cw=main.clientWidth;$("g").style.gridTemplateColumns="repeat("+(cw>=900?8:cw>=560?4:2)+",1fr)";
- try{if(!q&&SO=="rare"){try{await loadRank()}catch(rankErr){console.warn("Classement Wikipédia indisponible, utilisation du classement local.",rankErr);RANK=Object.values(col||{}).filter(c=>c&&c.t&&c.img&&!noImageTitle(c.t)).map(c=>({t:c.t,r:+c.r||0,v:+c.v||0,src:c.src||"wiki",cr:c.src==="cr"?c:null,g:inferCardCategory(c)}));RANK=RANK.filter((e,i,a)=>a.findIndex(x=>nz2(x.t)===nz2(e.t))===i).sort((a,b)=>b.r-a.r||b.v-a.v||String(a.t).localeCompare(String(b.t)));RANKSET=new Set(RANK.map(e=>e.t));buildCategoryStats(RANK)}const base=CG?RANK.filter(e=>e.g===CG):RANK;FL=fr.size?base.filter(e=>fr.has(e.r)):base}else if(q){await loadFilms()}const [r,tot]=await Promise.all([collect(cursors[page-1]),totalOf()]);
+ try{if(!q&&SO=="rare"){try{await loadRank()}catch(rankErr){console.warn("Classement Wikipédia indisponible, utilisation du classement local.",rankErr);RANK=Object.values(col||{}).filter(c=>c&&c.t&&c.img&&!noImageTitle(c.t)).map(c=>({t:c.t,r:+c.r||0,v:+c.v||0,src:c.src||"wiki",cr:c.src==="cr"?c:null,g:inferCardCategory(c)}));RANK=(_sn=>RANK.filter(e=>{const k=nz2(e.t);if(_sn.has(k))return false;_sn.add(k);return true}))(new Set()).sort((a,b)=>b.r-a.r||b.v-a.v||String(a.t).localeCompare(String(b.t)));RANKSET=new Set(RANK.map(e=>e.t));buildCategoryStats(RANK)}const base=CG?RANK.filter(e=>e.g===CG):RANK;FL=fr.size?base.filter(e=>fr.has(e.r)):base}else if(q){await loadFilms()}const [r,tot]=await Promise.all([collect(cursors[page-1]),totalOf()]);
   if(!$("g")||tab!==1)return;cursors[page]=r.next;if(q&&page==1){const needle=q.toLowerCase();const local=[...FILMS.filter(f=>(f.t||"").toLowerCase().includes(needle)||(f.baseTitle||"").toLowerCase().includes(needle)),...CRE.filter(c=>c.t.toLowerCase().includes(needle)&&(!fr.size||fr.has(c.r)))];const seen=new Set();r.out=[...local,...r.out].filter(c=>{if(seen.has(c.id))return false;seen.add(c.id);return true}).slice(0,PS)}
   $("g").innerHTML=r.out.length?r.out.map(card).join(""):'<div class="msg">Aucune carte avec image trouvée.</div>';bind($("g"));
   const SH=[.9,.08,.015,.004,.0008,.0003,.00005,.00001],frac=fr.size?Math.max(.0001,[...fr].reduce((s,i)=>s+SH[i],0)):1,rr=rawTot?imgTot/rawTot:.4,tp=(!q&&SO=="rare"&&fr.size&&!fr.has(0))?Math.max(page,Math.ceil(FL.length*.7/PS)):Math.max(page,Math.ceil((q?tot*rr:RANK.length*.8+Math.max(0,tot-RANK.length)*rr)*frac/PS));
