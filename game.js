@@ -371,7 +371,7 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
    <div class="sb2"><div><b>🪙 ${fair(c)}</b><span>Valeur estimée</span></div><div><b>👁 ${c.v!=null?Math.round(c.v).toLocaleString("fr-FR"):"—"}</b><span>${c.src=="film"?"Votes IMDb":"Vues / mois"}</span></div></div>
    <div class="sub">Exemplaires : ${own?own.n:0}${c.src=="cr"?" · "+c.plat:""}</div><div style="margin-top:10px">${link}</div>${c.src=="wiki"?`<div class="sub" style="margin-top:8px">Texte de l'article : CC BY-SA 4.0 — crédits sur la page Wikipédia.</div>`:""}`;
   const hist=MK.H.filter(x=>x.r==c.r).slice(0,6),act=MK.A.filter(a=>!a.done&&a.c.pid==c.pid).length;
-  const mkt=`<div class="sb2"><div><b>🪙 ${fair(c)}</b><span>Prix estimé</span></div><div><b>${MK.PX[c.r]||"—"}</b><span>Prix moyen ${n}</span></div></div><div class="sub">Dernières ventes (${n}) : ${hist.length?hist.map(x=>x.p+" 🪙").join(" · "):"aucune pour l'instant"}</div><div class="sub" style="margin-top:6px">${act?act+" exemplaire(s) en vente en ce moment.":"Aucun exemplaire en vente en ce moment."}</div>`;
+  const mkt=marketBlock(c)+`<div class="sub" style="margin-top:10px">Dernières ventes (${n}) : ${hist.length?hist.map(x=>x.p+" 🪙").join(" · "):"aucune pour l'instant"}</div><div class="sub" style="margin-top:6px">${act?act+" exemplaire(s) en vente en ce moment.":"Aucun exemplaire en vente en ce moment."}</div>`;
   M.innerHTML=`<div class="mbox v2"><button class="btn g x" id="mx">✕</button><div class="mtop"><div class="mcard">${card(c)}</div><div class="minfo"><h2>${c.t}</h2><button class="btn g wlbtn ${isW(c)?"on":""}" id="wl">${isW(c)?"⭐ Suivie":"☆ Suivre"}</button><div class="hd"><span class="rchip" style="background:${cl}">${n}</span>${c.src=="film"?`<span class="film-badge">🎬 ${c.year||""}${c.rating?` · ⭐ ${c.rating.toFixed(1)}`:""}</span>`:""}<span class="tabs"><button class="${tabm?"":"on"}" data-m="0">Détails</button><button class="${tabm?"on":""}" data-m="1">Marché</button></span></div>${tabm?mkt:det}</div></div>${own?`<div class="mbot"><button class="btn" id="au">🔨 Mettre aux enchères</button><button class="btn g" id="ds">🗑 Défausser (+${dsc(c)} 🪙)</button></div>`:""}</div>`;
   $("mx").onclick=closeModal;M.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{tabm=+b.dataset.m;draw()});
   if($("wl"))$("wl").onclick=()=>{toggleW(c);if(tab==3&&!AV.d)paintMk(true);draw()};
@@ -907,25 +907,83 @@ async function all(){
  $("rt")?.addEventListener("click",all);
 }}
 /* ===== ARGENT · MARCHÉ (IA) · CASINO ===== */
-const PRICE=[10,30,80,180,400,2000,5000,15000,35000,80000],price=c=>{
- const base=PRICE[Math.max(0,Math.min(R.length-1,c.r))];
- /* Valeur de base fortement liée à la rareté, avec une petite variation de marché. */
- const day=Math.floor(Date.now()/864e5);
- const market=.92+.16*h((day+11)*(c.r+3)+(c.pid||c.id||"x").length*37);
- return Math.max(1,Math.round(base*market));
-};
+/* V136 : prix équitables et vivants.
+   - base par rareté : un seul étage tout en haut (Légendaire holo full art ≈ 3 500 🪙, très peu de cartes dépassent 5 000)
+   - chaque carte varie selon sa popularité (vues Wikipédia) autour de cette base
+   - le cours bouge chaque jour (marche aléatoire stable : même résultat toute la journée, historique reconstructible sur 30 jours)
+   - la demande des acheteurs (tendance de catégorie) s'y ajoute en direct */
+const PRICE=[10,25,60,140,320,800,1800,3500];
+const _ph=s=>{let n=2166136261;for(let i=0;i<s.length;i++){n^=s.charCodeAt(i);n=Math.imul(n,16777619)}n^=n>>>15;n=Math.imul(n,2246822507);n^=n>>>13;n=Math.imul(n,3266489909);n^=n>>>16;return(n>>>0)/4294967296};
+const dayNow=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
+const _wc=new Map();
+function walkArr(key,amp,from,to){const ck=key+"|"+amp+"|"+from+"|"+to;let r=_wc.get(ck);if(r)return r;
+ const W=24;let x=0;const out=[];
+ for(let d=from-W;d<=to;d++){x=.62*x+amp*(_ph(key+"#"+d)*2-1)*1.73;if(d>=from)out.push(x)}
+ if(_wc.size>4000)_wc.clear();_wc.set(ck,out);return out}
+const _gc=new Map();
+function catOf(c){const k=c.id||c.pid;let g=_gc.get(k);if(g!==undefined)return g;try{g=inferCardCategory(c)||""}catch(e){g=""}if(_gc.size>60000)_gc.clear();_gc.set(k,g);return g}
+function popF(c){if(c.src==="cr")return 1.15;if(c.src==="film")return 1;const v=+c.v;if(!(v>0)||v>1e10)return 1;return Math.max(.75,Math.min(1.4,.78+.2*(Math.log10(v)-4)))}
+const _pdc=new Map();
+function priceSeries(c,days){ // prix « du jour » (sans la demande en direct) pour les `days` derniers jours, aujourd'hui compris
+ const t=dayNow(),from=t-days+1,key=String(c.pid||c.id||"x"),r=Math.max(0,Math.min(R.length-1,c.r)),g=catOf(c);
+ const a=walkArr("c:"+key,.045*(1+.12*r),from,t),b=walkArr("g:"+g,.03,from,t),m=walkArr("all",.02,from,t),base=PRICE[r]*popF(c);
+ return a.map((x,i)=>Math.max(1,Math.round(base*Math.exp(x+b[i]+m[i]))))}
+function priceDay(c){const t=dayNow(),k=(c.pid||c.id)+"|"+c.r+"|"+t;let v=_pdc.get(k);if(v!==undefined)return v;
+ v=priceSeries(c,1)[0];if(_pdc.size>60000)_pdc.clear();_pdc.set(k,v);return v}
+const price=c=>{let tr=1;try{tr=trend(catOf(c))}catch(e){}return Math.max(1,Math.round(priceDay(c)*tr))};
+/* historique (30 j) + statistiques de ventes de chaque carte */
+const stKey=c=>String(c.pid||c.id);
+function stRec(a){const c=a.c,k=stKey(c),t=dayNow(),e=MK.ST[k]||(MK.ST[k]={n:0,v:0,hi:0,lo:0,d:{},bids:0,mb:0,ms:0});
+ e.n++;e.v+=a.b;e.hi=Math.max(e.hi,a.b);e.lo=e.lo?Math.min(e.lo,a.b):a.b;e.bids+=(a.hs||[]).length;e.ts=Date.now();e.last={u:a.w,p:a.b,ts:Date.now()};
+ e.d[t]=(e.d[t]||0)+1;Object.keys(e.d).forEach(x=>{if(+x<t-14)delete e.d[x]});
+ if(a.w==ME)e.mb++;if(a.s==ME)e.ms++;
+ const ks=Object.keys(MK.ST);if(ks.length>500)ks.sort((x,y)=>(MK.ST[x].ts||0)-(MK.ST[y].ts||0)).slice(0,100).forEach(x=>delete MK.ST[x])}
+function sparkSVG(arr,color,w,h){w=w||300;h=h||70;const lo=Math.min(...arr),hi=Math.max(...arr),sp=Math.max(1,hi-lo),px=i=>(i/(arr.length-1))*(w-8)+4,py=v=>h-8-((v-lo)/sp)*(h-16);
+ const pts=arr.map((v,i)=>px(i).toFixed(1)+","+py(v).toFixed(1)).join(" ");
+ return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block" role="img" aria-label="Cours sur ${arr.length} jours"><polygon points="4,${h-8} ${pts} ${w-4},${h-8}" fill="${color}" opacity=".13"/><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/><circle cx="${px(arr.length-1)}" cy="${py(arr[arr.length-1])}" r="3.5" fill="${color}"/></svg>`}
+function priceInfo(c){const ser=priceSeries(c,30),now=price(c);ser[ser.length-1]=now;const y=ser[ser.length-2]!=null?ser[ser.length-2]:now,dp=y?(now-y)/y*100:0;return{ser,now,dp,lo:Math.min(...ser),hi:Math.max(...ser),avg:Math.round(ser.reduce((s,x)=>s+x,0)/ser.length)}}
+const fmtPct=d=>(d>=0?"▲ +":"▼ ")+Math.abs(d).toFixed(1).replace(".",",")+" %";
+const pctCol=d=>d>=0?"#7ee29a":"#ff9a7a";
+function marketBlock(c){const pi=priceInfo(c),col0=R[Math.max(0,Math.min(R.length-1,c.r))][1],e=MK.ST[stKey(c)],t=dayNow();
+ const bars=(()=>{const a=[];for(let d=t-13;d<=t;d++)a.push(e&&e.d[d]||0);const mx=Math.max(1,...a);return `<div style="display:flex;align-items:flex-end;gap:5px;height:34px">${a.map(v=>`<i title="${v} vente(s)" style="flex:0 0 16px;background:${col0};opacity:${v?0.9:.18};height:${Math.max(3,Math.round(v/mx*34))}px;border-radius:2px"></i>`).join("")}</div>`})();
+ return `<div class="sb2"><div><b>🪙 ${pi.now.toLocaleString("fr-FR")}</b><span>Cours du jour · <b style="color:${pctCol(pi.dp)}">${fmtPct(pi.dp)}</b></span></div><div><b>${pi.lo.toLocaleString("fr-FR")} – ${pi.hi.toLocaleString("fr-FR")}</b><span>Min – max sur 30 j</span></div></div>
+ <div style="margin:8px 0 2px">${sparkSVG(pi.ser,col0,560,84)}</div><div class="sub" style="margin:0 0 10px;font-size:11px">Cours des 30 derniers jours (moyenne ${pi.avg.toLocaleString("fr-FR")} 🪙) · le prix change chaque jour et réagit à la demande des acheteurs.</div>
+ <label class="lab">VENTES DANS TA PARTIE</label>${e?`<div class="sb2"><div><b>${e.n}</b><span>Achats (enchères conclues)</span></div><div><b>${Math.round(e.v/e.n).toLocaleString("fr-FR")} 🪙</b><span>Prix moyen payé</span></div></div><div class="sub">Plus haut ${e.hi.toLocaleString("fr-FR")} 🪙 · plus bas ${e.lo.toLocaleString("fr-FR")} 🪙 · ${e.bids} mises au total · volume ${e.v.toLocaleString("fr-FR")} 🪙${e.mb?` · tu l'as achetée ${e.mb}×`:""}${e.ms?` · tu l'as vendue ${e.ms}×`:""}</div><div class="sub">Dernière vente : ${e.last.p.toLocaleString("fr-FR")} 🪙 à ${nm(e.last.u)} · ${ago(e.last.ts)}</div><div class="sub" style="margin:8px 0 3px">Achats par jour (14 derniers jours)</div>${bars}`:`<div class="sub">Aucune vente de cette carte pour l'instant. Les statistiques se remplissent à chaque enchère conclue.</div>`}`}
+function priceMini(c){const pi=priceInfo(c),col0=R[Math.max(0,Math.min(R.length-1,c.r))][1];
+ return `<div class="abox" style="margin-top:12px"><div class="arow"><span>📈 Cours du jour</span><b>🪙 ${pi.now.toLocaleString("fr-FR")} <small style="color:${pctCol(pi.dp)}">${fmtPct(pi.dp)}</small></b></div>${sparkSVG(pi.ser,col0,420,60)}<div class="sub" style="margin:2px 0 0;font-size:11px">30 j : ${pi.lo.toLocaleString("fr-FR")} – ${pi.hi.toLocaleString("fr-FR")} 🪙</div></div>`}
+/* onglet « Cours » : plus fortes hausses / baisses du jour et cartes les plus échangées */
+function coursTab(){
+ const seen=new Map();const add=c=>{if(c&&c.id&&c.img&&!seen.has(c.pid||c.id)&&seen.size<500){seen.set(c.pid||c.id,c)}};
+ MK.A.forEach(a=>add(a.c));MK.H.forEach(x=>add(x.c));Object.values(col).forEach(add);
+ const rows=[...seen.values()].map(c=>{const ser=priceSeries(c,2),now=price(c),y=ser[0],dp=y?(now-y)/y*100:0;store[c.id]=c;return{c,now,dp}});
+ const row=x=>`<div class="off" data-oc="${String(x.c.id).replace(/"/g,"&quot;")}" style="cursor:pointer"><b style="color:${R[x.c.r][1]}">${R[x.c.r][0]}</b> · ${x.c.t} · <b>${x.now.toLocaleString("fr-FR")} 🪙</b> <span style="margin-left:auto;color:${pctCol(x.dp)};font-weight:800">${fmtPct(x.dp)}</span></div>`;
+ const up=rows.slice().sort((a,b)=>b.dp-a.dp).slice(0,8),dn=rows.slice().sort((a,b)=>a.dp-b.dp).slice(0,8);
+ const tr=Object.entries(MK.ST).sort((a,b)=>b[1].n-a[1].n).slice(0,8).map(([k,e])=>{const c=[...seen.values()].find(x=>String(x.pid||x.id)==k)||(MK.H.find(x=>String(x.c.pid||x.c.id)==k)||{}).c;if(!c)return"";store[c.id]=c;return `<div class="off" data-oc="${String(c.id).replace(/"/g,"&quot;")}" style="cursor:pointer"><b style="color:${R[c.r][1]}">${R[c.r][0]}</b> · ${c.t} · <b>${e.n}</b> vente(s) · moy. ${Math.round(e.v/e.n).toLocaleString("fr-FR")} 🪙 <span class="sub" style="margin:0 0 0 auto">${ago(e.ts)}</span></div>`}).join("");
+ return `<div class="sub" style="margin:0 0 6px">Le prix de chaque carte change chaque jour. Clique sur une carte → onglet « Marché » pour voir son cours sur 30 jours et ses statistiques.</div>
+ <h3 style="margin-top:14px">📈 Plus fortes hausses aujourd'hui</h3>${up.map(row).join("")||'<div class="sub">—</div>'}
+ <h3 style="margin-top:22px">📉 Plus fortes baisses aujourd'hui</h3>${dn.map(row).join("")||'<div class="sub">—</div>'}
+ <h3 style="margin-top:22px">🔥 Cartes les plus échangées</h3>${tr||'<div class="sub">Aucune vente enregistrée pour l\'instant.</div>'}`}
 function upM(){$("mn").textContent="🪙 "+money.toLocaleString("fr-FR")}
 const gain=n=>{money+=n;save();upM();if(n>=1)try{SFX.cash()}catch(e){wcDbg(e)}};
 /* ===== ENCHÈRES (toi et des joueurs IA aux pseudos humains) ===== */
 const DUR=[["10 min",6e5],["30 min",18e5],["1 h",36e5],["3 h",108e5],["6 h",216e5],["12 h",432e5]];
 const ME="__me",MAXS=5;
-const PSEUDOS="Willkoursk,floreal,yvan28,babarceleste,tibiz,jeunepousse2kk,sorrenuwu,Lavrano,M4rcelin,Ninon_b,xXPierreXx,cl0tilde,Kevinou75,Alizé_,mathis.d,Le_Gaulois,Pixelle,TheoBg,hugo_w,Camille.R,LaRoussette,DarkNono,zoe_cards,Bastos,Nadjib,Lucie2k4,Romain_V,ElFuego,mimi_chouette,Jules44,Sarah.k,Gaspard_,MaxouLeBoss,Inès_p,Tonio83,Mélusine,Zack_TV,Clem1,Oscar.m,Nolhan,Anaïs_r,LeGrosPat,Yannick.b,Célia_w,Dylan_49,Margaux,Kiki_le_Kid,RaphaelC,Louane.d,Amaury_,Théo.lcs,Manon_Gm,Sofiane07,Jade_pl".split(",");
+const PSEUDOS=(()=>{const base="Willkoursk,floreal,yvan28,babarceleste,tibiz,jeunepousse2kk,sorrenuwu,Lavrano,M4rcelin,Ninon_b,xXPierreXx,cl0tilde,Kevinou75,Alizé_,mathis.d,Le_Gaulois,Pixelle,TheoBg,hugo_w,Camille.R,LaRoussette,DarkNono,zoe_cards,Bastos,Nadjib,Lucie2k4,Romain_V,ElFuego,mimi_chouette,Jules44,Sarah.k,Gaspard_,MaxouLeBoss,Inès_p,Tonio83,Mélusine,Zack_TV,Clem1,Oscar.m,Nolhan,Anaïs_r,LeGrosPat,Yannick.b,Célia_w,Dylan_49,Margaux,Kiki_le_Kid,RaphaelC,Louane.d,Amaury_,Théo.lcs,Manon_Gm,Sofiane07,Jade_pl".split(",");
+ /* 560 pseudos supplémentaires, générés de façon déterministe (toujours les mêmes) */
+ const F="Léo,Lucas,Hugo,Louis,Jules,Gabin,Adam,Nathan,Tom,Enzo,Noah,Liam,Ethan,Maël,Raphaël,Arthur,Paul,Victor,Axel,Kylian,Mathéo,Rayan,Ilyes,Yanis,Sacha,Timéo,Noé,Evan,Lény,Alexis,Quentin,Clément,Maxime,Antoine,Baptiste,Romain,Florian,Valentin,Dorian,Bastien,Emma,Léa,Chloé,Inès,Jade,Louise,Alice,Lina,Sarah,Manon,Camille,Lola,Zoé,Eva,Juliette,Anna,Rose,Nina,Clara,Léonie,Maëlys,Océane,Pauline,Marion,Laura,Margot,Elsa,Mila,Ambre,Lou,Yasmine,Nour,Sofia,Maya,Ayoub,Karim,Samir,Bilal,Idriss,Omar,Mehdi,Walid,Sami,Elias,Tiago,Diego,Marco,Luca,Matteo,Kevin,Dylan,Jordan,Steven,Théo,Mathis".split(",");
+ const N="Loup,Panda,Dragon,Renard,Pixel,Ninja,Tigre,Faucon,Hibou,Lynx,Corbeau,Phoenix,Cobra,Koala,Yeti,Orage,Comète,Nova,Turbo,Zen,Retro,Cosmos,Lagune,Bambou,Sushi,Waffle,Crêpe,Churros,Raclette,Brioche,Baguette,Camembert,Mochi,Ramen,Gaufre,Cookie,Tonnerre,Mistral,Éclair,Volcan,Glacier,Rubis,Saphir,Onyx,Jade,Ambre,Cactus,Bison,Gecko,Albatros,Narval,Axolotl,Capybara,Mangouste,Fennec,Chouette,Marmotte,Hérisson,Pingouin".split(",");
+ const A="Rapide,Sombre,Cosmic,Lunaire,Solaire,Furtif,Rusé,Sauvage,Mystic,Epic,Chill,Fou,Grand,Petit,Vieux,Neon,Glacé,Doré,Argenté,Bleu,Rouge,Noir,Blanc,Vert,Pourpre,Électrique,Magique,Secret,Royal,Lucky".split(",");
+ let sd=20241007;const rnd=()=>{sd=(Math.imul(sd,1664525)+1013904223)>>>0;return sd/4294967296};
+ const pick=a=>a[Math.floor(rnd()*a.length)],seen=new Set(base.map(x=>x.toLowerCase())),out=[];
+ const fm=[()=>pick(F)+Math.floor(rnd()*99),()=>pick(F)+"_"+pick(N),()=>"xX"+pick(F)+"Xx",()=>pick(F)+"."+String.fromCharCode(97+Math.floor(rnd()*26)),()=>pick(N)+pick(A),()=>pick(A)+pick(N),()=>pick(N)+Math.floor(rnd()*999),()=>pick(F)+(1990+Math.floor(rnd()*16)),()=>pick(F).toLowerCase()+"_"+pick(N).toLowerCase(),()=>pick(N)+"_"+pick(F),()=>"The"+pick(N),()=>pick(F)+"Cards",()=>pick(N)+"Collect",()=>pick(F)+"_"+Math.floor(rnd()*99)];
+ let g=0;while(out.length<560&&g++<20000){const x=fm[Math.floor(rnd()*fm.length)]();if(x.length>16||seen.has(x.toLowerCase()))continue;seen.add(x.toLowerCase());out.push(x)}
+ return base.concat(out)})();
 const hs=x=>{let n=0;for(const ch of x)n=Math.imul(n,31)+ch.charCodeAt(0)|0;return n};
 const pv=u=>.75+.5*h(hs(u)),ac=u=>.5+h(hs(u)+7); // avarice / activité de chaque joueur IA
 const BOT_STYLE={
- Willkoursk:{m:1.14,a:1.25,s:0.82}, floreal:{m:1.08,a:1.10,s:0.55}, yvan28:{m:1.22,a:0.92,s:0.45}, babarceleste:{m:1.35,a:0.78,s:0.28}, tibiz:{m:1.16,a:1.35,s:0.72}, jeuneepousse2kk:{m:1.28,a:0.62,s:0.18}, sorrenuwu:{m:1.12,a:1.45,s:0.90}, Lavrano:{m:1.20,a:1.05,s:0.40}, M4rcelin:{m:1.32,a:0.70,s:0.20}, Ninon_b:{m:1.10,a:1.20,s:0.62}, Kevinou75:{m:1.18,a:1.02,s:0.38}, Pixelle:{m:1.26,a:0.88,s:0.36}, TheoBg:{m:1.09,a:1.28,s:0.68}, hugo_w:{m:1.16,a:1.16,s:0.52}, Camille_R:{m:1.24,a:0.96,s:0.44}, Le_Gaulois:{m:1.38,a:0.70,s:0.16}, DarkNono:{m:1.20,a:1.30,s:0.58}, Zoe_cards:{m:1.30,a:1.00,s:0.34}, Bastos:{m:1.15,a:1.34,s:0.64}, Nadjib:{m:1.27,a:0.83,s:0.31}
+ Willkoursk:{m:1.14,a:1.25,s:0.82}, floreal:{m:1.08,a:1.10,s:0.55}, yvan28:{m:1.22,a:0.92,s:0.45}, babarceleste:{m:1.35,a:0.78,s:0.28}, tibiz:{m:1.16,a:1.35,s:0.72}, jeunepousse2kk:{m:1.28,a:0.62,s:0.18}, sorrenuwu:{m:1.12,a:1.45,s:0.90}, Lavrano:{m:1.20,a:1.05,s:0.40}, M4rcelin:{m:1.32,a:0.70,s:0.20}, Ninon_b:{m:1.10,a:1.20,s:0.62}, Kevinou75:{m:1.18,a:1.02,s:0.38}, Pixelle:{m:1.26,a:0.88,s:0.36}, TheoBg:{m:1.09,a:1.28,s:0.68}, hugo_w:{m:1.16,a:1.16,s:0.52}, "Camille.R":{m:1.24,a:0.96,s:0.44}, Le_Gaulois:{m:1.38,a:0.70,s:0.16}, DarkNono:{m:1.20,a:1.30,s:0.58}, zoe_cards:{m:1.30,a:1.00,s:0.34}, Bastos:{m:1.15,a:1.34,s:0.64}, Nadjib:{m:1.27,a:0.83,s:0.31}
 };
-let MK={A:[],H:[],W:[],PX:{},n:5};
+let MK={A:[],H:[],W:[],PX:{},n:5,BB:{},BI:[],TR:{},TRt:0,ST:{}};
 try{const x=JSON.parse(localStorage.getItem("wc_mk3")||"null");if(x&&x.A)MK={...MK,...x};
  else{const o=JSON.parse(localStorage.getItem("wc_mk2")||"null");if(o&&o.A){o.A.forEach(a=>{if(a.s==-1){if(a.w==-1)money+=a.b;const c={...a.c};col[c.id]=col[c.id]?{...col[c.id],n:col[c.id].n+1}:{...c,n:1}}else if(a.w==-1)money+=a.b});localStorage.removeItem("wc_mk2");save()}}}catch(e){wcDbg(e)}
 
@@ -976,7 +1034,26 @@ const dt=l=>{const s=Math.ceil(l/1e3),h=Math.floor(s/3600),m=Math.floor(s%3600/6
 let TL=[];function toast(m){let t=$("toast");if(!t){t=document.createElement("div");t.id="toast";document.body.appendChild(t)}TL=[...TL.slice(-2),m];t.innerHTML=TL.join("<br>");t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>{t.classList.remove("on");TL=[]},5000)}
 const addCard=c=>{const had=!!col[c.id];col[c.id]=had?{...col[c.id],n:col[c.id].n+1}:{...c,n:1};if(had)bumpDaily("dupe",1);if(c.src==="cr")bumpDaily("creator",1)};
 // ===== MOTEUR D'ENCHÈRES IA : comportements différenciés, activité progressive et surenchères =====
-function botProfile(u){return BOT_STYLE[u]||{m:.9+pv(u)*.35,a:.7+ac(u)*.55,s:.35+h(hs(u)+17)*.45}}
+/* V135 : marché vivant — 600+ acheteurs aux profils, goûts et budgets différents */
+let AD=1;try{AD=Math.max(0,Math.min(2,+localStorage.getItem("wc_aucdiff")||1))}catch(e){AD=1}
+const ADIFF=[{n:"Généreux",m:1.15,p:1.2},{n:"Normal",m:1,p:1},{n:"Difficile",m:.87,p:.8}];
+const BOT_BUDGET={collector:[2000,14000],flipper:[3000,12000],sniper:[1500,8000],casual:[600,4000],whale:[30000,120000],lowball:[300,2000]};
+const BOT_TYPE_LABEL={collector:"collectionneur",flipper:"revendeur",sniper:"sniper",casual:"occasionnel",whale:"gros portefeuille",lowball:"chasseur de bonnes affaires"};
+const _bp={};
+function botProfile(u){let p=_bp[u];if(p)return p;
+ const base=BOT_STYLE[u]||{m:.9+pv(u)*.35,a:.7+ac(u)*.55,s:.35+h(hs(u)+17)*.45};
+ const x=h(hs(u)+101),type=x<.30?"collector":x<.50?"flipper":x<.65?"sniper":x<.93?"casual":x<.97?"whale":"lowball";
+ const keys=Object.keys(CATGROUPS).filter(k=>k!="adult"),fav=[keys[Math.floor(h(hs(u)+211)*keys.length)],keys[Math.floor(h(hs(u)+317)*keys.length)]];
+ const B=BOT_BUDGET[type],budget=Math.round(B[0]+(B[1]-B[0])*h(hs(u)+419));
+ return _bp[u]={...base,type,fav,budget}}
+/* budget : se vide quand un acheteur gagne, se recharge en 12 h */
+function botBudget(u,now){const p=botProfile(u),s=MK.BB[u];if(!s)return p.budget;const f=Math.min(1,Math.max(0,(now-s.t)/432e5));return Math.round(s.b+(p.budget-s.b)*f)}
+function botSpend(u,v,now){const cur=botBudget(u,now);MK.BB[u]={b:Math.max(0,cur-v),t:now};const k=Object.keys(MK.BB);if(k.length>400)k.sort((x,y)=>MK.BB[x].t-MK.BB[y].t).slice(0,100).forEach(x=>delete MK.BB[x])}
+/* catégorie d'une enchère + tendance du marché (la demande monte quand on se bat pour une catégorie, retombe avec le temps) */
+const aCat=a=>a.g!==undefined?a.g:(a.g=(()=>{try{return inferCardCategory(a.c)||""}catch(e){return ""}})());
+const trend=g=>(g&&MK.TR[g])||1;
+const trendBump=(g,d)=>{if(!g)return;MK.TR[g]=Math.max(.85,Math.min(1.25,(MK.TR[g]||1)+d))};
+function trendDecay(now){const dt=now-(MK.TRt||now);MK.TRt=now;if(dt<=0)return;const k=Math.exp(-dt/216e5);for(const g in MK.TR){MK.TR[g]=1+(MK.TR[g]-1)*k;if(Math.abs(MK.TR[g]-1)<.002)delete MK.TR[g]}}
 function botCeil(a,u,now){
  const p=botProfile(u),f=fair(a.c),seed=h(hs(a.id+u)+Math.floor(now/12000));
  /* Chaque acheteur a une vraie "opinion" du prix : certains sous-évaluent,
@@ -989,55 +1066,102 @@ function botCeil(a,u,now){
  let cap=f*p.m*view*(.94+h(hs(u+String(Math.floor(now/60000))))*.12);
  if(a.c.r>=6)cap*=1.02+(.25*pv(u));
  if(a.c.r<=2&&h(hs(u+a.c.pid))<.22)cap*=.86;
- return Math.max(f*.58,Math.round(cap));
+ const g=aCat(a);
+ if(p.type=="collector")cap*=p.fav.includes(g)?1.15+.3*h(hs(u+"f")):.92;
+ else if(p.type=="flipper")cap*=.8;
+ else if(p.type=="whale")cap*=1.4+.5*h(hs(u+"w"));
+ else if(p.type=="lowball")cap*=.7;
+ cap*=trend(g)*ADIFF[AD].m;
+ return Math.max(f*.5,Math.round(cap));
 }
 function maybeBid(a,u,now){
  if(a.done||u==a.s||u==a.w)return false;
  a.cool=a.cool||{};a.hs=a.hs||[];
  const p=botProfile(u),left=a.end-now,nb=nextBid(a),cap=botCeil(a,u,now);
- if(nb>cap)return false;
- const first=a.w==null;
+ if(nb>cap||nb>botBudget(u,now))return false;
+ const first=a.w==null,g=aCat(a);
  const urgency=left<15000?2.8:left<45000?2.0:left<120000?1.25:.72;
  const listingAge=Math.min(1.8,1+Math.max(0,now-a.ts)/90000);
  const rivalry=a.w&&a.w!=u?1.32:1;
  const personal=Math.min(2.2,p.a*urgency*listingAge*rivalry);
- const probability=first?.095:Math.min(.52,.018*personal);
+ let probability=first?.095:Math.min(.52,.018*personal);
+ if(p.type=="sniper")probability=left<14000?.55:probability*.06;
+ else if(p.type=="collector")probability*=p.fav.includes(g)?1.7:.5;
+ else if(p.type=="flipper"){if(first&&a.st<fair(a.c)*.6)probability*=1.5}
+ else if(p.type=="whale")probability*=.6;
+ else if(p.type=="lowball"&&first&&nb>fair(a.c)*.7)return false;
+ probability=Math.min(.9,probability*ADIFF[AD].p);
  if(Math.random()>probability)return false;
- const aggression=Math.random()<.18?(1.025+Math.random()*.055):(1.002+Math.random()*.018);
- const amt=Math.min(cap,Math.max(nb,Math.round(nb*aggression)));
+ let aggression=Math.random()<.18?(1.025+Math.random()*.055):(1.002+Math.random()*.018);
+ if(p.type=="whale")aggression=1.12+Math.random()*.23;      // grosse surenchère pour intimider
+ else if(p.type=="sniper")aggression=1.01+Math.random()*.03;
+ const amt=Math.min(cap,botBudget(u,now),Math.max(nb,Math.round(nb*aggression)));
  if(amt<nb||amt>cap)return false;
  if(a.w==ME){money+=a.b;toast(`🔔 ${u} te surenchérit sur « ${a.c.t} » : ${amt} 🪙`)}
  a.b=amt;a.w=u;a.n=(a.n||0)+1;a.hs.push({u,p:amt,ts:now});a.cool[u]=now+(1800+Math.floor(Math.random()*6500));
  if(a.end-now<SNIPE_MS)a.end=Math.max(a.end,now+RESET_MS);
- a.last=now;a.lastBidder=u;return true;
+ a.last=now;a.lastBidder=u;trendBump(g,.004);return true;
 }
+/* choisit quelques acheteurs parmi tous les profils, en favorisant ceux que la carte intéresse */
+function pickBots(a,k,now){const g=aCat(a),left=a.end-now,c=[];
+ for(let i=0;i<k*4;i++){const u=PSEUDOS[(Math.random()*PSEUDOS.length)|0];if(u==a.s||u==a.w||c.some(x=>x.u==u))continue;
+  const p=botProfile(u);let sc=Math.random();
+  if(p.type=="collector"&&p.fav.includes(g))sc+=1.2;
+  if(p.type=="sniper"&&left<25000)sc+=1.5;
+  if(p.type=="flipper"&&a.w==null&&a.st<fair(a.c)*.6)sc+=.8;
+  c.push({u,sc})}
+ return c.sort((x,y)=>y.sc-x.sc).slice(0,k).map(x=>x.u)}
+/* pendant ton absence (onglet fermé / en veille) les acheteurs ont continué à enchérir */
+function catchUp(a,now){
+ const from=a.lastSim||a.t||now,span=Math.min(now,a.end)-from;
+ if(span<30000)return false;
+ const steps=Math.min(16,Math.ceil(span/30000));let ch=false;
+ for(let i=1;i<=steps;i++){const vt=from+span*i/steps;if(a.done||a.end<=vt)break;
+  pickBots(a,3,vt).forEach(u=>{if(vt>=(a.cool[u]||0)&&maybeBid(a,u,vt))ch=true})}
+ return ch}
 function simulate(){
- const now=Date.now();let ch=0;
+ const now=Date.now();let ch=0;try{trendDecay(now)}catch(e){wcDbg(e)}
  MK.A.forEach(a=>{
   if(a.done)return;
   a.hs=a.hs||[];a.cool=a.cool||{};a.nextBot=a.nextBot||now+1200+Math.random()*3500;
+  if(now-(a.lastSim||a.t||now)>=30000){try{if(catchUp(a,now))ch=1}catch(e){wcDbg(e)}}
   const left=Math.max(0,a.end-now);
   if(now>=a.nextBot&&left>0){
-   const cand=[];const count=1+Math.floor(Math.random()*3);
-   while(cand.length<count){const u=PSEUDOS[Math.floor(Math.random()*PSEUDOS.length)];if(u!=a.s&&!cand.includes(u))cand.push(u)}
-   cand.sort(()=>Math.random()-.5).forEach(u=>{if(now>=(a.cool[u]||0)&&maybeBid(a,u,now))ch=1});
+   const count=1+Math.floor(Math.random()*3);
+   pickBots(a,count,now).forEach(u=>{if(now>=(a.cool[u]||0)&&maybeBid(a,u,now))ch=1});
    a.nextBot=now+2200+Math.random()*5200;
   }
-  if(left>0&&left<SNIPE_MS&&Math.random()<.24){
-   const u=PSEUDOS[Math.floor(Math.random()*PSEUDOS.length)];
-   if(now>=(a.cool[u]||0)&&maybeBid(a,u,now))ch=1;
+  if(left>0&&left<SNIPE_MS&&Math.random()<.45){
+   pickBots(a,2,now).forEach(u=>{if(now>=(a.cool[u]||0)&&maybeBid(a,u,now))ch=1});
   }
+  a.lastSim=now;
   if(a.end<=now){
    a.done=1;ch=1;const c=a.c,rec={id:a.id,c,r:c.r,p:a.b,ts:a.end,s:a.s,u:a.w};
    if(a.w!=null){
+    try{stRec(a)}catch(e){wcDbg(e)}
     MK.H.unshift(rec);MK.H.length=Math.min(MK.H.length,120);MK.PX[c.r]=Math.round((MK.PX[c.r]||a.b)*.8+a.b*.2);
+    if(a.w!=ME){try{botSpend(a.w,a.b,now);const cc={...c};delete cc.n;MK.BI.push({u:a.w,c:cc,p:a.b,ts:now});if(MK.BI.length>60)MK.BI.shift()}catch(e){wcDbg(e)}}
     if(a.s==ME){const net=Math.round(a.b*.95);money+=net;toast(`Vendu : « ${c.t} » à ${a.w} pour ${a.b} 🪙 (frais 5 % → +${net})`)}
     if(a.w==ME){addCard(c);MK.W.unshift(rec);MK.W.length=Math.min(MK.W.length,60);toast(`🏆 Enchère remportée : « ${c.t} » pour ${a.b} 🪙`) }
-   }else if(a.s==ME){addCard(c);MK.H.unshift(rec);toast(`Aucun acheteur pour « ${c.t} » : carte rendue.`)}
+   }else{trendBump(aCat(a),-.008);if(a.s==ME){addCard(c);MK.H.unshift(rec);toast(`Aucun acheteur pour « ${c.t} » : carte rendue.`)}}
   }
  });
  MK.A=MK.A.filter(a=>!a.done);if(ch){save();upM();saveMk()}return ch
 }
+/* revente : un acheteur qui a gagné une carte peut la remettre en vente plus tard, souvent plus cher */
+function botResell(){
+ const now=Date.now();if(!MK.BI.length)return;
+ if(MK.A.filter(a=>!a.done&&a.s!=ME).length>=Math.max(48,(MK.n||5)*8)+25)return;
+ let n=0;
+ for(let i=MK.BI.length-1;i>=0&&n<2;i--){const b=MK.BI[i],p=botProfile(b.u);if(now-b.ts<36e4)continue;
+  const pr=p.type=="flipper"?.25:p.type=="whale"?.04:p.type=="collector"?.03:.08;if(Math.random()>pr)continue;
+  MK.BI.splice(i,1);const c=b.c,f=fair(c),d=[3e5,48e4,72e4,12e5,18e5][Math.floor(Math.random()*5)];
+  const st=Math.max(1,Math.round(Math.max(b.p*(p.type=="flipper"?1.08+Math.random()*.3:.8+Math.random()*.4),f*.5)));
+  store[c.id]=c;const a={id:AID(),c,s:b.u,st,b:st,w:null,n:0,hs:[],cool:{},end:now+d,t:now,ts:now,dur:d,nextBot:now+2000+Math.random()*8000,resale:1};
+  MK.A.push(a);try{wlOnListed(a)}catch(e){wcDbg(e)}n++}
+ if(n){saveMk();if(tab==3)paintMk(true)}
+}
+setInterval(()=>{try{botResell()}catch(e){wcDbg(e)}},30000);
 
 /* ===== V100 : liste de souhaits + alertes d'enchères ===== */
 let WL={},WLOG=[],WLU=0,WLV=0;
@@ -1229,7 +1353,7 @@ function pickSell(){M.style.display="flex";const L=Object.values(col).sort((a,b)
 // ---- page Enchères ----
 let AV={tab:"b",q:"",sort:"new",fr:new Set(),d:null,hideOwn:false};
 const tile=a=>{store[a.c.id]=a.c;const cur=a.w==null?a.st:a.b;
- return `<div class="at" data-id="${a.id}" data-auid="${a.id}">${WL[a.c.pid]?'<div class="wst" title="Dans ta liste de souhaits">⭐</div>':""}${card(a.c)}<div class="ar"><div><small data-au-label="price-label">${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</small><b data-au-price>🪙 ${cur}</b></div><div style="text-align:right"><small>⏱ DURÉE</small><b class="cd" data-e="${a.end}"></b></div></div><div class="as"><span data-au-status>${a.s==ME?"Ta vente":"Vendu par "+a.s}${a.w?` · ${a.w==ME?"<b style='color:#7ee29a'>tu mènes</b>":"👑 "+a.w}`:""}${a.mine&&a.w!=ME?" · <b style='color:#ff9a7a'>surenchéri</b>":""}</span></div></div>`};
+ return `<div class="at" data-id="${a.id}" data-auid="${a.id}">${WL[a.c.pid]?'<div class="wst" title="Dans ta liste de souhaits">⭐</div>':""}${card(a.c)}<div class="ar"><div><small data-au-label="price-label">${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</small><b data-au-price>🪙 ${cur}</b></div><div style="text-align:right"><small>⏱ DURÉE</small><b class="cd" data-e="${a.end}"></b></div></div><div class="as"><span data-au-status>${a.s==ME?"Ta vente":"Vendu par "+a.s+(a.resale?" ♻ revente":"")}${a.w?` · ${a.w==ME?"<b style='color:#7ee29a'>tu mènes</b>":"👑 "+a.w}`:""}${a.mine&&a.w!=ME?" · <b style='color:#ff9a7a'>surenchéri</b>":""}</span></div></div>`};
 const SORTS={new:["Récemment listées",(x,y)=>y.ts-x.ts],end:["Se termine bientôt",(x,y)=>x.end-y.end],pa:["Prix croissant",(x,y)=>(x.w==null?x.st:x.b)-(y.w==null?y.st:y.b)],pd:["Prix décroissant",(x,y)=>(y.w==null?y.st:y.b)-(x.w==null?x.st:x.b)],rar:["Rareté",(x,y)=>y.c.r-x.c.r]};
 const aucViewSig=()=>WLV+"|"+(AV.hideOwn?1:0)+"|"+AV.tab+"|"+AV.d+"|"+AV.q+"|"+AV.sort+"|"+[...AV.fr].join(",");
 let mkViewSig="";
@@ -1245,30 +1369,35 @@ function updateAuctionDom(){
   const price=el.querySelector("[data-au-price]"),label=el.querySelector("[data-au-label='price-label']"),status=el.querySelector("[data-au-status]");
   if(price)price.textContent="🪙 "+(a.w==null?a.st:a.b);
   if(label)label.textContent=a.w==null?"MISE DE DÉPART":"MISE ACTUELLE";
-  if(status){status.innerHTML=`${a.s==ME?"Ta vente":"Vendu par "+a.s}${a.w?` · ${a.w==ME?"<b style='color:#7ee29a'>tu mènes</b>":"👑 "+a.w}`:""}${a.mine&&a.w!=ME?" · <b style='color:#ff9a7a'>surenchéri</b>":""}`}
+  if(status){status.innerHTML=`${a.s==ME?"Ta vente":"Vendu par "+a.s+(a.resale?" ♻ revente":"")}${a.w?` · ${a.w==ME?"<b style='color:#7ee29a'>tu mènes</b>":"👑 "+a.w}`:""}${a.mine&&a.w!=ME?" · <b style='color:#ff9a7a'>surenchéri</b>":""}`}
  });
  const tl=$("atl"),a=AV.d&&MK.A.find(x=>x.id==AV.d&&!x.done);if(tl&&a){const l=a.end-now;tl.textContent=l>0?"Se termine dans "+dt(l):"Terminée"}
 }
+function mktInfo(){try{const t=Object.entries(MK.TR||{}).filter(([g,v])=>CATGROUPS[g]&&Math.abs(v-1)>=.015).sort((x,y)=>Math.abs(y[1]-1)-Math.abs(x[1]-1)).slice(0,4).map(([g,v])=>`${CATGROUPS[g].l} ${v>1?'<b style="color:#7ee29a">▲ +':'<b style="color:#ff9a7a">▼ '}${Math.round((v-1)*100)} %</b>`);
+ return `👥 ${PSEUDOS.length} acheteurs actifs · `+(t.length?"Demande : "+t.join(" · "):"marché calme")}catch(e){return ""}}
 function listPage(){
  const A=MK.A.filter(a=>!a.done),mineS=A.filter(a=>a.s==ME),mineB=A.filter(a=>a.mine),myH=MK.H.filter(x=>x.s==ME||x.u==ME);
- const tabs=[["b","Parcourir"],["v",`Mes ventes (${mineS.length}/${MAXS})`],["e","Mes enchères"],["g",`Gagnées (${MK.W.length})`],["h",`Historique (${myH.length})`],["w",`⭐ Souhaits (${Object.keys(WL).length})`]];
+ const tabs=[["b","Parcourir"],["v",`Mes ventes (${mineS.length}/${MAXS})`],["e","Mes enchères"],["g",`Gagnées (${MK.W.length})`],["h",`Historique (${myH.length})`],["w",`⭐ Souhaits (${Object.keys(WL).length})`],["m","📈 Cours"]];
  let body="";
  if(AV.tab=="b"){let L=A.filter(a=>a.s!=ME&&(!AV.q||a.c.t.toLowerCase().includes(AV.q.toLowerCase()))&&(!AV.fr.size||AV.fr.has(a.c.r))&&(!AV.hideOwn||!ownN(a.c))).sort(SORTS[AV.sort][1]);
-  body=`<div class="bar"><input id="aq" placeholder="Rechercher une carte…" value="${AV.q}"><button class="btn" id="ago">🔍 Rechercher</button><button class="btn g ${AV.hideOwn?"on":""}" id="aown" title="Cache les cartes que tu possèdes déjà">${AV.hideOwn?"✓ ":""}Masquer celles que j'ai déjà</button><select id="asr">${Object.entries(SORTS).map(([k,v])=>`<option value="${k}" ${k==AV.sort?"selected":""}>${v[0]}</option>`).join("")}</select></div>
+  body=`<div class="bar"><input id="aq" placeholder="Rechercher une carte…" value="${AV.q}"><button class="btn" id="ago">🔍 Rechercher</button><button class="btn g ${AV.hideOwn?"on":""}" id="aown" title="Cache les cartes que tu possèdes déjà">${AV.hideOwn?"✓ ":""}Masquer celles que j'ai déjà</button><select id="asr">${Object.entries(SORTS).map(([k,v])=>`<option value="${k}" ${k==AV.sort?"selected":""}>${v[0]}</option>`).join("")}</select><select id="adf" title="Difficulté du marché : plus c'est dur, moins les acheteurs paient cher">${ADIFF.map((d,i)=>`<option value="${i}" ${i==AD?"selected":""}>Marché : ${d.n}</option>`).join("")}</select></div>
+  <div class="sub" style="margin:0 0 8px">${mktInfo()}</div>
   <div class="chips">${R.map((r,i)=>HID.has(i)?"":`<button class="chip ${AV.fr.has(i)?"on":""}" style="background:${r[1]}" data-r="${i}">${SYM[i]} ${r[0]}</button>`).join("")}</div>
   <div class="grid mg">${L.length?L.map(tile).join(""):'<div class="msg">Aucune enchère ne correspond.</div>'}</div>
   <h3 style="margin-top:26px">Dernières ventes</h3>${MK.H.filter(x=>x.u).slice(0,10).map(x=>`<div class="off">${x.c.t} · <b style="color:${R[x.r][1]}">${R[x.r][0]}</b> · <b>${x.p} 🪙</b> · ${nm(x.u)} <span class="sub" style="margin:0">(vendeur : ${nm(x.s)} · ${ago(x.ts)})</span></div>`).join("")||'<div class="sub">Aucune vente pour le moment.</div>'}`}
  else if(AV.tab=="v")body=`<div class="bar"><button class="btn" id="sell">➕ Mettre une carte aux enchères</button><span class="sub" style="align-self:center;margin:0">Frais de vente 5 % · ${MAXS} ventes max en même temps</span></div><div class="grid mg">${mineS.sort((x,y)=>x.end-y.end).map(a=>tile(a)+"").join("")||'<div class="msg">Aucune vente en cours. Mets une carte de ta collection aux enchères.</div>'}</div>`;
  else if(AV.tab=="e")body=`<div class="grid mg">${mineB.sort((x,y)=>x.end-y.end).map(tile).join("")||'<div class="msg">Tu n\'as misé sur aucune enchère.</div>'}</div>`;
  else if(AV.tab=="g")body=`<div class="grid mg">${MK.W.map(x=>{store[x.c.id]=x.c;return `<div class="at">${card(x.c)}<div class="as">Gagnée pour <b>${x.p} 🪙</b> · ${ago(x.ts)}<br>Vendeur : ${nm(x.s)}</div></div>`}).join("")||'<div class="msg">Tu n\'as encore rien gagné.</div>'}</div>`;
+ else if(AV.tab=="m")body=coursTab();
  else if(AV.tab=="w"){body=wishTab();if(WLU){WLU=0;saveWL();wlBadge()}}
  else body=myH.map(x=>`<div class="off">${x.s==ME?(x.u?`💰 Vendue à <b>${x.u}</b> pour <b>${x.p} 🪙</b>`:"↩ Invendue"):`🛒 Achetée à <b>${nm(x.s)}</b> pour <b>${x.p} 🪙</b>`} · « ${x.c.t} » <b style="color:${R[x.r][1]}">${R[x.r][0]}</b> <span class="sub" style="margin:0">${ago(x.ts)}</span></div>`).join("")||'<div class="sub">Aucun historique.</div>';
  $("ah").innerHTML=`<div class="tabs2">${tabs.map(t=>`<button class="${AV.tab==t[0]?"on":""}" data-t="${t[0]}">${t[1]}</button>`).join("")}</div>${body}`;
  $("ah").querySelectorAll(".tabs2 button").forEach(b=>b.onclick=()=>{AV.tab=b.dataset.t;paintMk(true)});
- if($("aq")){const go=()=>{AV.q=$("aq").value.trim();paintMk(true)};$("aq").onkeydown=e=>{if(e.key=="Enter")go()};$("ago").onclick=go;$("aown").onclick=()=>{AV.hideOwn=!AV.hideOwn;paintMk(true)};$("asr").onchange=e=>{AV.sort=e.target.value;paintMk(true)};
+ if($("aq")){const go=()=>{AV.q=$("aq").value.trim();paintMk(true)};$("aq").onkeydown=e=>{if(e.key=="Enter")go()};$("ago").onclick=go;$("aown").onclick=()=>{AV.hideOwn=!AV.hideOwn;paintMk(true)};$("asr").onchange=e=>{AV.sort=e.target.value;paintMk(true)};$("adf").onchange=e=>{AD=+e.target.value;try{localStorage.setItem("wc_aucdiff",String(AD))}catch(x){wcDbg(x)}paintMk(true)};
   $("ah").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;AV.fr.has(i)?AV.fr.delete(i):AV.fr.add(i);paintMk(true)})}
  if($("sell"))$("sell").onclick=pickSell;
  $("ah").querySelectorAll(".wlrm").forEach(b=>b.onclick=e=>{e.stopPropagation();const p=b.dataset.p;if(WL[p]){delete WL[p]}else{const k=Object.keys(WL).find(x=>String(x)==p);if(k)delete WL[k]}WLV++;saveWL();paintMk(true)});
+ $("ah").querySelectorAll("[data-oc]").forEach(e=>e.onclick=()=>openModal(e.dataset.oc));
  if($("wlnotif"))$("wlnotif").onclick=()=>{try{Notification.requestPermission().then(()=>paintMk(true))}catch(e){wcDbg(e)}};
  bind($("ah"),false);$("ah").querySelectorAll(".at").forEach(t=>{const cd=t.querySelector(".card");if(cd)cd.onclick=null;if(t.dataset.id)t.onclick=()=>{AV.d=t.dataset.id;paintMk(true)}})}
 function detailPage(){const a=MK.A.find(x=>x.id==AV.d&&!x.done);
@@ -1277,7 +1406,7 @@ function detailPage(){const a=MK.A.find(x=>x.id==AV.d&&!x.done);
  const box=mine?`<div class="abox"><div class="arow"><span>Valeur estimée</span><b>≈ ${f} 🪙 <small style="color:var(--mut)">(${Math.round(f*.8)}–${Math.round(f*1.25)})</small></b></div><div class="arow"><span>Si l'enchère s'arrêtait maintenant</span><b style="color:#7ee29a">${a.w==null?"aucune mise":"+"+Math.round(a.b*.95)+" 🪙 (après 5 % de frais)"}</b></div>${a.n==0?`<button class="btn g" id="acn" style="margin-top:10px">Annuler l'enchère (aucune mise)</button>`:""}</div>`
  :`<div class="abox"><div class="arow"><span>Votre solde : <b style="color:var(--fg)">${money.toLocaleString("fr-FR")}</b> pièces</span><span>Mise minimum : <b style="color:var(--fg)">${nb}</b></span></div><div class="abid">${STP(nb)}<button class="btn" id="abd">Miser</button></div>${a.w==ME?`<div class="sub" style="color:#7ee29a;margin:8px 0 0">Tu mènes avec ${a.b} 🪙 — ta mise actuelle te sera rendue si tu surenchéris.</div>`:""}<div class="sub" style="font-size:11px;margin:10px 0 0">La mise est débitée de votre solde immédiatement. Si vous êtes surenchéri, elle vous est intégralement remboursée. Une mise dans les 20 dernières secondes remet le chronomètre à 1 minute.</div></div>`;
  $("ah").innerHTML=`<div class="bkl" id="abk">← Retour aux enchères</div><div class="ad"><div class="adl">${card(a.c)}</div><div class="adr"><h2 style="margin:0">${a.c.t}</h2>${ownN(a.c)?`<div class="ownline">✓ Tu as déjà cette carte (×${ownN(a.c)})</div><br>`:""}<button class="btn g wlbtn ${isW(a.c)?"on":""}" id="wlD" style="margin-top:8px">${isW(a.c)?"⭐ Suivie":"☆ Suivre cette carte"}</button><div class="sub" style="margin:4px 0 14px">${mine?"Ta vente":"Mis en vente par <b style='color:var(--ac)'>"+a.s+"</b>"}</div>
- <div class="abox"><div class="arow"><span>${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</span><b class="big">🪙 ${cur}</b></div>${a.w?`<div class="arow"><span>Meilleur enchérisseur</span><b>${a.w==ME?"Toi":"👑 "+a.w}</b></div>`:""}<div class="arow"><span>🔨 Temps restant</span><b id="atl"></b></div></div>${box}
+ <div class="abox"><div class="arow"><span>${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</span><b class="big">🪙 ${cur}</b></div>${a.w?`<div class="arow"><span>Meilleur enchérisseur</span><b>${a.w==ME?"Toi":"👑 "+a.w}</b></div>`:""}<div class="arow"><span>🔨 Temps restant</span><b id="atl"></b></div></div>${box}${priceMini(a.c)}
  <h4 class="lab" style="margin-top:22px">HISTORIQUE DES MISES (${hs.length})</h4>${hs.length?hs.map(x=>`<div class="off"><b>${nm(x.u)}</b> a misé <b>${x.p} 🪙</b> <span class="sub" style="margin:0 0 0 auto">${ago(x.ts)}</span></div>`).join(""):'<div class="sub">Aucune mise placée pour l\'instant.</div>'}</div></div>`;
  $("abk").onclick=()=>{AV.d=null;paintMk(true)};bind($("ah"),false);const cd=$("ah").querySelector(".card");if(cd)cd.onclick=()=>openModal(a.c.id);
  if($("wlD"))$("wlD").onclick=()=>{toggleW(a.c);paintMk(true)};
