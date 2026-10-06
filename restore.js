@@ -1,3 +1,6 @@
+/* WikiCollect — copie de secours au démarrage (chargé en premier) */
+/* Journal discret : les erreurs « avalées » sont visibles dans la console (niveau Verbose) au lieu d'être totalement muettes. */
+function wcDbg(e){try{console.debug("[WikiCollect]",e)}catch(_){}}
 (function(){
  try{window.__LT0=+localStorage.getItem("wc_col_t")||0}catch(e){window.__LT0=0}
  window.__colChecked=false;
@@ -15,5 +18,5 @@
   Promise.all([get("last"),get("prev")]).then(([a,b])=>{const best=[a,b].filter(x=>x&&x.d&&has(x.d)).sort((x,y)=>y.t-x.t)[0];
    if(best){W.block=true;Object.keys(best.d).forEach(k=>localStorage.setItem(k,best.d[k]));sessionStorage.setItem("wc_restored","1");location.reload()}else W.ready=true});
  }else W.ready=true;
- try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){wcDbg(e)}
 })();

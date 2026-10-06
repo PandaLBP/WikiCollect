@@ -1,4 +1,5 @@
-/* ===== bloc @7 ===== */
+/* WikiCollect — feuille de style (regroupe tous les anciens blocs <style>, dans le même ordre) */
+/* ===== base ===== */
 :root{--bg:#0d0b12;--sf:#17131f;--sf2:#241d31;--fg:#f1eef7;--mut:#9d94b0;--ac:#a855f7;color-scheme:dark}
 *{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font-family:Inter,system-ui,sans-serif;display:flex}
@@ -461,7 +462,7 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 .rippleFx{position:absolute;border-radius:50%;pointer-events:none;background:#fff8;transform:scale(0);animation:rippleV2 .45s ease-out forwards}@keyframes rippleV2{to{transform:scale(2.8);opacity:0}}
 @media(max-width:760px){.fpSlots{grid-template-columns:1fr 1fr 1fr}.arcade-stat{width:100%}.casino-v2 .arcade-stat{grid-template-columns:repeat(3,1fr)}.slot-lever{display:none}}
 
-/* ===== bloc @471 ===== */
+/* ===== base ===== */
 .booster-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:6px;flex-wrap:wrap}
 .booster-head h2{margin:0}
 .booster-timer{font-size:13px;font-weight:800;color:#d8c2ff;background:#171126;border:1px solid #3a2f4d;border-radius:999px;padding:7px 12px;min-height:32px;display:flex;align-items:center}
@@ -635,7 +636,7 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 .mtfoot{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px;padding-top:12px;border-top:1px solid #2b2238}
 .mtfoot .btn{width:auto;min-width:110px;height:auto;padding:10px 18px}
 
-/* ===== bloc @673 ===== */
+/* ===== base ===== */
 .colTag,.tagFilter,.multiTagItem,.tagMgrBadge{transition:background .15s,border-color .15s,color .15s}.colTag{border:1px solid var(--tag-color,#a855f7);border-radius:999px;padding:3px 8px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:3px}.tagFilter{border:1px solid var(--tag-color,#a855f7)}.tagMgrRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tagMgrColor{width:42px;height:38px;padding:2px;border-radius:9px;border:1px solid #555;background:transparent}.tagMgrBadge{border:1px solid;border-radius:9px;padding:6px 9px}.multiTagItem{border:1px solid;border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:7px}.multiTagItem input{accent-color:var(--tag-color,#a855f7)}
 
 /* ===== v63-audio-ui ===== */
@@ -664,7 +665,7 @@ input{-webkit-user-select:text;user-select:text;background:var(--sf2);border:1px
 @keyframes suspenseFlicker{from{opacity:.62;transform:translateY(1px)}to{opacity:1;transform:translateY(-1px)}}
 .casevisual.slow.running .casepointer{box-shadow:0 0 14px #fff,0 0 30px #a855f7aa}.casevisual.slow.running{box-shadow:inset 0 0 38px #a855f722}
 
-/* ===== bloc @3025 ===== */
+/* ===== base ===== */
 /* V92 : aspect classeur / album pour la collection */
 .binder{position:relative;display:grid;grid-template-columns:34px 1fr;gap:0;margin:16px 0 10px;filter:drop-shadow(0 18px 34px #0008)}
 .binderRail{position:relative;border:1px solid #3a274f;border-right:0;border-radius:18px 0 0 18px;background:linear-gradient(180deg,#2a1738,#171021 45%,#241332);padding-top:22px;display:flex;flex-direction:column;align-items:center;gap:26px}
@@ -1367,7 +1368,7 @@ main{padding:14px 16px 26px!important}
 .wc-milestone .dbar{margin:7px 0 0!important}
 @media(max-width:760px){.wc-login-days{grid-template-columns:repeat(4,minmax(0,1fr))}.wc-milestones{grid-template-columns:1fr}}
 
-/* ===== bloc @4299 ===== */
+/* ===== base ===== */
 .lst .grid{gap:18px}.reveal .card{width:138px}.mcard .card{box-shadow:0 18px 34px rgba(0,0,0,.38)}
 
 /* ===== v66-cardcase-fix ===== */

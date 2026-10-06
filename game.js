@@ -16,6 +16,11 @@ const OVR={
 /* ===== V99 : catalogue de cartes par catégorie (titres Wikipédia FR + rareté forcée) ===== */
 let CG="";
 const nz2=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9]+/g," ").trim().toLowerCase();
+/* const CATALOG= → voir data.js */
+/* const CATGROUPS= → voir data.js */
+/* V108 — chaque grand univers possède des cartes sur toute l'échelle de rareté.
+   Les noms ci-dessous servent d'ancrages de notoriété ; le moteur conserve les overrides
+   individuels et les cartes Wikipédia sans image ne sont jamais ajoutées. */
 const TIER_ANCHORS={
  adult:{
   7:"Mia Khalifa|Sophie Rain|Sweetie Fox",
@@ -62,19 +67,21 @@ const MR=r=>NEEDS_RARITY_MIGRATION?(OLD_TO_NEW[+r]??Math.max(0,Math.min(7,+r||0)
 /* V130 : une seule rareté officielle par article (forçages OVR / liste VIP), partout dans le jeu. */
 function forcedRarity(t){const k=nz2(t),f=(OVR[t]!=null?OVR[t]:(OVRN[k]!=null?OVRN[k]:VIPR[k]));return f==null?null:+f}
 // Créateurs : nom|y(outube)/t(witch)|identifiant|rareté (selon leur popularité)
+/* const PHOTO= → voir data.js */
+/* const PHOTO_OVERRIDES= → voir data.js */
 const CRE="Squeezie|y|squeezie|10,Cyprien|y|cyprien|8,Norman|y|normanfaitdesvideos|8,Michou|y|michou|8,Inoxtag|y|inoxtag|8,Amixem|y|amixem|8,Tibo InShape|y|tiboinshape|8,Mister V|y|misterv|7,Joyca|y|joyca|7,Léna Situations|y|lenasituations|8,EnjoyPhoenix|y|enjoyphoenix|6,Natoo|y|natoo|6,Seb la Frite|y|seblafrite|5,McFly et Carlito|y|LeFatShow|8,Hugo Décrypte|y|hugodecrypte|8,Underscore_|y|underscore_|6,Dr Nozman|y|drnozman|5,Fabien Olicard|y|fabienolicard|5,Nota Bene|y|notabenemovies|5,Mastu|y|mastu|6,Wankil Studio|y|wankilstudio|7,Amine|y|amineoff|5,Gotaga|t|gotaga|8,ZeratoR|t|zerator|8,Kameto|t|kamet0|8,Domingo|t|domingo|8,Locklear|t|locklear|7,Ponce|t|ponce|7,Sardoche|t|sardoche|7,Anyme023|t|anyme023|6,Hapsolutelly|t|hapsolutelly/hapsolutely|6,Chelxie|t|chelxie|6,Doigby|t|doigby|5,Maghla|t|maghla|5,Mynthos|t|mynthos|5,Rebeudeter|t|rebeudeter|6,Ultia|t|ultia|6,Baghera Jones|t|bagherajones|6,Jiraya|t|jiraya|6,Nikof|t|nikof|5,MisterMV|t|mistermv|6,Byilhan|t|byilhan|5,MrBeast|y|mrbeast|10,PewDiePie|y|pewdiepie|10,Markiplier|y|markiplier|8,Ninja|t|ninja|8,Pokimane|t|pokimane|8,xQc|t|xqc|8,Kai Cenat|t|kaicenat|8,Ibai|t|ibai|8,Shroud|t|shroud|8,Dream|y|dream|8,TommyInnit|y|tommyinnit|8,Valkyrae|t|valkyrae|7,Ludwig|t|ludwig|8,Asmongold|t|asmongold|8,Sykkuno|t|sykkuno|7,iShowSpeed|y|ishowspeed|8,KSI|y|ksi|8,Logan Paul|y|loganpaul|8,Mark Rober|y|markrober|8,Dude Perfect|y|dudeperfect|8,Emma Chamberlain|y|emmachamberlain|7,TimTheTatman|t|timthetatman|7,Tfue|t|tfue|7,Dr Disrespect|t|drdisrespect|7,Kurzgesagt|y|kurzgesagt|8,Vsauce|y|vsauce|8,Linus Tech Tips|y|linustechtips|7,MKBHD|y|mkbhd|8,AmineMaTue|t|aminematue|8,PFut|t|pfut|7,Ravus|t|ravus|5,Snakou|t|snakou|5,Xari|t|xari|6,Jeel|t|jeel|5,Deujna|t|deujna|5,Julia Bayonetta|t|juliabayonetta|4,Little Big Whale|t|littlebigwhale|6,Lebouseuh|t|lebouseuh|4,Alderiate|t|alderiate|6,MoMaN|t|moman|5,Etoiles|t|etoiles|5,Ninjaxx|y|ninjaxx|5,LeStream|t|lestream|4,Skyyart|t|skyyart|5,Rivenzi|t|rivenzi|5,JL Tomy|t|jltomy|5,Chowh1|t|chowh1|5".split(",").map((s,i)=>{const [n,p,hd0,r]=s.split("|"),hd=hd0.split("/")[0],yt=p=="y",av=(pl,k)=>`https://unavatar.io/${pl}/${encodeURIComponent(k)}?fallback=false`,imgs=[...hd0.split("/").map(k=>av(yt?"youtube":"twitch",k)),av(yt?"twitch":"youtube",hd),av("x",hd),av("instagram",hd)];return{id:"c"+i+"-"+MR(r),pid:"c"+i,t:n,plat:yt?"YouTube":"Twitch",d:`${yt?"YouTubeur":"Streamer"} — @${hd} sur ${yt?"YouTube":"Twitch"}.`,img:PHOTO[n]||imgs[0],imgs:PHOTO[n]?[PHOTO[n]]:imgs,realImg:PHOTO[n],lock:PHOTO[n]?1:0,r:MR(r),url:(yt?"https://www.youtube.com/@":"https://www.twitch.tv/")+hd,src:"cr"}}).filter(c=>!["amine","zbb"].includes(String(c.t||"").trim().toLowerCase()));
 // V86 : pool Légendaire holo full art élargi avec drames historiques, catastrophes, attentats, disparitions, scandales connus, grandes villes, personnalités historiques, culture, sport et monuments.
 
 const CRE_LEGENDARY=new Set(["Squeezie","Cyprien","Norman","Michou","Inoxtag","Amixem","Tibo InShape","Mister V","Joyca","Léna Situations","McFly et Carlito","Hugo Décrypte","Gotaga","ZeratoR","Domingo","MrBeast","PewDiePie","Markiplier","Ninja","Kai Cenat","Ibai","KSI","iShowSpeed","MKBHD"]);
 CRE.forEach(c=>{if(CRE_LEGENDARY.has(c.t)){c.r=7;c.id=c.pid+"-7"}});
 try{JSON.parse(localStorage.getItem("wc_cre")||"[]").forEach((l,i)=>{const [n,p,hd,r]=l,yt=p=="y",av=(pl,k)=>`https://unavatar.io/${pl}/${encodeURIComponent(k)}?fallback=false`,imgs=[av(yt?"youtube":"twitch",hd),av(yt?"twitch":"youtube",hd),av("x",hd),av("instagram",hd)];
- if(!["zbb","amine"].includes(n.toLowerCase())&&!CRE.some(c=>c.t.toLowerCase()==n.toLowerCase()))CRE.push({id:"x"+i+"-"+MR(r),pid:"x"+i,t:n,plat:yt?"YouTube":"Twitch",d:`${yt?"YouTubeur":"Streamer"} — @${hd} sur ${yt?"YouTube":"Twitch"}.`,img:imgs[0],imgs,r:MR(r),url:(yt?"https://www.youtube.com/@":"https://www.twitch.tv/")+hd,src:"cr"})})}catch(e){}
+ if(!["zbb","amine"].includes(n.toLowerCase())&&!CRE.some(c=>c.t.toLowerCase()==n.toLowerCase()))CRE.push({id:"x"+i+"-"+MR(r),pid:"x"+i,t:n,plat:yt?"YouTube":"Twitch",d:`${yt?"YouTubeur":"Streamer"} — @${hd} sur ${yt?"YouTube":"Twitch"}.`,img:imgs[0],imgs,r:MR(r),url:(yt?"https://www.youtube.com/@":"https://www.twitch.tv/")+hd,src:"cr"})})}catch(e){wcDbg(e)}
 const CD=10*1000,MAXB=10,PS=50,BOOSTER_COOLDOWN=10*60*1000;
 let boosterCooldowns=Array(MAXB).fill(0);
-try{const bc=JSON.parse(localStorage.getItem("wc_booster_cooldowns_v57")||"null");if(Array.isArray(bc)&&bc.length===MAXB)boosterCooldowns=bc.map(x=>Math.max(0,+x||0))}catch(e){}
+try{const bc=JSON.parse(localStorage.getItem("wc_booster_cooldowns_v57")||"null");if(Array.isArray(bc)&&bc.length===MAXB)boosterCooldowns=bc.map(x=>Math.max(0,+x||0))}catch(e){wcDbg(e)}
 const boosterReady=i=>i>=0&&i<MAXB&&(boosterCooldowns[i]||0)<=Date.now();
 const boosterLeft=i=>Math.max(0,(boosterCooldowns[i]||0)-Date.now());
-const saveBoosterCooldowns=()=>{try{localStorage.setItem("wc_booster_cooldowns_v57",JSON.stringify(boosterCooldowns))}catch(e){}};
+const saveBoosterCooldowns=()=>{try{localStorage.setItem("wc_booster_cooldowns_v57",JSON.stringify(boosterCooldowns))}catch(e){wcDbg(e)}};
 const h=n=>{n=Math.imul(n^n>>>15,2246822507);n=Math.imul(n^n>>>13,3266489909);return((n^n>>>16)>>>0)/4294967296};
 const WT=R.reduce((s,x)=>s+x[2],0);
 const pick=r=>{let t=WT*r,i=0;for(;i<R.length-1&&(t-=R[i][2])>=0;i++);return i};
@@ -98,7 +105,7 @@ try{
   localStorage.setItem(ACCOUNT_RESET_V92,"1");
   localStorage.setItem("wc_money","50");
  }
-}catch(e){}
+}catch(e){wcDbg(e)}
 /* V105 : nouveau reset explicite — collection + succès + statistiques remises à zéro.
    On utilise une nouvelle clé pour forcer le reset même si une ancienne version avait déjà marqué le compte comme réinitialisé. */
 const ACCOUNT_RESET_V105="wc_account_reset_v105_collection_success_stats";
@@ -107,11 +114,11 @@ try{
     ["wc_col","wc_ach","wc_col_ui","wc_stats"].forEach(k=>localStorage.removeItem(k));
     localStorage.setItem(ACCOUNT_RESET_V105,"1");
   }
-}catch(e){}
+}catch(e){wcDbg(e)}
 let col={},stock=MAXB,t0=0,money=50;
 let WCJ=0,WCJL=[];
-try{WCJ=+(localStorage.getItem("wc_jackpot")||"10000");WCJL=JSON.parse(localStorage.getItem("wc_jhist")||"[]")}catch(e){}
-const saveJ=()=>{try{localStorage.setItem("wc_jackpot",String(Math.max(10000,Math.floor(WCJ))));localStorage.setItem("wc_jhist",JSON.stringify(WCJL.slice(0,12)))}catch(e){}};
+try{WCJ=+(localStorage.getItem("wc_jackpot")||"10000");WCJL=JSON.parse(localStorage.getItem("wc_jhist")||"[]")}catch(e){wcDbg(e)}
+const saveJ=()=>{try{localStorage.setItem("wc_jackpot",String(Math.max(10000,Math.floor(WCJ))));localStorage.setItem("wc_jhist",JSON.stringify(WCJL.slice(0,12)))}catch(e){wcDbg(e)}};
 let WCQ=null;
 const dayKey=()=>new Date().toISOString().slice(0,10);
 const DAILY=[
@@ -143,10 +150,10 @@ function loadDaily(){
  }catch(e){WCQ={day:dayKey(),p:{open:0,rare:0,casino:0},c:{}}}
  WCQ.p=WCQ.p||{open:0,rare:0,casino:0};WCQ.c=WCQ.c||{};
  DAILY.forEach(m=>{if(WCQ.p[m.id]==null)WCQ.p[m.id]=0});
- try{localStorage.setItem("wc_daily2",JSON.stringify(WCQ))}catch(e){}
+ try{localStorage.setItem("wc_daily2",JSON.stringify(WCQ))}catch(e){wcDbg(e)}
  return WCQ
 }
-function bumpDaily(id,n=1){try{wcCount(id,n)}catch(e){}loadDaily();WCQ.p[id]=Math.min(DAILY.find(x=>x.id==id).goal,WCQ.p[id]+n);try{localStorage.setItem("wc_daily2",JSON.stringify(WCQ))}catch(e){}}
+function bumpDaily(id,n=1){try{wcCount(id,n)}catch(e){wcDbg(e)}loadDaily();WCQ.p[id]=Math.min(DAILY.find(x=>x.id==id).goal,WCQ.p[id]+n);try{localStorage.setItem("wc_daily2",JSON.stringify(WCQ))}catch(e){wcDbg(e)}}
 function todayEvent(){
  const E=[
   ["📚 Journée Encyclopédie","Les cartes Wikipédia communes et peu communes sont mises à l'honneur.","Complète ta collection avec les petites raretés."],
@@ -210,7 +217,7 @@ function profilePage(){
   </div>`;
 }
 
-try{col=JSON.parse(localStorage.getItem("wc_col")||"{}");const s=localStorage.getItem("wc_stock");if(s!==null){stock=+s;t0=+localStorage.getItem("wc_t0")||0}const m=localStorage.getItem("wc_money");if(m!==null)money=+m}catch(e){}
+try{col=JSON.parse(localStorage.getItem("wc_col")||"{}");const s=localStorage.getItem("wc_stock");if(s!==null){stock=+s;t0=+localStorage.getItem("wc_t0")||0}const m=localStorage.getItem("wc_money");if(m!==null)money=+m}catch(e){wcDbg(e)}
 /* V105 : garde-fou — au premier lancement de cette version, aucune carte/succès/statistique ne doit survivre. */
 if(false){
   try{
@@ -220,15 +227,15 @@ if(false){
     localStorage.removeItem("wc_stats");
     localStorage.removeItem("wc_col_ui");
     localStorage.setItem("ACCOUNT_RESET_V105_GUARD","1");
-  }catch(e){}
+  }catch(e){wcDbg(e)}
 }
 let SAVEFAIL=false;
-let _mt=0;function mirrorCol(){clearTimeout(_mt);_mt=setTimeout(()=>{if(!window.__colChecked)return mirrorCol();try{if(window.WCSAVE)window.WCSAVE.put("col",{t:Date.now(),ls:!SAVEFAIL,col})}catch(e){}},500)}
-const save=()=>{try{try{stampRecent()}catch(e){}localStorage.setItem("wc_rarity_schema","v92");
+let _mt=0;function mirrorCol(){clearTimeout(_mt);_mt=setTimeout(()=>{if(!window.__colChecked)return mirrorCol();try{if(window.WCSAVE)window.WCSAVE.put("col",{t:Date.now(),ls:!SAVEFAIL,col})}catch(e){wcDbg(e)}},500)}
+const save=()=>{try{try{stampRecent()}catch(e){wcDbg(e)}localStorage.setItem("wc_rarity_schema","v92");
  const strip=(k,v)=>typeof v=="string"&&v.startsWith("data:image/jpeg")?undefined:v,slim=(k,v)=>k==="d"?undefined:strip(k,v);
  try{localStorage.setItem("wc_col",JSON.stringify(col,strip));localStorage.setItem("wc_col_t",String(Date.now()));SAVEFAIL=false}
- catch(e){try{localStorage.setItem("wc_col",JSON.stringify(col,slim));localStorage.setItem("wc_col_t",String(Date.now()));SAVEFAIL=false}catch(e2){if(!SAVEFAIL){SAVEFAIL=true;try{toast("⚠️ Stockage du navigateur plein : tes nouvelles cartes ne sont PAS sauvegardées. Exporte ta sauvegarde (Profil) et libère de la place.")}catch(x){}}}}
- localStorage.setItem("wc_stock",stock);localStorage.setItem("wc_t0",t0);localStorage.setItem("wc_money",money);saveBoosterCooldowns()}catch(e){}try{mirrorCol()}catch(e){}};
+ catch(e){try{localStorage.setItem("wc_col",JSON.stringify(col,slim));localStorage.setItem("wc_col_t",String(Date.now()));SAVEFAIL=false}catch(e2){if(!SAVEFAIL){SAVEFAIL=true;try{toast("⚠️ Stockage du navigateur plein : tes nouvelles cartes ne sont PAS sauvegardées. Exporte ta sauvegarde (Profil) et libère de la place.")}catch(x){wcDbg(x)}}}}
+ localStorage.setItem("wc_stock",stock);localStorage.setItem("wc_t0",t0);localStorage.setItem("wc_money",money);saveBoosterCooldowns()}catch(e){wcDbg(e)}try{mirrorCol()}catch(e){wcDbg(e)}};
 // V87 : Kameto canonique = créateur Twitch @kamet0 avec sa vraie photo de profil.
 // L'ancienne carte Wikipédia « Kameto » est la mauvaise variante pour ce jeu : on la retire du catalogue et de la collection,
 // puis on conserve/restaure uniquement la carte créateur correcte.
@@ -236,14 +243,14 @@ try{
  const before=Object.keys(col).length;
  Object.keys(col).forEach(k=>{const c=col[k]; if(c && String(c.t||'').trim().toLowerCase()==='kameto' && c.src!=='cr') delete col[k]});
  if(Object.keys(col).length!==before)save();
-}catch(e){}
+}catch(e){wcDbg(e)}
 // remet les bonnes photos / raretés sur les créateurs déjà possédés et supprime les doublons
 const DUPLICATE_TITLES=new Set(["norman thavaud"]);
 const EXCLUDED_TITLES=new Set(["lizzie","catherine ringer","traci lords"]);
 const isExcludedTitle=t=>EXCLUDED_TITLES.has(String(t||"").trim().toLowerCase());
 const isRemovedTitle=t=>isExcludedTitle(t)||DUPLICATE_TITLES.has(String(t||"").trim().toLowerCase());
 // V86 : force le recalcul du classement pour faire apparaître les nouvelles cartes sélectionnées.
-try{if(localStorage.getItem("wc_v86_rank_refresh")!=="1"){localStorage.removeItem("wc_rank6");localStorage.setItem("wc_v86_rank_refresh","1")}}catch(e){}
+try{if(localStorage.getItem("wc_v86_rank_refresh")!=="1"){localStorage.removeItem("wc_rank6");localStorage.setItem("wc_v86_rank_refresh","1")}}catch(e){wcDbg(e)}
 function hyd(){const N={};Object.values(col).forEach(c=>{
  if(c&&String(c.t||"").trim().toLowerCase()==="sophie reine")c.t="Sophie Rain";
  if(c.src=="cr"){const k=CRE.find(x=>x.pid==c.pid);if(k){c.r=k.r;c.id=k.id;c.url=k.url;if(k.lock){c.img=k.img;c.imgs=k.imgs;c.realImg=k.realImg}}}
@@ -257,7 +264,7 @@ try{
  const before=Object.keys(col).length;
  Object.keys(col).forEach(k=>{const c=col[k];if(c&&isRemovedTitle(c.t))delete col[k]});
  if(Object.keys(col).length!==before)save();
-}catch(e){}
+}catch(e){wcDbg(e)}
 // V75 : « Amine » (@amineoff) est retiré définitivement du catalogue des créateurs.
 try{
  const before=Object.keys(col).length;
@@ -266,13 +273,13 @@ try{
   if(c&&String(c.t||"").trim().toLowerCase()==="amine")delete col[k];
  });
  if(Object.keys(col).length!==before)save();
-}catch(e){}
+}catch(e){wcDbg(e)}
 // V74 : Zbb retiré du jeu. On purge aussi toute carte Zbb éventuellement restée dans la sauvegarde.
 try{
  const before=Object.keys(col).length;
  Object.keys(col).forEach(k=>{const c=col[k];if(c&&["zbb","amine"].includes(String(c.t||"").trim().toLowerCase()))delete col[k]});
  if(Object.keys(col).length!==before)save();
-}catch(e){}
+}catch(e){wcDbg(e)}
 // V87 supprimé : il effaçait toutes tes cartes Kameto et en redonnait une gratuite à chaque rechargement de la page.
 // découpe crantée des paquets
 document.documentElement.style.setProperty("--clip","polygon("+Array.from({length:15},(_,i)=>`${i*100/14}% ${i%2?0:2.4}%`).join(",")+","+Array.from({length:15},(_,i)=>`${100-i*100/14}% ${i%2?100:97.6}%`).join(",")+")");
@@ -290,10 +297,11 @@ try{
  const keep=new Set([...byTitle.values()].map(c=>c.id));
  Object.keys(col).forEach(k=>{const c=col[k];if(!c||!c.img||typeof c.img!=="string"||noImageTitle(c.t)||!keep.has(c.id))delete col[k]});
  save();
-}catch(e){}
+}catch(e){wcDbg(e)}
 const CANONICAL_TITLES={"Sophie Reine":"Sophie Rain"};
 const canonicalTitle=t=>CANONICAL_TITLES[String(t||"")]||t;
-try{store[SPECIAL_ADULT_CARD.id]=SPECIAL_ADULT_CARD}catch(e){}
+const SPECIAL_ADULT_CARD={id:"special-sweetie-fox-7",pid:"special-sweetie-fox",t:"Sweetie Fox",d:"Créatrice de contenu et modèle connue sous le nom Sweetie Fox",img:SPECIAL_ADULT_IMG,r:7,src:"wiki",nsfw:true,v:900000};
+try{store[SPECIAL_ADULT_CARD.id]=SPECIAL_ADULT_CARD}catch(e){wcDbg(e)}
 const isSweetie=t=>String(t||"").normalize("NFD").replace(/[^a-zA-Z0-9]/g,"").toLowerCase()==="sweetiefox";
 const ok=p=>p.thumbnail&&!noImageTitle(p.title)&&!/homonymie/i.test(p.description||"")&&!isRemovedTitle(p.title);
 function rp(p){
@@ -306,7 +314,7 @@ function rp(p){
  const cr=categoryRankRarity(p.title,s,g);
  return boost(p.title,cr==null?rarOf(s):cr);
 }
-function mk(p,rf,vf){const title=canonicalTitle(p.title),pp=title===p.title?p:{...p,title};const r=rf??rp(pp),pv=p.pageviews?Object.values(p.pageviews).reduce((a,b)=>a+(b||0),0):vf,c={v:pv,id:p.pageid+"-"+r,pid:"w"+p.pageid,t:title,d:p.description||"",img:p.thumbnail.source,r,src:"wiki",nsfw:SEX.test(title)||ADULT.has(nz2(title))||/pornograph|érotique|hentai|sexuel/i.test(p.description||"")};if(nz2(title)==="sweetie fox"){c.img=SPECIAL_ADULT_CARD.img;c.d="Créatrice de contenu et modèle connue sous le nom Sweetie Fox";c.r=7;c.id=String(c.id).replace(/-\d+$/,"-7")}store[c.id]=c;return c}
+function mk(p,rf,vf){const title=canonicalTitle(p.title),pp=title===p.title?p:{...p,title};let _or=null;try{_or=ownedRar("w"+p.pageid,title)}catch(e){wcDbg(e)}const r=_or??rf??rp(pp),pv=p.pageviews?Object.values(p.pageviews).reduce((a,b)=>a+(b||0),0):vf,c={v:pv,id:p.pageid+"-"+r,pid:"w"+p.pageid,t:title,d:p.description||"",img:p.thumbnail.source,r,src:"wiki",nsfw:SEX.test(title)||ADULT.has(nz2(title))||/pornograph|érotique|hentai|sexuel/i.test(p.description||"")};if(nz2(title)==="sweetie fox"){c.img=SPECIAL_ADULT_CARD.img;c.d="Créatrice de contenu et modèle connue sous le nom Sweetie Fox";c.r=7;c.id=String(c.id).replace(/-\d+$/,"-7")}store[c.id]=c;return c}
 function card(c){const [n,cl]=R[c.r];
 return `<div class="card r${c.r} ${c.nsfw?"nsfw":""} ${c.src=="film"?"film-art":""}" style="--c:${cl}" data-id="${c.id}"><div class="in"><span class="bd">${SYM[c.r]}</span>${c.n>1?`<span class="cnt">×${c.n}</span>`:""}<img class="${c.src=="cr"?"creator-art":c.src=="film"?"film-art":""}" src="${c.img}" referrerpolicy="no-referrer" alt="${(c.t||"").replace(/"/g,"&quot;")}"><div class="nm"><span class="t">${c.t}</span><small>${SYM[c.r]} ${n}${c.src=="film"?`<span class="film-badge">🎬 FILM</span>`:""}</small></div></div><i class="foil"></i><i class="tex"></i><i class="glare"></i><i class="spk"></i><i class="gl a"></i><i class="gl b"></i></div>`}
 const ph=t=>"data:image/svg+xml;utf8,"+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'><rect width='4' height='4' fill='#6b21a8'/><text x='2' y='2.9' font-size='2.4' text-anchor='middle' fill='#e9d5ff' font-family='sans-serif'>${(t||"?")[0]}</text></svg>`);
@@ -320,7 +328,7 @@ async function creatorWikiImage(c){
   ps.sort((a,b)=>((a.title||'').toLowerCase()==c.t.toLowerCase()?0:1)-((b.title||'').toLowerCase()==c.t.toLowerCase()?0:1));
   const p=ps.find(x=>x.thumbnail?.source&&nz(x.title)==nz(c.t));
   if(p?.thumbnail?.source){c.realImg=p.thumbnail.source;return c.realImg}
- }catch(e){}
+ }catch(e){wcDbg(e)}
  try{
   const s=await (await fetch(`https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${enc}&language=fr&format=json&origin=*&limit=5`)).json();
   const ids=(s.search||[]).filter(x=>nz(x.label)==nz(c.t)).slice(0,5).map(x=>x.id).join('|'); if(!ids)return null;
@@ -329,10 +337,10 @@ async function creatorWikiImage(c){
    const file=j.entities?.[id]?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
    if(file){c.realImg=`https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(file)}?width=700`;return c.realImg}
   }
- }catch(e){}
+ }catch(e){wcDbg(e)}
  return null
 }
-function bindCards(root,rm=true){root.querySelectorAll(".card").forEach(e=>{const c=store[e.dataset.id],img=e.querySelector("img");
+function bind(root,rm=true){root.querySelectorAll(".card").forEach(e=>{const c=store[e.dataset.id],img=e.querySelector("img");
  if(!c||!img)return;
  if(c.src=="cr"){const k=CRE.find(x=>x.pid==c.pid);if(k&&k.lock){c.img=k.img;c.imgs=k.imgs;c.realImg=k.realImg;if(img.src!==k.img)img.src=k.img}else if(k&&!c.imgs)c.imgs=k.imgs}
  const L=(c.imgs&&c.imgs.length?c.imgs:[c.img]).filter(Boolean);let i=0,n=0,dead=false;
@@ -365,7 +373,7 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
   const ti=$("tin"),dd=$("tdd");
   if(ti&&dd){
    const addT=raw=>{const o=col[c.id]||own,t=cleanTag(raw);if(!t)return;o.tags=o.tags||[];if(o.tags.includes(t)){toast("Déjà sur cette carte.");return}if(o.tags.length>=8){toast("8 étiquettes maximum par carte.");return}
-    o.tags.push(t);save();try{if(tab==2)collection()}catch(e){}draw();const n=$("tin");if(n)n.focus()};
+    o.tags.push(t);save();try{if(tab==2)collection()}catch(e){wcDbg(e)}draw();const n=$("tin");if(n)n.focus()};
    let hl=-1,items=[];
    const paint=()=>{const q=ti.value.trim().toLowerCase(),have=new Set((col[c.id]||own).tags||[]),all=colTags(),list=all.filter(t=>!have.has(t)&&(!q||t.toLowerCase().includes(q)));
     items=list.map(t=>({t,n:0}));const exact=all.some(t=>t.toLowerCase()==q);
@@ -378,11 +386,11 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
     else if(e.key=="Enter"){e.preventDefault();if(hl>=0&&bs[hl])addT(bs[hl].dataset.v);else if(ti.value.trim())addT(ti.value)}
     else if(e.key=="Escape"){dd.hidden=true}};
    ti.onblur=()=>setTimeout(()=>{dd.hidden=true},120)}
-  M.querySelectorAll(".tgs i").forEach(i=>i.onclick=()=>{const o=col[c.id]||own;o.tags=(o.tags||[]).filter(x=>x!=i.dataset.t);save();try{if(tab==2)collection()}catch(e){}draw()});
+  M.querySelectorAll(".tgs i").forEach(i=>i.onclick=()=>{const o=col[c.id]||own;o.tags=(o.tags||[]).filter(x=>x!=i.dataset.t);save();try{if(tab==2)collection()}catch(e){wcDbg(e)}draw()});
   const im=M.querySelector("img");if(im)im.onerror=()=>{im.src=ph(c.t)}};
  draw();
- if(c.src=="wiki"){try{const j=await(await fetch("https://fr.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(c.t))).json();if(M.style.display=="flex"&&j.extract&&store[id]===c){desc=j.extract;draw()}}catch(e){}}}
-function render(){clearInterval(timer);closeModal();try{SFX.stopAll()}catch(e){}try{simulate()}catch(e){}
+ if(c.src=="wiki"){try{const j=await(await fetch("https://fr.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(c.t))).json();if(M.style.display=="flex"&&j.extract&&store[id]===c){desc=j.extract;draw()}}catch(e){wcDbg(e)}}}
+function render(){clearInterval(timer);closeModal();try{SFX.stopAll()}catch(e){wcDbg(e)}try{simulate()}catch(e){wcDbg(e)}
  [0,1,2,3,4,5,6,7,8].forEach(i=>{const e=$("t"+i);if(e)e.className=tab==i?"on":""});
  try{([packs,all,collection,market,casino,missionsPage,eventPage,profilePage,succesPage][tab]||packs)()}
  catch(e){console.error(e);main.innerHTML=`<div class="msg">Oups, une erreur est survenue.<br><br><button class="btn" onclick="render()">Réessayer</button></div>`}}
@@ -441,10 +449,10 @@ async function getTop(){if(topCache)return topCache;
 /* ===== V116 : boosters plus variés (tout le catalogue, pas de thème, pas de doublons récents) ===== */
 const SRC=new WeakMap();
 const tkey=c=>String((c&&c.t)||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
-const RECENT_MAX=150;let RECENT=[];try{RECENT=JSON.parse(localStorage.getItem("wc_recent_pulls")||"[]")||[]}catch(e){}
+const RECENT_MAX=150;let RECENT=[];try{RECENT=JSON.parse(localStorage.getItem("wc_recent_pulls")||"[]")||[]}catch(e){wcDbg(e)}
 let RECENT_SET=new Set(RECENT);
 const isRecent=c=>RECENT_SET.has(tkey(c));
-function recordPulled(cs){try{cs.forEach(c=>{const k=tkey(c);if(k)RECENT.push(k)});RECENT=RECENT.slice(-RECENT_MAX);RECENT_SET=new Set(RECENT);localStorage.setItem("wc_recent_pulls",JSON.stringify(RECENT))}catch(e){}}
+function recordPulled(cs){try{cs.forEach(c=>{const k=tkey(c);if(k)RECENT.push(k)});RECENT=RECENT.slice(-RECENT_MAX);RECENT_SET=new Set(RECENT);localStorage.setItem("wc_recent_pulls",JSON.stringify(RECENT))}catch(e){wcDbg(e)}}
 /* V117 : tirage purement aléatoire. La rareté suit les % du jeu, puis la carte est tirée UNIFORMÉMENT parmi toutes les cartes candidates de cette rareté
    (pages Wikipédia au hasard + tout le catalogue + cartes VIP). Aucune catégorie, aucun thème, aucune préférence. Seule règle : ne pas redonner
    une carte tirée dans les 150 dernières. */
@@ -474,18 +482,18 @@ async function buildPack(minRarity=null){
   if(vt.length){const {pages,rd}=await wq(APIB+"redirects=1&titles="+encodeURIComponent(vt.slice(0,50).map(v=>v.t).join("|")));const forced={};vt.forEach(v=>{const a=rd[v.t]||v.t;forced[nz2(rd[a]||a)]=v.r});
    Object.values(pages).filter(ok).forEach(p=>{if(isExcludedTitle(p.title)||seen.has(p.pageid))return;seen.add(p.pageid);const c=mk(p,forced[nz2(p.title)]);SRC.set(c,"vip");pool.push(c)})}
   if(vt.some(v=>isSweetie(v.t))&&!pool.some(c=>c.pid===SPECIAL_ADULT_CARD.pid)){const c={...SPECIAL_ADULT_CARD};SRC.set(c,"vip");pool.push(c)}
- }catch(e){}
+ }catch(e){wcDbg(e)}
  try{if(window.wcCatalogV41&&window.wcCatalogV41.randomSample){const need={};rolls.forEach(r=>{need[r]=(need[r]||0)+1});const counts={};Object.keys(need).forEach(r=>{counts[r]=Math.max(12,need[r]*10)});
-  const extra=await window.wcCatalogV41.randomSample(counts);extra.forEach(c=>{if(!seen.has(c.pid)&&!isExcludedTitle(c.t)){seen.add(c.pid);SRC.set(c,"cat");store[c.id]=c;pool.push(c)}})}}catch(e){}
+  const extra=await window.wcCatalogV41.randomSample(counts);extra.forEach(c=>{if(!seen.has(c.pid)&&!isExcludedTitle(c.t)){seen.add(c.pid);SRC.set(c,"cat");store[c.id]=c;pool.push(c)}})}}catch(e){wcDbg(e)}
  if(rolls.some(r=>r>=2)&&top.length){ // articles très consultés (top mensuel) pour les rangs hauts
   const T=[],rr=[...new Set(rolls.filter(r=>r>=1))],tper=Math.max(5,Math.min(14,Math.floor(48/Math.max(1,rr.length))));rr.forEach(r=>T.push(...top.filter(x=>x.r==r).sort(()=>Math.random()-.5).slice(0,tper)));
-  if(T.length)try{add(await(await fetch(API+"titles="+encodeURIComponent(T.slice(0,50).map(x=>x.t).join("|")))).json(),"top")}catch(e){}}
+  if(T.length)try{add(await(await fetch(API+"titles="+encodeURIComponent(T.slice(0,50).map(x=>x.t).join("|")))).json(),"top")}catch(e){wcDbg(e)}}
  const used=new Set(),res=[];
  if(minRarity!=null){
   const creatorCand=CRE.filter(c=>c.r>=minRarity);
   let guaranteed=creatorCand.length?creatorCand[Math.floor(Math.random()*creatorCand.length)]:null;
   if(!guaranteed){const wc=pool.filter(c=>c.r>=minRarity&&!used.has(c.pid));if(wc.length)guaranteed=wc[Math.floor(Math.random()*wc.length)];}
-  if(!guaranteed&&top.length){const TT=top.filter(x=>x.r>=minRarity).sort(()=>Math.random()-.5).slice(0,12);if(TT.length)try{const jj=await (await fetch(API+"titles="+encodeURIComponent(TT.map(x=>x.t).join("|")))).json();add(jj,"top");const wc=pool.filter(c=>c.r>=minRarity&&!used.has(c.pid));if(wc.length)guaranteed=wc[Math.floor(Math.random()*wc.length)];}catch(e){}}
+  if(!guaranteed&&top.length){const TT=top.filter(x=>x.r>=minRarity).sort(()=>Math.random()-.5).slice(0,12);if(TT.length)try{const jj=await (await fetch(API+"titles="+encodeURIComponent(TT.map(x=>x.t).join("|")))).json();add(jj,"top");const wc=pool.filter(c=>c.r>=minRarity&&!used.has(c.pid));if(wc.length)guaranteed=wc[Math.floor(Math.random()*wc.length)];}catch(e){wcDbg(e)}}
   if(guaranteed){
    // Dans le Booster Légendaire, l'emplacement garanti peut devenir un Légendaire holo full art.
    if(minRarity===6 && Math.random()<LEGEND_HFA_BOOSTER_CHANCE){
@@ -498,7 +506,7 @@ async function buildPack(minRarity=null){
       add(jj,"top");
       const wc=pool.filter(c=>c.r===7&&!used.has(c.pid));
       if(wc.length) guaranteed=wc[Math.floor(Math.random()*wc.length)];
-     }catch(e){}
+     }catch(e){wcDbg(e)}
     }
    }
    used.add(guaranteed.pid);res.push(guaranteed)
@@ -564,7 +572,7 @@ async function clues(c){
   if(oc&&E[oc]){const l=E[oc].labels;if(l.fr||l.en)out.push(`<small>Domaine</small>${(l.fr||l.en).value}`)}
   const w=c.t.toLowerCase().split(/\W+/).filter(x=>x.length>2),cj=await J(BASE+"prop=categories&clshow=!hidden&cllimit=40&titles="+encodeURIComponent(c.t)),
    cats=(Object.values(cj.query.pages)[0].categories||[]).map(x=>x.title.replace(/^Catégorie:/,"")).filter(x=>!w.some(y=>x.toLowerCase().includes(y)));
-  if(cats.length)out.push(`<small>Thème</small>${cats[Math.floor(Math.random()*cats.length)]}`)}catch(e){}
+  if(cats.length)out.push(`<small>Thème</small>${cats[Math.floor(Math.random()*cats.length)]}`)}catch(e){wcDbg(e)}
  while(out.length<3)out.push(`<small>Indice</small>${out.length?"…":(c.d||"Un grand mystère")}`);
  return out}
 // tunnel : plus la rareté est haute, plus c'est long ; holo full art = 15 s, arc-en-ciel, 3 indices, secousses et anneaux de choc
@@ -615,7 +623,7 @@ async function loadFilms(){
  if(FILMS_LOADING)return FILMS_LOADING;
  FILMS_LOADING=(async()=>{
    try{
-     let cached=null;try{cached=JSON.parse(localStorage.getItem(FILM_CACHE_KEY)||"null")}catch(e){}
+     let cached=null;try{cached=JSON.parse(localStorage.getItem(FILM_CACHE_KEY)||"null")}catch(e){wcDbg(e)}
      if(cached&&Array.isArray(cached)&&cached.length===1000){FILMS=cached;FILMS_READY=true;return FILMS}
      let payload=null;
      try{
@@ -646,7 +654,7 @@ async function loadFilms(){
      if(selected.length<1000)throw new Error(`Seulement ${selected.length} films avec affiche disponibles`);
      selected.sort((a,b)=>b.__score-a.__score||(+b.votes||0)-(+a.votes||0));
      FILMS=selected.slice(0,1000).map((m,i)=>makeFilm(m,filmRarity(i)));
-     try{localStorage.setItem(FILM_CACHE_KEY,JSON.stringify(FILMS))}catch(e){}
+     try{localStorage.setItem(FILM_CACHE_KEY,JSON.stringify(FILMS))}catch(e){wcDbg(e)}
      FILMS_READY=true;return FILMS;
    }catch(e){
      console.warn("Catalogue films indisponible",e);FILMS=[];FILMS_READY=true;return FILMS;
@@ -779,7 +787,7 @@ async function wq(u){const pages={},rd={};let cont={},gen=null;
 async function loadRank(){if(RANK.length)return;
  const filmPromise=loadFilms();
  const today=new Date().toISOString().slice(0,10);let W=null;
- try{const s=JSON.parse(localStorage.getItem("wc_rank6")||"null");if(s&&s.day==today)W=s.l}catch(e){}
+ try{const s=JSON.parse(localStorage.getItem("wc_rank6")||"null");if(s&&s.day==today)W=s.l}catch(e){wcDbg(e)}
  if(!W){const d=new Date(),ms=[1,2,3,4,5,6].map(n=>{const x=new Date(d.getFullYear(),d.getMonth()-n,1);return[x.getFullYear(),x.getMonth()+1]});
   const js=await Promise.all(ms.map(([y,m])=>fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/top/fr.wikipedia/all-access/${y}/${p2(m)}/all-days`).then(r=>r.json()).catch(()=>null)));
   const sum={},nm={};
@@ -792,7 +800,7 @@ async function loadRank(){if(RANK.length)return;
 Object.keys(OVR).forEach(t=>{if(sum[t]==null&&dd[t]==null)sum[t]=0});
 EXTRA.forEach(t=>{sum[t]=Math.max(sum[t]||0,2e5)});
   W=[...new Set([...Object.keys(sum),...Object.keys(dd)])].filter(t=>!isRemovedTitle(t)).map(t=>{const a=Math.round(sum[t]!==undefined?Math.max(sum[t]/(nm[t]||1),dd[t]||0):dd[t]);return[t,OVR[t]??boost(t,rarOf(a)),a]});
-  try{localStorage.setItem("wc_rank6",JSON.stringify({day:today,l:W}))}catch(e){}}
+  try{localStorage.setItem("wc_rank6",JSON.stringify({day:today,l:W}))}catch(e){wcDbg(e)}}
  const films=await filmPromise;
  const cn=new Set(CRE.map(c=>c.t));
  RANK=withVip([...W.filter(x=>!cn.has(x[0])).map(x=>({t:x[0],r:x[1],v:x[2],src:"wiki"})),...CRE.map(c=>({t:c.t,r:c.r,v:1e11,cr:c})),...films]).sort((a,b)=>b.r-a.r||(b.o||0)-(a.o||0)||b.v-a.v||String(a.t).localeCompare(String(b.t)));
@@ -807,11 +815,7 @@ EXTRA.forEach(t=>{sum[t]=Math.max(sum[t]||0,2e5)});
  RANK.sort((a,b)=>b.r-a.r||(b.o||0)-(a.o||0)||b.v-a.v||String(a.t).localeCompare(String(b.t)));
  RANKSET=new Set(RANK.map(e=>e.t))}
 // curseur : "r:i" = classement, "a:Titre" = reste de Wikipédia A→Z, "s:n" = recherche
-/* Toutes les cartes : mémoire des pages déjà vues (10 min) + préchargement silencieux de la page suivante */
-const COLLECT_MEM=new Map(),COLLECT_TTL=6e5,collectCtx=()=>[SO,CG,q,[...fr].sort().join()].join("¦");
-function collectCached(cur,c){const k=c+"¦"+cur,e=COLLECT_MEM.get(k);if(e&&Date.now()-e.t<COLLECT_TTL)return e.p;const p=collectRaw(cur);COLLECT_MEM.set(k,{t:Date.now(),p});p.catch(()=>COLLECT_MEM.delete(k));if(COLLECT_MEM.size>14)COLLECT_MEM.delete(COLLECT_MEM.keys().next().value);return p}
-function collect(cur){const c=collectCtx(),p=collectCached(cur,c);p.then(r=>{if(r&&r.next&&collectCtx()===c&&tab===1)setTimeout(()=>{if(collectCtx()===c&&tab===1)collectCached(r.next,c)},300)}).catch(()=>{});return p}
-async function collectRaw(cur){let mode=cur[0],val=cur.slice(2),out=[];
+async function collect(cur){let mode=cur[0],val=cur.slice(2),out=[];
  if(mode=="r"&&(SO=="az"||fr.size&&![...fr].some(r=>RANK.some(e=>e.r==r&&(!CG||e.g===CG))))){mode=CG?"c":"a";val=CG?"0|":""}
  const push=c=>{const k=nz2(c&&c.t);if(!k||out.some(o=>nz2(o&&o.t)===k))return;if(noImageTitle(c.t))return;if(!fr.size||fr.has(c.r))out.push(c)};
  for(let t=0;t<(fr.size?45:14)&&out.length<PS;t++){
@@ -823,7 +827,7 @@ async function collectRaw(cur){let mode=cur[0],val=cur.slice(2),out=[];
   else if(mode=="c"){const cats=catList(CG);let [cis,cont]=val.split("|");const ci=+cis||0;
    if(CG==="adult"&&ci===0&&+cis===0){push(SPECIAL_ADULT_CARD);}if(ci>=cats.length)return{out,next:null};
    const need=Math.max(10,PS-out.length);let r={pages:{},next:null};
-   try{r=await wq(API+"generator=categorymembers&gcmtitle="+encodeURIComponent("Catégorie:"+cats[ci])+"&gcmtype=page&gcmlimit="+need+(cont?"&gcmcontinue="+encodeURIComponent(cont):""))}catch(e){}
+   try{r=await wq(API+"generator=categorymembers&gcmtitle="+encodeURIComponent("Catégorie:"+cats[ci])+"&gcmtype=page&gcmlimit="+need+(cont?"&gcmcontinue="+encodeURIComponent(cont):""))}catch(e){wcDbg(e)}
    Object.values(r.pages).sort((a,b)=>(a.index||0)-(b.index||0)).forEach(p=>{if(isSweetie(p.title)){push({...SPECIAL_ADULT_CARD});return}if(isRemovedTitle(p.title)||RANKSET.has(p.title))return;rawTot++;if(!ok(p))return;imgTot++;push(mk(p))});
    val=r.next!=null?ci+"|"+r.next:(ci+1)+"|"}
   else{const off=val,u=API+(mode=="s"?"generator=search&gsrlimit=50&gsrsearch="+encodeURIComponent(q)+"&gsroffset="+off:"generator=allpages&gaplimit=50&gapfilterredir=nonredirects"+(off?"&gapfrom="+encodeURIComponent(off):""));
@@ -852,10 +856,10 @@ async function localCatalogFallback(){
    rows.sort((a,b)=>(b.r||0)-(a.r||0)||(a.t||"").localeCompare(b.t||"")).forEach(add);
   }
   db.close();
- }catch(e){}
+ }catch(e){wcDbg(e)}
  // Secours immédiat : la collection locale contient déjà des milliers de cartes avec image.
  // On l'utilise si l'API Wikipédia est momentanément indisponible.
- try{Object.values(col||{}).forEach(add)}catch(e){}
+ try{Object.values(col||{}).forEach(add)}catch(e){wcDbg(e)}
  CRE.forEach(add);
  return out.slice((page-1)*PS,page*PS);
 }
@@ -896,7 +900,7 @@ const PRICE=[10,30,80,180,400,2000,5000,15000,35000,80000],price=c=>{
  return Math.max(1,Math.round(base*market));
 };
 function upM(){$("mn").textContent="🪙 "+money.toLocaleString("fr-FR")}
-const gain=n=>{money+=n;save();upM();if(n>=1)try{SFX.cash()}catch(e){}};
+const gain=n=>{money+=n;save();upM();if(n>=1)try{SFX.cash()}catch(e){wcDbg(e)}};
 /* ===== ENCHÈRES (toi et des joueurs IA aux pseudos humains) ===== */
 const DUR=[["10 min",6e5],["30 min",18e5],["1 h",36e5],["3 h",108e5],["6 h",216e5],["12 h",432e5]];
 const ME="__me",MAXS=5;
@@ -908,23 +912,23 @@ const BOT_STYLE={
 };
 let MK={A:[],H:[],W:[],PX:{},n:5};
 try{const x=JSON.parse(localStorage.getItem("wc_mk3")||"null");if(x&&x.A)MK={...MK,...x};
- else{const o=JSON.parse(localStorage.getItem("wc_mk2")||"null");if(o&&o.A){o.A.forEach(a=>{if(a.s==-1){if(a.w==-1)money+=a.b;const c={...a.c};col[c.id]=col[c.id]?{...col[c.id],n:col[c.id].n+1}:{...c,n:1}}else if(a.w==-1)money+=a.b});localStorage.removeItem("wc_mk2");save()}}}catch(e){}
+ else{const o=JSON.parse(localStorage.getItem("wc_mk2")||"null");if(o&&o.A){o.A.forEach(a=>{if(a.s==-1){if(a.w==-1)money+=a.b;const c={...a.c};col[c.id]=col[c.id]?{...col[c.id],n:col[c.id].n+1}:{...c,n:1}}else if(a.w==-1)money+=a.b});localStorage.removeItem("wc_mk2");save()}}}catch(e){wcDbg(e)}
 
 // V81 : purge les cartes explicitement retirées des enchères sauvegardées.
 try{
  const isBlocked=x=>x&&x.c&&isRemovedTitle(x.c.t);
  MK.A=(MK.A||[]).filter(a=>!isBlocked(a));MK.H=(MK.H||[]).filter(a=>!isBlocked(a));MK.W=(MK.W||[]).filter(a=>!isBlocked(a));
-}catch(e){}
+}catch(e){wcDbg(e)}
 // V84 : retire aussi l'ancienne carte Wiki « Kameto » des enchères, sans toucher à la carte créateur.
 try{
  const bad=a=>a&&a.c&&(()=>false)(a.c);
  MK.A=(MK.A||[]).filter(a=>!bad(a));MK.H=(MK.H||[]).filter(a=>!bad(a));MK.W=(MK.W||[]).filter(a=>!bad(a));
-}catch(e){}
+}catch(e){wcDbg(e)}
 // V79 : supprime Norman Thavaud, doublon de Norman, dans la sauvegarde des enchères.
 try{
  const isDup=c=>c&&DUPLICATE_TITLES.has(String(c.t||"").trim().toLowerCase());
  MK.A=(MK.A||[]).filter(x=>!isDup(x.c));MK.H=(MK.H||[]).filter(x=>!isDup(x.c));MK.W=(MK.W||[]).filter(x=>!isDup(x.c));
-}catch(e){}
+}catch(e){wcDbg(e)}
 MK.W=MK.W||[];
 // V80 : remet aussi les cartes d'enchères sur les 8 raretés actuelles.
 try{
@@ -936,8 +940,8 @@ try{
  };
  MK.A=(MK.A||[]).map(a=>({...a,c:normMkCard(a.c)}));MK.H=(MK.H||[]).map(a=>({...a,c:normMkCard(a.c)}));MK.W=(MK.W||[]).map(a=>({...a,c:normMkCard(a.c)}));
  MK.PX={};
-}catch(e){}
-const saveMk=()=>{try{localStorage.setItem("wc_mk3",JSON.stringify(MK))}catch(e){}};
+}catch(e){wcDbg(e)}
+const saveMk=()=>{try{localStorage.setItem("wc_mk3",JSON.stringify(MK))}catch(e){wcDbg(e)}};
 // V74 : purge des anciennes annonces Zbb dans les enchères sauvegardées.
 try{
  const isZbb=x=>x&&x.c&&["zbb","amine"].includes(String(x.c.t||"").trim().toLowerCase());
@@ -945,7 +949,7 @@ try{
  MK.H=(MK.H||[]).filter(a=>!isZbb(a));
  MK.W=(MK.W||[]).filter(a=>!isZbb(a));
  saveMk();
-}catch(e){}
+}catch(e){wcDbg(e)}
 const fair=c=>Math.max(1,Math.round(price(c)*.6+(MK.PX[c.r]||price(c))*.4));
 /* V114 : toute carte défaussée rapporte 10 🪙, quelle que soit sa rareté */
 const DISCARD_VALUE=10;
@@ -1023,7 +1027,7 @@ function simulate(){
 /* ===== V100 : liste de souhaits + alertes d'enchères ===== */
 let WL={},WLOG=[],WLU=0,WLV=0;
 try{WL=JSON.parse(localStorage.getItem("wc_wish")||"{}")||{};WLOG=JSON.parse(localStorage.getItem("wc_wish_log")||"[]")||[];WLU=+localStorage.getItem("wc_wish_unread")||0}catch(e){WL={};WLOG=[]}
-const saveWL=()=>{try{localStorage.setItem("wc_wish",JSON.stringify(WL));localStorage.setItem("wc_wish_log",JSON.stringify(WLOG.slice(0,40)));localStorage.setItem("wc_wish_unread",String(WLU))}catch(e){}};
+const saveWL=()=>{try{localStorage.setItem("wc_wish",JSON.stringify(WL));localStorage.setItem("wc_wish_log",JSON.stringify(WLOG.slice(0,40)));localStorage.setItem("wc_wish_unread",String(WLU))}catch(e){wcDbg(e)}};
 const isW=c=>!!(c&&WL[c.pid]);
 function wlBadge(){const b=$("t3");if(b)b.innerHTML="🔨 Enchères"+(WLU>0?` <span class="wlb" title="Alertes de ta liste de souhaits">⭐${WLU}</span>`:"")}
 function toggleW(c){if(!c)return false;
@@ -1037,14 +1041,14 @@ function wlAlert(a,kind){
  const msg=kind=="soon"?`⏰ « ${a.c.t} » (liste de souhaits) se termine bientôt · ${cur} 🪙`:`⭐ « ${a.c.t} » vient d'être mise en vente · dès ${cur} 🪙`;
  WLOG.unshift({pid:a.c.pid,t:a.c.t,k:kind,p:cur,ts:Date.now(),aid:a.id});WLOG.length=Math.min(WLOG.length,40);
  if(!(tab==3&&AV.tab=="w"))WLU++;
- WLV++;saveWL();wlBadge();toast(msg);try{SFX.reveal(Math.min(3,a.c.r))}catch(e){}
- try{if(document.hidden&&window.Notification&&Notification.permission=="granted")new Notification("WikiCollect",{body:msg.replace(/^[^ ]+ /,"")})}catch(e){}
+ WLV++;saveWL();wlBadge();toast(msg);try{SFX.reveal(Math.min(3,a.c.r))}catch(e){wcDbg(e)}
+ try{if(document.hidden&&window.Notification&&Notification.permission=="granted")new Notification("WikiCollect",{body:msg.replace(/^[^ ]+ /,"")})}catch(e){wcDbg(e)}
 }
 function wlOnListed(a){if(a&&a.s!=ME&&WL[a.c.pid]){a.wl=1;wlAlert(a,"listed")}}
 /* V112 : une carte de la liste de souhaits qu'on obtient (booster, enchère, fusion…) en est retirée automatiquement */
-function wlPrune(){let ch=0;try{_own.t=0}catch(e){}
+function wlPrune(){let ch=0;try{_own.t=0}catch(e){wcDbg(e)}
  Object.keys(WL).forEach(k=>{const w=WL[k];if(w&&w.c&&ownN(w.c)>0){delete WL[k];ch++;WLOG.unshift({pid:k,t:w.c.t,k:"got",p:0,ts:Date.now()});toast(`🎉 Tu as obtenu « ${w.c.t} » : retirée de ta liste de souhaits.`)}});
- if(ch){WLOG.length=Math.min(WLOG.length,40);WLV++;saveWL();try{if(tab==3)paintMk(true)}catch(e){}}return ch}
+ if(ch){WLOG.length=Math.min(WLOG.length,40);WLV++;saveWL();try{if(tab==3)paintMk(true)}catch(e){wcDbg(e)}}return ch}
 function wlTick(){
  wlPrune();
  const now=Date.now();let ch=0;
@@ -1068,9 +1072,9 @@ function wlSpawn(){
   MK.A.push(a);wlOnListed(a);n++});
  if(n){saveMk();if(tab==3)paintMk(true)}
 }
-setInterval(()=>{try{wlSpawn()}catch(e){}},20000);
-setInterval(()=>{try{wlTick()}catch(e){}},4000);
-setTimeout(()=>{try{wlBadge();wlTick()}catch(e){}},1500);
+setInterval(()=>{try{wlSpawn()}catch(e){wcDbg(e)}},20000);
+setInterval(()=>{try{wlTick()}catch(e){wcDbg(e)}},4000);
+setTimeout(()=>{try{wlBadge();wlTick()}catch(e){wcDbg(e)}},1500);
 function wishTab(){
  wlPrune();
  const L=Object.values(WL).sort((x,y)=>y.ts-x.ts);
@@ -1090,8 +1094,18 @@ function ownMap(){const now=Date.now();if(_own.m&&now-_own.t<1500)return _own.m;
 function ownN(c){if(!c)return 0;const m=ownMap();return Math.max(m.get(c.id)||0,c.pid?m.get(c.pid)||0:0,c.t?m.get("t:"+String(c.t).toLowerCase())||0:0)}
 function markOwned(root){if(!root)return;_own.t=0;root.querySelectorAll(".card").forEach(e=>{if(e.classList.contains("isown"))return;const c=store[e.dataset.id],n=ownN(c);if(!n)return;
  e.classList.add("isown");const inn=e.querySelector(".in");if(inn&&!inn.querySelector(".ownb")){const b=document.createElement("span");b.className="ownb";b.textContent="✓ POSSÉDÉE"+(n>1?" ×"+n:"");inn.appendChild(b)}})}
-/* branche les cartes (images, effets) puis marque celles que tu possèdes déjà */
-function bind(root,rm=true){bindCards(root,rm);try{if(root&&((root.id=="g"&&tab==1)||(root.id=="ah"&&tab==3)))markOwned(root)}catch(e){}}
+{const _bind=bind;bind=function(root,rm){const r=_bind.apply(this,arguments);try{if(root&&((root.id=="g"&&tab==1)||(root.id=="ah"&&tab==3)))markOwned(root)}catch(e){wcDbg(e)}return r}}
+/* V122 : une seule carte par article. Même article = même rareté (celle que tu possèdes déjà), et les doubles existants sont fusionnés. */
+const dkey=c=>nz2(c&&c.t).replace(/\bier\b/g,"1er").replace(/\bpremier\b/g,"1er");
+let _orr={t:0,m:null};
+function ownedRar(pid,title){return null; /* V125 : désactivé (les doublons sont voulus) */ const now=Date.now();if(!_orr.m||now-_orr.t>1500){const m=new Map();Object.values(col).forEach(c=>{if(!c||!(c.n>0)||c.src==="film"||c.src==="cr")return;const r=+c.r;[c.pid,"t:"+dkey(c)].forEach(k=>{if(k&&!(m.get(k)>=r))m.set(k,r)})});_orr={t:now,m}}
+ const a=_orr.m.get(pid),b=_orr.m.get("t:"+dkey({t:title}));return a!=null?a:b}
+function dedupCol(){return 0; /* V125 : désactivé (les doublons sont voulus) */ let ch=0;const g=new Map();
+ Object.values(col).forEach(c=>{if(!c||!(c.n>0)||c.src==="film"||c.src==="cr")return;const k=dkey(c);if(!k)return;if(!g.has(k))g.set(k,[]);g.get(k).push(c)});
+ g.forEach(a=>{if(a.length<2)return;a.sort((x,y)=>(+y.r-+x.r)||(y.n-x.n));const keep=a[0];
+  a.slice(1).forEach(o=>{keep.n+=o.n;const t=[...new Set([...(keep.tags||[]),...(o.tags||[])])].slice(0,8);if(t.length)keep.tags=t;if(!keep.img&&o.img)keep.img=o.img;delete col[o.id];ch++})});
+ if(ch){_orr.t=0;_own.t=0;try{save()}catch(e){wcDbg(e)}try{toast("🧹 "+ch+" doublon"+(ch>1?"s":"")+" de cartes fusionné"+(ch>1?"s":"")+" (une seule carte par article)")}catch(e){wcDbg(e)}}return ch}
+try{dedupCol()}catch(e){console.warn("dedupCol",e)}
 /* V126 : « Plus récentes d'abord » = vraiment l'ordre d'obtention. Chaque carte reçoit une date quand elle arrive (ou quand un nouvel exemplaire arrive). */
 let _ln=null;
 function stampRecent(){if(!_ln)return;const now=Date.now();let k=0;Object.keys(col).forEach(id=>{const c=col[id];if(!c)return;const n=c.n||0,p=_ln[id];if(p===undefined||n>p)c.addedAt=now+(k++);_ln[id]=n});Object.keys(_ln).forEach(id=>{if(!col[id])delete _ln[id]})}
@@ -1099,7 +1113,8 @@ function stampInit(){const ids=Object.keys(col),base=Date.now()-1e9;_ln={};ids.f
 try{stampInit()}catch(e){console.warn("stampInit",e)}
 /* V129 : copie complète de la collection dans IndexedDB. Si le stockage normal du navigateur était plein, on récupère cette copie au démarrage. */
 (async()=>{try{const W=window.WCSAVE;if(!W){window.__colChecked=true;return}const r=await W.get("col");const lt=window.__LT0||0;
- if(r&&r.ls===false&&r.col&&lt>0&&r.t>lt+1500){const n=Object.keys(r.col).length;if(n>=Object.keys(col).length){col=r.col;try{hyd()}catch(e){}try{stampInit()}catch(e){}save();try{render()}catch(e){}try{toast("♻️ Collection récupérée depuis la copie de secours ("+n.toLocaleString("fr-FR")+" cartes)")}catch(e){}}}}catch(e){console.warn("récup collection",e)}window.__colChecked=true})();
+ if(r&&r.ls===false&&r.col&&lt>0&&r.t>lt+1500){const n=Object.keys(r.col).length;if(n>=Object.keys(col).length){col=r.col;try{hyd()}catch(e){wcDbg(e)}try{stampInit()}catch(e){wcDbg(e)}save();try{render()}catch(e){wcDbg(e)}try{toast("♻️ Collection récupérée depuis la copie de secours ("+n.toLocaleString("fr-FR")+" cartes)")}catch(e){wcDbg(e)}}}}catch(e){console.warn("récup collection",e)}window.__colChecked=true})();
+{const _col=collection;collection=function(){try{dedupCol()}catch(e){wcDbg(e)}return _col.apply(this,arguments)}}
 let filling=false;
 async function refill(){
  if(filling)return;
@@ -1185,7 +1200,7 @@ async function refill(){
     a.last=a.hs[0].ts;
     a.cool[u]=now+4000+Math.random()*9000;
    }
-   MK.A.push(a);try{wlOnListed(a)}catch(e){}
+   MK.A.push(a);try{wlOnListed(a)}catch(e){wcDbg(e)}
   });
   saveMk()
  }catch(e){console.error(e)}finally{filling=false}
@@ -1250,7 +1265,7 @@ function listPage(){
   $("ah").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;AV.fr.has(i)?AV.fr.delete(i):AV.fr.add(i);paintMk(true)})}
  if($("sell"))$("sell").onclick=pickSell;
  $("ah").querySelectorAll(".wlrm").forEach(b=>b.onclick=e=>{e.stopPropagation();const p=b.dataset.p;if(WL[p]){delete WL[p]}else{const k=Object.keys(WL).find(x=>String(x)==p);if(k)delete WL[k]}WLV++;saveWL();paintMk(true)});
- if($("wlnotif"))$("wlnotif").onclick=()=>{try{Notification.requestPermission().then(()=>paintMk(true))}catch(e){}};
+ if($("wlnotif"))$("wlnotif").onclick=()=>{try{Notification.requestPermission().then(()=>paintMk(true))}catch(e){wcDbg(e)}};
  bind($("ah"),false);$("ah").querySelectorAll(".at").forEach(t=>{const cd=t.querySelector(".card");if(cd)cd.onclick=null;if(t.dataset.id)t.onclick=()=>{AV.d=t.dataset.id;paintMk(true)}})}
 function detailPage(){const a=MK.A.find(x=>x.id==AV.d&&!x.done);
  if(!a){AV.d=null;return listPage()}
@@ -1277,8 +1292,8 @@ async function market(){
  // Le remplissage lourd se fait après le premier rendu, en arrière-plan.
  setTimeout(()=>{if(tab!==3)return;refill().then(()=>{if(tab===3)paintMk(true)}).catch(e=>console.warn("refill marché",e))},0);
  timer=setInterval(()=>{if(tab!=3)return;simulate();paintMk(false);if(++tk%30==0)refill().then(()=>paintMk(true)).catch(()=>{})},1000)}
-setInterval(()=>{try{if(tab!=3)simulate();else {simulate();updateAuctionDom()}}catch(e){}},15000);
-const take=b=>{b=Math.floor(b);if(!(b>=1)||b>money){try{SFX.error()}catch(e){}alert("Mise invalide ou pas assez de pièces.");return 0}money-=b;SFX.bet();WCJ+=Math.max(1,Math.floor(b*.02));bumpDaily("casino",1);save();saveJ();upM();return b};
+setInterval(()=>{try{if(tab!=3)simulate();else {simulate();updateAuctionDom()}}catch(e){wcDbg(e)}},15000);
+const take=b=>{b=Math.floor(b);if(!(b>=1)||b>money){try{SFX.error()}catch(e){wcDbg(e)}alert("Mise invalide ou pas assez de pièces.");return 0}money-=b;SFX.bet();WCJ+=Math.max(1,Math.floor(b*.02));bumpDaily("casino",1);save();saveJ();upM();return b};
 const alive=id=>!!$(id);
 /* V99 : ancienne version de casino() supprimée (elle était écrasée par la suivante) */
 const bk=()=>`<button class="btn g" id="bk" style="margin-bottom:14px">← Retour au casino</button>`;()=>`<button class="btn g" id="bk" style="margin-bottom:14px">← Retour au casino</button>`;
@@ -1297,8 +1312,8 @@ function mines(){
  $("mgo").onclick=()=>{if(G&&!G.over)return;const b=take(+$("mb").value);if(!b)return;const m=+$("mm").value,mines=new Set();while(mines.size<m)mines.add(Math.floor(Math.random()*25));G={b,m,mines,open:new Set(),over:false};paint()};
  $("mcash").onclick=cash;
  $("mgrid").onclick=e=>{const c=e.target.closest(".mc");if(!c||!G||G.over)return;const i=+c.dataset.i;if(G.open.has(i))return;
-  if(G.mines.has(i)){try{SFX.mineBoom()}catch(e){}G.over=true;paint();$("mst").textContent="💥 Mine ! Tu perds "+G.b+" 🪙";return}
-  G.open.add(i);try{SFX.gem()}catch(e){}paint();if(G.open.size==25-G.m)cash()};
+  if(G.mines.has(i)){try{SFX.mineBoom()}catch(e){wcDbg(e)}G.over=true;paint();$("mst").textContent="💥 Mine ! Tu perds "+G.b+" 🪙";return}
+  G.open.add(i);try{SFX.gem()}catch(e){wcDbg(e)}paint();if(G.open.size==25-G.m)cash()};
  paint()}
 
 /* ---------- PILE OU FACE ---------- */
@@ -1402,9 +1417,7 @@ const CARD_CASES=[
  {n:'Legend Case',p:3000,items:[{r:0,w:5},{r:1,w:10},{r:2,w:18},{r:3,w:35},{r:4,w:12},{r:5,w:10},{r:6,w:9},{r:7,w:1}]}
 ];
 let CASE_POOL=[];
-/* pool des Card Case : cartes Wikipédia + échantillon du gros catalogue quand il est disponible */
-async function loadCasePool(need){let pool=await loadCasePoolWiki(need);try{if(window.wcCatalogV41){const extra=await window.wcCatalogV41.sample(700);const seen=new Set(pool.map(c=>c.id));extra.forEach(c=>{if(c.img&&(!need||c.r>=need)&&!seen.has(c.id)){seen.add(c.id);pool.push(c);store[c.id]=c}})}}catch(e){}return pool}
-async function loadCasePoolWiki(need){
+async function loadCasePool(need){
  if(CASE_POOL.length>=180&&(need==null||CASE_POOL.some(c=>c.r===need)))return CASE_POOL;
  const seen=new Set(CASE_POOL.map(c=>c.id));
  const add=c=>{if(!c||!c.id||!c.img||seen.has(c.id))return;seen.add(c.id);CASE_POOL.push(c);store[c.id]=c};
@@ -1422,7 +1435,7 @@ async function loadCasePoolWiki(need){
    const j=await (await fetch(API+"generator=random&grnnamespace=0&grnlimit=50")).json();
    Object.values(j.query?.pages||{}).forEach(pg=>{if(ok(pg))add(mk(pg))});
   }
- }catch(e){}
+ }catch(e){wcDbg(e)}
  return CASE_POOL;
 }
 function chooseCaseCard(r,pool){
@@ -1445,11 +1458,11 @@ async function cardcases(){
  const reelCardHTML=c=>`<div class="caseitem"><img src="${c.img||ph(c.t)}" alt="${esc(c.t)}" onerror="this.src='${ph(c.t)}'"><b title="${esc(c.t)}">${esc(c.t)}</b><small>${R[c.r]?.[0]||'Carte'}</small></div>`;
  const stopCurrent=()=>{
   cancelAnimationFrame(tickRaf);
-  if(grantFn){const g=grantFn;grantFn=null;try{g()}catch(e){}}
+  if(grantFn){const g=grantFn;grantFn=null;try{g()}catch(e){wcDbg(e)}}
   if(spinTimer){clearTimeout(spinTimer);spinTimer=null}
   if(tickTimer){clearInterval(tickTimer);tickTimer=null}
-  if(spinStop){try{spinStop()}catch(e){};spinStop=null}
-  try{SFX.stopAll()}catch(e){}
+  if(spinStop){try{spinStop()}catch(e){wcDbg(e)};spinStop=null}
+  try{SFX.stopAll()}catch(e){wcDbg(e)}
  };
  const draw=async()=>{
   stopCurrent();const C=CARD_CASES[ci];loadInv();
@@ -1491,12 +1504,12 @@ async function cardcases(){
     $('cwin').textContent='La roulette tourne…';$('chint').textContent='Les cartes défilent…';
     const DUR=7.5;let lastIdx=-1,finished=false;
     // un « tic » à chaque carte qui passe sous le curseur
-    const tickLoop=()=>{if(finished)return;try{const tx=new DOMMatrix(getComputedStyle(rr).transform).m41,idx=Math.floor((centerX-rr.offsetLeft-tx)/stride);if(idx!==lastIdx){lastIdx=idx;SFX.tick(idx)}}catch(e){}tickRaf=requestAnimationFrame(tickLoop)};
+    const tickLoop=()=>{if(finished)return;try{const tx=new DOMMatrix(getComputedStyle(rr).transform).m41,idx=Math.floor((centerX-rr.offsetLeft-tx)/stride);if(idx!==lastIdx){lastIdx=idx;SFX.tick(idx)}}catch(e){wcDbg(e)}tickRaf=requestAnimationFrame(tickLoop)};
     // la carte est créditée même si tu quittes la page pendant le tirage
-    const grant=()=>{let a=[];try{a=JSON.parse(localStorage.getItem('wc_card_case_inv')||'[]')}catch(e){}a.push({...win,ts:Date.now()});try{localStorage.setItem('wc_card_case_inv',JSON.stringify(a))}catch(e){}
+    const grant=()=>{let a=[];try{a=JSON.parse(localStorage.getItem('wc_card_case_inv')||'[]')}catch(e){wcDbg(e)}a.push({...win,ts:Date.now()});try{localStorage.setItem('wc_card_case_inv',JSON.stringify(a))}catch(e){wcDbg(e)}
      const had=!!col[win.id];col[win.id]=had?{...col[win.id],n:col[win.id].n+1}:{...win,n:1};if(had)bumpDaily("dupe",1);if(win.src==="cr")bumpDaily("creator",1);bumpDaily("case",1);save();upM();loadInv();busy=false;const ob=$('copen');if(ob)ob.disabled=false};
     grantFn=grant;
-    try{SFX.riser(2.4)}catch(e){}tickRaf=requestAnimationFrame(tickLoop);
+    try{SFX.riser(2.4)}catch(e){wcDbg(e)}tickRaf=requestAnimationFrame(tickLoop);
     requestAnimationFrame(()=>{rr.style.transition=`transform ${DUR}s cubic-bezier(.17,.55,.12,1)`;rr.style.transform=`translate3d(${shift}px,0,0)`});
     const finish=()=>{if(finished)return;finished=true;cancelAnimationFrame(tickRaf);if(spinTimer){clearTimeout(spinTimer);spinTimer=null}
      if(grantFn){grantFn=null;grant()}
@@ -1541,7 +1554,7 @@ function crash(){
   const dt=Math.min(100,now-last);last=now;
   G.m*=Math.pow(1.00035,dt);
   if(G.m>=G.cp){
-   try{SFX.crashBoom()}catch(e){}G.m=G.cp;G.over=true;hist.push(G.cp);G.msg=`💥 Crash à ${G.cp.toFixed(2)}× · mise perdue : ${G.bet.toLocaleString('fr-FR')} 🪙`;cancelAnimationFrame(raf);paint();return;
+   try{SFX.crashBoom()}catch(e){wcDbg(e)}G.m=G.cp;G.over=true;hist.push(G.cp);G.msg=`💥 Crash à ${G.cp.toFixed(2)}× · mise perdue : ${G.bet.toLocaleString('fr-FR')} 🪙`;cancelAnimationFrame(raf);paint();return;
   }
   updateVisual();raf=requestAnimationFrame(tick);
  };
@@ -1608,7 +1621,7 @@ function roulette(){
      else{const S=[n];if(dx)S.push(n+dx);if(dy)S.push(n+3*dy);if(dx&&dy)S.push(n+dx+3*dy);nums=S}}}
    nums=[...new Set(nums)].sort((a,b)=>a-b);k="i"+nums.join("-")}
   if(bets.reduce((s,y)=>s+y.a,0)+chip>money)return alert("Pas assez de pièces.");
-  bets.push({k,nums,a:chip,x:cx,y:cy});try{SFX.chip()}catch(e){}draw()};
+  bets.push({k,nums,a:chip,x:cx,y:cy});try{SFX.chip()}catch(e){wcDbg(e)}draw()};
  $("un").onclick=()=>{if(!busy){bets.pop();draw()}};$("cl").onclick=()=>{if(!busy){bets=[];draw()}};
  $("rb").onclick=()=>{if(!busy&&last.length){bets=last.map(b=>({...b}));draw()}};
  $("x2").onclick=()=>{if(!busy&&bets.length){if(tot()*2>money)return alert("Pas assez de pièces.");bets=bets.concat(bets.map(b=>({...b})));draw()}};
@@ -1621,7 +1634,7 @@ function roulette(){
    if(p<1)requestAnimationFrame(f);else{SFX.reelStop();let w=0;// plein 35:1, cheval 17:1, transversale 11:1, carré 8:1, sixain 5:1, douzaines/colonnes 2:1, chances simples 1:1 (mise rendue incluse)
     bets.forEach(b=>{if(!b.nums.includes(n))return;const L=b.nums.length,o=!b.k.startsWith("i");w+=b.a*((o?(L==12?2:1):pay[L])+1)});
     if(w)gain(w);bets=[];hist.unshift(n);$("rh").innerHTML=hist.slice(0,14).map(v=>`<span style="background:${rcol(v)}">${v}</span>`).join("");
-    try{w?SFX.win():SFX.lose()}catch(e){}$("rm").innerHTML=`<b style="font-size:22px">${n}</b> ${n==0?"vert":REDS.has(n)?"rouge":"noir"} · ${w?`🎉 Tu gagnes ${w} 🪙 (net ${w-T>=0?"+":""}${w-T})`:"Perdu"}`;busy=false;draw()}};
+    try{w?SFX.win():SFX.lose()}catch(e){wcDbg(e)}$("rm").innerHTML=`<b style="font-size:22px">${n}</b> ${n==0?"vert":REDS.has(n)?"rouge":"noir"} · ${w?`🎉 Tu gagnes ${w} 🪙 (net ${w-T>=0?"+":""}${w-T})`:"Perdu"}`;busy=false;draw()}};
   requestAnimationFrame(f)}}
 /* ---------- BLACKJACK ---------- */
 const SU=["♠","♥","♦","♣"],RK=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];let shoe=[];
@@ -1644,7 +1657,7 @@ function blackjack(){
   if($("dl"))$("dl").onclick=deal;if($("iy"))$("iy").onclick=()=>insure(1);if($("in"))$("in").onclick=()=>insure(0);
   if($("hit"))$("hit").onclick=hit;if($("sta"))$("sta").onclick=stand;if($("dbl"))$("dbl").onclick=dbl;if($("spl"))$("spl").onclick=spl};
  const nat=x=>x.c.length==2&&hv(x.c).t==21&&!x.sp,dbj=()=>S.D.length==2&&hv(S.D).t==21;
- const deal=()=>{bet=Math.floor(+$("bb").value);if(!take(bet))return;try{[0,180,360,540].forEach(t=>setTimeout(()=>SFX.cardDraw(),t))}catch(e){}if(shoe.length<80)newShoe();
+ const deal=()=>{bet=Math.floor(+$("bb").value);if(!take(bet))return;try{[0,180,360,540].forEach(t=>setTimeout(()=>SFX.cardDraw(),t))}catch(e){wcDbg(e)}if(shoe.length<80)newShoe();
   S={ph:"play",H:[{c:[dr(),dr()],b:bet}],cur:0,D:[dr(),dr()],ins:0,msg:""};
   if(S.D[0].r==0){S.ph="ins";paint();return}
   peek()};
@@ -1652,9 +1665,9 @@ function blackjack(){
  const insure=y=>{if(y){const i=Math.floor(S.H[0].b/2);if(take(i))S.ins=i}
   if(dbj()||nat(S.H[0]))return settle();S.msg=S.ins?"Pas de blackjack du croupier : l'assurance est perdue.":"";S.ph="play";paint()};
  const nxt=()=>{const i=S.H.findIndex(x=>!x.done);if(i<0)return dealer();S.cur=i;paint()};
- const hit=()=>{const h=S.H[S.cur];try{SFX.cardDraw()}catch(e){}h.c.push(dr());if(hv(h.c).t>=21)h.done=1;nxt()};
+ const hit=()=>{const h=S.H[S.cur];try{SFX.cardDraw()}catch(e){wcDbg(e)}h.c.push(dr());if(hv(h.c).t>=21)h.done=1;nxt()};
  const stand=()=>{S.H[S.cur].done=1;nxt()};
- const dbl=()=>{const h=S.H[S.cur];if(!take(h.b))return;h.b*=2;try{SFX.cardDraw()}catch(e){}h.c.push(dr());h.done=1;nxt()};
+ const dbl=()=>{const h=S.H[S.cur];if(!take(h.b))return;h.b*=2;try{SFX.cardDraw()}catch(e){wcDbg(e)}h.c.push(dr());h.done=1;nxt()};
  const spl=()=>{const h=S.H[S.cur];if(!take(h.b))return;const a=h.c[0].r==0,x={c:[h.c[0],dr()],b:h.b,sp:1,sa:a,done:a},y={c:[h.c[1],dr()],b:h.b,sp:1,sa:a,done:a};S.H.splice(S.cur,1,x,y);nxt()};
  const dealer=()=>{S.ph="dealer";if(S.H.some(x=>hv(x.c).t<=21))while(hv(S.D).t<17)S.D.push(dr());if(typeof SFX!=="undefined")SFX.cardPlace();settle()};
  const settle=()=>{S.ph="end";const dt=hv(S.D).t,db=dbj();let ret=0,bets=0,msg=[];
@@ -1662,7 +1675,7 @@ function blackjack(){
    if(nat(x)&&!db)r=x.b*2.5;else if(nat(x)&&db)r=x.b;else if(pt>21)r=0;else if(db)r=0;else if(dt>21||pt>dt)r=x.b*2;else if(pt==dt)r=x.b;
    x.r=nat(x)&&!db?"Blackjack ! 3:2":pt>21?"Brûlé":r>x.b?"Gagné":r==x.b?"Égalité":"Perdu";ret+=r});
   if(S.ins){bets+=S.ins;if(db)ret+=S.ins*3}
-  if(ret)gain(ret);const net=ret-bets;try{net>0?SFX.win():net<0?SFX.lose():SFX.nav()}catch(e){}S.msg=(db?"Blackjack du croupier. ":"")+(net>0?`🎉 +${net} 🪙`:net==0?"Égalité, mise rendue.":`${net} 🪙`);paint()};
+  if(ret)gain(ret);const net=ret-bets;try{net>0?SFX.win():net<0?SFX.lose():SFX.nav()}catch(e){wcDbg(e)}S.msg=(db?"Blackjack du croupier. ":"")+(net>0?`🎉 +${net} 🪙`:net==0?"Égalité, mise rendue.":`${net} 🪙`);paint()};
  paint()}
 /* ---------- MACHINE À SOUS : 5 rouleaux × 3 lignes, 20 lignes de gain ---------- */
 const SL=["🍒","🍋","🍊","🍇","🔔","⭐","💎","7️⃣","🃏","🎰"],SW=[26,24,20,16,12,8,5,3,4,3],
@@ -1692,7 +1705,7 @@ function slotsBase(){
     if(ev.sc>=3)g.forEach((c,i)=>c.forEach((v,r)=>{if(v==9){const e=$(`s${i}${r}`);if(e)e.classList.add("win")}}));
     if(ev.fs){SFX.win();free+=isF?Math.floor(ev.fs/2):ev.fs}
     if(isF)fw+=w;if(w)gain(w);
-    try{w?SFX.win():SFX.lose()}catch(e){}$("sm").innerHTML=(w?`🎉 <b>+${w} 🪙</b>${isF?" (×2)":""} · ${ev.L.length} ligne(s)${ev.sc>=3?" · Scatter !":""}`:"Perdu…")+(ev.fs?` · <b>${ev.fs} tours gratuits !</b>`:"");
+    try{w?SFX.win():SFX.lose()}catch(e){wcDbg(e)}$("sm").innerHTML=(w?`🎉 <b>+${w} 🪙</b>${isF?" (×2)":""} · ${ev.L.length} ligne(s)${ev.sc>=3?" · Scatter !":""}`:"Perdu…")+(ev.fs?` · <b>${ev.fs} tours gratuits !</b>`:"");
     $("sfs").textContent=free?`✨ Tours gratuits : ${free} restants · gains cumulés ${fw} 🪙`:"";busy=false;
     if(free>0)setTimeout(()=>{if(alive("sr"))spin()},3200);else if(isF){$("sm").innerHTML+=` · <b>Fin des tours gratuits : ${fw} 🪙</b>`;fw=0}}},50)};
  $("sp").onclick=()=>{SFX.slots();spin()}}
@@ -1762,7 +1775,7 @@ async function fusionSame(c){
 /* ===== COLLECTION V55 : tags + sélection + suppression + 50 cartes/page ===== */
 const UNTAGGED_FILTER="__NO_TAG__";
 let colPage=1,colTagFilter="",colSearch="",colSort="rar",colSelected=new Set();
-const COL_PAGE_SIZE=50;let colView="binder",bkIdx=0,bkPer=9,bkAnim="";try{const u=JSON.parse(localStorage.getItem("wc_bk")||"null");if(u){colView="binder";bkPer=9;bkIdx=u.i|0}}catch(e){}const saveBk=()=>{colView="binder";try{localStorage.setItem("wc_bk",JSON.stringify({v:"binder",p:9,i:bkIdx}))}catch(e){}};
+const COL_PAGE_SIZE=50;let colView="binder",bkIdx=0,bkPer=9,bkAnim="";try{const u=JSON.parse(localStorage.getItem("wc_bk")||"null");if(u){colView="binder";bkPer=9;bkIdx=u.i|0}}catch(e){wcDbg(e)}const saveBk=()=>{colView="binder";try{localStorage.setItem("wc_bk",JSON.stringify({v:"binder",p:9,i:bkIdx}))}catch(e){wcDbg(e)}};
 const selKey=v=>String(v);
 const selHas=v=>colSelected.has(selKey(v));
 const selAdd=v=>colSelected.add(selKey(v));
@@ -1770,23 +1783,23 @@ const selDel=v=>colSelected.delete(selKey(v));
 const selClear=()=>colSelected.clear();
 const colTags=()=>{
  const s=new Set();
- try{const saved=JSON.parse(localStorage.getItem("wc_col_tags")||"[]");if(Array.isArray(saved))saved.forEach(t=>{t=cleanTag(t);if(t)s.add(t)})}catch(e){}
+ try{const saved=JSON.parse(localStorage.getItem("wc_col_tags")||"[]");if(Array.isArray(saved))saved.forEach(t=>{t=cleanTag(t);if(t)s.add(t)})}catch(e){wcDbg(e)}
  Object.values(col).forEach(c=>(c.tags||[]).forEach(t=>s.add(t)));
  return orderedColTags([...s]);
 };
 const cleanTag=t=>(t||"").trim().replace(/\s+/g," ").slice(0,40);
 const colTagOrder=()=>{try{const x=JSON.parse(localStorage.getItem("wc_col_tag_order")||"[]");return Array.isArray(x)?x.map(cleanTag).filter(Boolean):[]}catch(e){return []}};
-const saveColTagOrder=order=>{try{localStorage.setItem("wc_col_tag_order",JSON.stringify([...new Set(order.map(cleanTag).filter(Boolean))]))}catch(e){}};
+const saveColTagOrder=order=>{try{localStorage.setItem("wc_col_tag_order",JSON.stringify([...new Set(order.map(cleanTag).filter(Boolean))]))}catch(e){wcDbg(e)}};
 const orderedColTags=tags=>{const clean=[...new Set(tags.map(cleanTag).filter(Boolean))],saved=colTagOrder(),set=new Set(clean),out=[...saved.filter(t=>set.has(t)),...clean.filter(t=>!saved.includes(t)).sort((a,b)=>a.localeCompare(b,"fr"))];if(out.length!==saved.length||out.some((x,i)=>x!==saved[i]))saveColTagOrder(out);return out};
 const TAG_COLORS=["#a855f7","#3b82f6","#22c55e","#f59e0b","#ef4444","#ec4899","#14b8a6","#8b5cf6","#06b6d4","#f97316"];
 const validTagColor=c=>/^#[0-9a-fA-F]{6}$/.test(c||"")?c:"#a855f7";
 const tagMeta=()=>{try{const x=JSON.parse(localStorage.getItem("wc_col_tag_meta")||"{}");return x&&typeof x==="object"?x:{}}catch(e){return {}}};
-const saveTagMeta=m=>{try{localStorage.setItem("wc_col_tag_meta",JSON.stringify(m))}catch(e){}};
+const saveTagMeta=m=>{try{localStorage.setItem("wc_col_tag_meta",JSON.stringify(m))}catch(e){wcDbg(e)}};
 const tagLabel=t=>{const x=String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");return /^\d+\s*-/.test(t)?"#"+x:x};
 const tagColor=(t,i=0)=>validTagColor(tagMeta()[t]||TAG_COLORS[i%TAG_COLORS.length]);
 const setTagColor=(t,c)=>{const m=tagMeta();m[t]=validTagColor(c);saveTagMeta(m)};
-function saveCollectionState(){try{localStorage.setItem("wc_col_ui",JSON.stringify({tag:colTagFilter,q:colSearch,sort:colSort,page:colPage}))}catch(e){}}
-try{const u=JSON.parse(localStorage.getItem("wc_col_ui")||"null");if(u){colTagFilter=u.tag||"";colSearch=u.q||"";colSort=u.sort||"rar";colPage=Math.max(1,+u.page||1)}}catch(e){}
+function saveCollectionState(){try{localStorage.setItem("wc_col_ui",JSON.stringify({tag:colTagFilter,q:colSearch,sort:colSort,page:colPage}))}catch(e){wcDbg(e)}}
+try{const u=JSON.parse(localStorage.getItem("wc_col_ui")||"null");if(u){colTagFilter=u.tag||"";colSearch=u.q||"";colSort=u.sort||"rar";colPage=Math.max(1,+u.page||1)}}catch(e){wcDbg(e)}
 /* ===== V115 : recherche dans la Collection par nom ET par thème (animal, film, jeu vidéo, streamer…) ===== */
 const SQ_STOP=new Set(["de","du","des","la","le","les","un","une","et","en","au","aux","d","l","a"]);
 const sqNorm=v=>String(v||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
@@ -1819,7 +1832,7 @@ const SQ_THEME_BY_WORD=(()=>{const m=new Map();SQ_THEMES.forEach(t=>t.k.forEach(
 const sqCache=new WeakMap();
 function sqHay(c){let h=sqCache.get(c);if(h!==undefined)return h;
  h=" "+sqNorm([c.t,c.d,c.desc,c.genres,c.plat,c.year,c.category,c.type,c.kind,c.genre,c.subcategory,c.src=="film"?"film cinema":"",c.src=="cr"?"streamer youtubeur createur "+(c.plat||""):""].filter(Boolean).join(" "));
- try{sqCache.set(c,h)}catch(e){}return h}
+ try{sqCache.set(c,h)}catch(e){wcDbg(e)}return h}
 function sqParse(q){const raw=String(q||"").trim();if(!raw)return null;
  const n=sqNorm(raw),words=n.split(" ").filter(w=>w&&!SQ_STOP.has(w)).map(sqStem);if(!words.length)return null;
  const phrase=words.join(" "),themePhrase=SQ_THEME_BY_WORD.get(phrase)||null;
@@ -1829,7 +1842,7 @@ function sqMatch(c,q){const h=sqHay(c)+" "+sqNorm((c.tags||[]).join(" "));
  if(q.themePhrase&&th(q.themePhrase))return true;
  return q.words.every((w,i)=>h.includes(" "+w)||th(q.perWord[i]))}
 function collection(){
- try{const s=SAVEFAIL?null:JSON.parse(localStorage.getItem("wc_col")||"null");if(s){col=s;hyd()}}catch(e){}
+ try{const s=SAVEFAIL?null:JSON.parse(localStorage.getItem("wc_col")||"null");if(s){col=s;hyd()}}catch(e){wcDbg(e)}
  colSelected=new Set([...colSelected].map(selKey));
  Object.values(col).forEach(c=>{c.tags=Array.isArray(c.tags)?c.tags.filter(Boolean).slice(0,8):[];store[c.id]=c});
  const A=Object.values(col).filter(c=>c&&c.n>0);
@@ -1887,7 +1900,7 @@ function collection(){
      const pos=input.selectionStart;
      collection();
      const ni=$("colSearch");
-     if(ni){ni.focus();try{ni.setSelectionRange(pos,pos)}catch(_){}}
+     if(ni){ni.focus();try{ni.setSelectionRange(pos,pos)}catch(_){wcDbg(_)}}
    },140);
  };
  main.querySelector("#colSearch").onkeydown=e=>{if(e.key==="Enter"){clearTimeout(colSearchTimer);collection()}};
@@ -1907,7 +1920,7 @@ function collection(){
   const ids=[...colSelected].map(selKey).filter(id=>Object.prototype.hasOwnProperty.call(col,id));
   return ids.length?ids:visItems.map(c=>c.id);
 };
- const persistTagNames=names=>{const clean=[...new Set(names.map(cleanTag).filter(Boolean))];try{localStorage.setItem("wc_col_tags",JSON.stringify(clean))}catch(e){};saveColTagOrder([...colTagOrder().filter(t=>clean.includes(t)),...clean.filter(t=>!colTagOrder().includes(t))])};
+ const persistTagNames=names=>{const clean=[...new Set(names.map(cleanTag).filter(Boolean))];try{localStorage.setItem("wc_col_tags",JSON.stringify(clean))}catch(e){wcDbg(e)};saveColTagOrder([...colTagOrder().filter(t=>clean.includes(t)),...clean.filter(t=>!colTagOrder().includes(t))])};
  const addTag=()=>{const inp=$("newTag"),t=cleanTag(inp&&inp.value),ci=$("newTagColor"),tc=validTagColor(ci&&ci.value);if(!t)return;const target=tagTarget();if(!target.length)return toast("Aucune carte sélectionnée.");target.forEach(id=>{const c=col[id];if(c){c.tags=c.tags||[];if(!c.tags.includes(t))c.tags.push(t);c.tags=c.tags.slice(0,8)}});setTagColor(t,tc);persistTagNames([...colTags(),t]);save();toast(`🏷 Étiquette « ${t} » ajoutée à ${target.length} carte(s).`);collection()};
  main.querySelector("#addTag").onclick=addTag;main.querySelector("#newTag").onkeydown=e=>{if(e.key==="Enter")addTag()};
  main.querySelector("#manageTags").onclick=()=>{
@@ -2002,7 +2015,7 @@ function creators(){
 $("hw").onclick=()=>{M.style.display="flex";M.innerHTML=`<div class="mbox" style="flex-direction:column"><button class="btn g x" id="mx">✕</button><h2>Comment ça marche ?</h2><div class="sub">Chaque carte est un vrai article Wikipédia (ou un créateur). Sa rareté dépend du nombre de <b>vues par mois</b> de la page : plus elle est consultée, plus la carte est rare.</div>${R.map((r,i)=>HID.has(i)?"":`<div class="row"><span style="color:${r[1]};font-weight:800">${SYM[i]} ${r[0]}</span><span>${i==0?"moins de "+THR[1]:THR[i].toLocaleString("fr-FR")+"+"} vues/mois</span></div>`).join("")}<p class="sub" style="margin-top:14px">Les sujets sexuels (+5 rangs) et les drames / attentats (+3 rangs) montent en grade. Boosters : 10 max, 1 rechargé toutes les 10 minutes. « Toutes les cartes » est classé de la plus rare à la plus commune.</p><button class="btn" id="mo">Compris !</button></div>`;$("mx").onclick=$("mo").onclick=closeModal};
 [0,1,2,3,4,5,6,7,8].forEach(i=>{const e=$("t"+i);if(e)e.onclick=()=>{tab=i;render()}});
 /* V92 : après le reset, la collection reste réellement vide. Aucun cadeau de test automatique. */
-try{col=JSON.parse(localStorage.getItem("wc_col")||"{}");hyd()}catch(e){}
+try{col=JSON.parse(localStorage.getItem("wc_col")||"{}");hyd()}catch(e){wcDbg(e)}
 upM();render();
 
 function closeFusionPicker(){const o=$("fusionPickOverlay");if(o)o.remove()}
@@ -2031,7 +2044,7 @@ function fusionHTML(A){
 
 /* Better casino landing page */
 function casino(g){
- try{SFX.stopAll()}catch(e){}
+ try{SFX.stopAll()}catch(e){wcDbg(e)}
  if(g=="roulette")return roulette();if(g=="blackjack")return blackjack();if(g=="slots")return slots();if(g=="mines")return mines();
  if(g=="coin")return coinflip();if(g=="double")return doublegame();if(g=="cardcases")return cardcases();if(g=="upgrade")return cardupgrade();if(g=="crash")return crash();
  const games=[
@@ -2051,7 +2064,7 @@ function casino(g){
   <button class="btn g" id="dly" style="margin-top:22px">🎁 Cadeau quotidien : +200 🪙</button></div>`;
  main.querySelectorAll(".cg").forEach(e=>e.onclick=()=>casino(e.dataset.g));
  $("jgo").onclick=()=>{if(money<1000)return alert("Pas assez de pièces.");money-=1000;WCJ+=20;save();saveJ();upM();const win=Math.random()<0.01;if(win){const w=WCJ;WCJ=10000;WCJL.unshift({n:"Toi",p:w,ts:Date.now()});saveJ();gain(w);toast("🏆 JACKPOT : +"+w.toLocaleString("fr-FR")+" 🪙");casino()}else toast("Pas cette fois… le jackpot continue de monter.")};
- $("dly").onclick=()=>{const l=+localStorage.getItem("wc_dly")||0;if(Date.now()-l<864e5)return alert("Reviens dans "+fmt(864e5-(Date.now()-l))+".");try{localStorage.setItem("wc_dly",Date.now())}catch(e){}gain(200)};
+ $("dly").onclick=()=>{const l=+localStorage.getItem("wc_dly")||0;if(Date.now()-l<864e5)return alert("Reviens dans "+fmt(864e5-(Date.now()-l))+".");try{localStorage.setItem("wc_dly",Date.now())}catch(e){wcDbg(e)}gain(200)};
 }
 
 /* Better Pile ou Face */
@@ -2096,7 +2109,7 @@ function slots(){
 const SFX=(()=>{
  // Sons doux : sinus / triangle filtrés, attaque arrondie, cloches pentatoniques, léger écho. Aucune onde carrée ni aiguë.
  let ctx=null,master=null,bus=null,activeSpin=null,enabled=true,vol=.55;
- try{enabled=localStorage.getItem('wc_sound')!=='0';const v=parseFloat(localStorage.getItem('wc_vol2'));if(v>=0&&v<=1)vol=v}catch(e){}
+ try{enabled=localStorage.getItem('wc_sound')!=='0';const v=parseFloat(localStorage.getItem('wc_vol2'));if(v>=0&&v<=1)vol=v}catch(e){wcDbg(e)}
  const init=()=>{
   if(!enabled)return null;
   if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;ctx=new AC();
@@ -2107,7 +2120,7 @@ const SFX=(()=>{
    bus=ctx.createGain();bus.gain.value=1;bus.connect(master);
    try{const len=Math.floor(ctx.sampleRate*1.7),ir=ctx.createBuffer(2,len,ctx.sampleRate);
     for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);let l=0;for(let k=0;k<len;k++){l=l*.72+(Math.random()*2-1)*.28;d[k]=l*Math.pow(1-k/len,3.4)}}
-    const cv=ctx.createConvolver();cv.buffer=ir;const wet=ctx.createGain();wet.gain.value=.3;bus.connect(cv);cv.connect(wet);wet.connect(master)}catch(e){}}
+    const cv=ctx.createConvolver();cv.buffer=ir;const wet=ctx.createGain();wet.gain.value=.3;bus.connect(cv);cv.connect(wet);wet.connect(master)}catch(e){wcDbg(e)}}
   if(ctx.state==='suspended')ctx.resume();
   return ctx;
  };
@@ -2137,7 +2150,7 @@ const SFX=(()=>{
  const cut=()=>{soft(.18,.06,900,2200);voice(620,.05,'triangle',.05,.02)};
  const packOpen=()=>{soft(.5,.08,300,1800);bell(659,.6,.06,.2)};
  let riserG=null;
- const riserStop=()=>{if(riserG&&ctx){try{riserG.gain.cancelScheduledValues(ctx.currentTime);riserG.gain.setTargetAtTime(0,ctx.currentTime,.06)}catch(e){}}riserG=null};
+ const riserStop=()=>{if(riserG&&ctx){try{riserG.gain.cancelScheduledValues(ctx.currentTime);riserG.gain.setTargetAtTime(0,ctx.currentTime,.06)}catch(e){wcDbg(e)}}riserG=null};
  const swell=(d=3)=>{const c=init();if(!c)return;riserStop();const g=c.createGain();g.gain.value=1;g.connect(bus);riserG=g;voice(130,d,'sine',.07,0,520,d*.85,g);soft(d,.05,250,1500,0,.9,g)};
  const riser=(d=3)=>swell(d);
  const boom=()=>{voice(110,.7,'sine',.2,0,44,.01);voice(55,.9,'sine',.09,.02,40,.02)};
@@ -2160,7 +2173,7 @@ const SFX=(()=>{
  const rouletteTick=()=>tick(Math.floor(Math.random()*5));
  const spin=(duration=3000)=>{if(activeSpin)activeSpin();const ms=Math.max(120,duration|0);let stopped=false,n=0;const id=setInterval(()=>{if(stopped)return;tick(n++)},170);trackedTimers.add(id);const to=setTimeout(()=>stop(),ms+60);trackedTimers.add(to);const stop=()=>{if(stopped)return;stopped=true;clearInterval(id);clearTimeout(to);trackedTimers.delete(id);trackedTimers.delete(to);if(activeSpin===stop)activeSpin=null};activeSpin=stop;return stop};
  const suspense=(d=2600)=>{let n=0;const step=Math.max(180,Math.floor(d/12));const id=setInterval(()=>{n++;voice(262+n*16,.07,'sine',.05);if(n>=Math.ceil(d/step))clearInterval(id)},step);trackedTimers.add(id);return id};
- const stopAll=()=>{riserStop();if(activeSpin){try{activeSpin()}catch(e){}activeSpin=null}for(const id of trackedTimers){clearInterval(id);clearTimeout(id)}trackedTimers.clear()};
+ const stopAll=()=>{riserStop();if(activeSpin){try{activeSpin()}catch(e){wcDbg(e)}activeSpin=null}for(const id of trackedTimers){clearInterval(id);clearTimeout(id)}trackedTimers.clear()};
  const coin=()=>{for(let i=0;i<7;i++)bell(P[5+(i%4)]*(i>3?1.5:1),.35,.04,i*.1)};
  const upgrade=()=>{voice(262,.4,'sine',.08,0,523,.2);bell(784,.7,.07,.32)};
  const slots=()=>{for(let i=0;i<10;i++)voice(P[3+(i*3)%6],.07,'sine',.04,i*.13)};
@@ -2183,9 +2196,9 @@ const SFX=(()=>{
  const mineBoom=()=>{boom();soft(.3,.07,300,500)};
  const crashBoom=()=>{boom();voice(330,.5,'sine',.05,0,120)};
  const chip=()=>{voice(300,.06,'sine',.06,0,230);soft(.02,.03,900,1300)};
- const setVol=v=>{vol=Math.max(0,Math.min(1,v));try{localStorage.setItem('wc_vol2',vol)}catch(e){}if(master)master.gain.value=vol};
+ const setVol=v=>{vol=Math.max(0,Math.min(1,v));try{localStorage.setItem('wc_vol2',vol)}catch(e){wcDbg(e)}if(master)master.gain.value=vol};
  const getVol=()=>vol;
- const toggle=()=>{enabled=!enabled;try{localStorage.setItem('wc_sound',enabled?'1':'0')}catch(e){};return enabled};
+ const toggle=()=>{enabled=!enabled;try{localStorage.setItem('wc_sound',enabled?'1':'0')}catch(e){wcDbg(e)};return enabled};
  const refresh=()=>{const b=document.getElementById('soundToggle');if(b){b.textContent=enabled?'🔊 Sons':'🔇 Sons';b.classList.toggle('off',!enabled)}};
  window.addEventListener('pointerdown',()=>init(),{once:true,passive:true});
  setTimeout(refresh,0);
@@ -2204,7 +2217,7 @@ document.addEventListener('click',e=>{
 
 /* ===================== V71 : anti-clignotement, 9 missions, succès étendus, fusion filtrée ===================== */
 let _ST=null;const stGet=()=>{if(!_ST){try{_ST=JSON.parse(localStorage.getItem("wc_stats")||"{}")}catch(e){_ST={}}}return _ST};
-function wcCount(id,n){const t=stGet();t[id]=(t[id]||0)+n;try{localStorage.setItem("wc_stats",JSON.stringify(t))}catch(e){}}
+function wcCount(id,n){const t=stGet();t[id]=(t[id]||0)+n;try{localStorage.setItem("wc_stats",JSON.stringify(t))}catch(e){wcDbg(e)}}
 const ACH=(()=>{const L=[],C=()=>Object.values(col).filter(c=>c&&c.n>0),cnt=r=>C().reduce((t,c)=>t+(c.r==r?c.n:0),0),tot=()=>C().reduce((t,c)=>t+c.n,0),uniq=()=>C().length,maxn=()=>Math.max(0,...C().map(c=>c.n)),dbl=()=>C().filter(c=>c.n>=2).length,crs=()=>C().filter(c=>c.src=="cr").length,st=k=>stGet()[k]||0;
  const add=(id,ic,n,d,rw,v,goal)=>L.push({id,ic,n,d,rw,v,goal});
  [[2,"💙","Premier éclat",25],[3,"💎","Reflets",40],[4,"🔥","Ultra chanceux",100],[5,"🌟","Pleine page",200],[6,"👑","Légendaire !",400],[7,"🌈","Le Graal",2000]].forEach(([r,ic,n,rw])=>add("r"+r,ic,n,"Obtenir ta première carte "+R[r][0],rw,()=>cnt(r),1));
@@ -2224,12 +2237,12 @@ const ACH=(()=>{const L=[],C=()=>Object.values(col).filter(c=>c&&c.n>0),cnt=r=>C
  [[5,"✨","Brillance",150],[25,"🌟","Galerie holo",600]].forEach(([g,ic,n,rw])=>add("h"+g,ic,n,"Obtenir "+g+" cartes Holo ou mieux",rw,()=>st("holo"),g));
  [[5,"🏷️","Étiqueteur",100]].forEach(([g,ic,n,rw])=>add("tg"+g,ic,n,"Appliquer une étiquette à "+g+" cartes",rw,()=>st("tag"),g));
  return L})();
-function achCheck(){let U={};try{U=JSON.parse(localStorage.getItem("wc_ach")||"{}")}catch(e){}
- const nw=[];ACH.forEach(a=>{if(U[a.id])return;let v=0;try{v=a.v()}catch(e){}if(v>=a.goal){U[a.id]=Date.now();nw.push(a)}});
- if(nw.length){try{localStorage.setItem("wc_ach",JSON.stringify(U))}catch(e){}const sum=nw.reduce((t,a)=>t+a.rw,0);gain(sum);try{toast(nw.length==1?"🏆 Succès débloqué : "+nw[0].n+" (+"+nw[0].rw+" 🪙)":"🏆 "+nw.length+" succès débloqués (+"+sum+" 🪙)")}catch(e){}}
+function achCheck(){let U={};try{U=JSON.parse(localStorage.getItem("wc_ach")||"{}")}catch(e){wcDbg(e)}
+ const nw=[];ACH.forEach(a=>{if(U[a.id])return;let v=0;try{v=a.v()}catch(e){wcDbg(e)}if(v>=a.goal){U[a.id]=Date.now();nw.push(a)}});
+ if(nw.length){try{localStorage.setItem("wc_ach",JSON.stringify(U))}catch(e){wcDbg(e)}const sum=nw.reduce((t,a)=>t+a.rw,0);gain(sum);try{toast(nw.length==1?"🏆 Succès débloqué : "+nw[0].n+" (+"+nw[0].rw+" 🪙)":"🏆 "+nw.length+" succès débloqués (+"+sum+" 🪙)")}catch(e){wcDbg(e)}}
  return U}
 let ACHF="all";
-setInterval(()=>{try{achCheck()}catch(e){}},5000);
+setInterval(()=>{try{achCheck()}catch(e){wcDbg(e)}},5000);
 // timer avant la prochaine rotation des missions (même minuit UTC que le changement de jour du jeu)
 function mTimer(){clearInterval(timer);const p2=x=>String(x).padStart(2,"0"),f=()=>{const e=document.getElementById("mt");if(!e){clearInterval(timer);return}
   const r=86400000-(Date.now()%86400000);if(r<=1000){clearInterval(timer);missionsPage();return}
