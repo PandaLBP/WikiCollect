@@ -969,14 +969,14 @@ const gain=n=>{money+=n;save();upM();if(n>=1)try{SFX.cash()}catch(e){wcDbg(e)}};
 const DUR=[["10 min",6e5],["30 min",18e5],["1 h",36e5],["3 h",108e5],["6 h",216e5],["12 h",432e5]];
 const ME="__me",MAXS=5;
 const PSEUDOS=(()=>{const base="Willkoursk,floreal,yvan28,babarceleste,tibiz,jeunepousse2kk,sorrenuwu,Lavrano,M4rcelin,Ninon_b,xXPierreXx,cl0tilde,Kevinou75,Alizé_,mathis.d,Le_Gaulois,Pixelle,TheoBg,hugo_w,Camille.R,LaRoussette,DarkNono,zoe_cards,Bastos,Nadjib,Lucie2k4,Romain_V,ElFuego,mimi_chouette,Jules44,Sarah.k,Gaspard_,MaxouLeBoss,Inès_p,Tonio83,Mélusine,Zack_TV,Clem1,Oscar.m,Nolhan,Anaïs_r,LeGrosPat,Yannick.b,Célia_w,Dylan_49,Margaux,Kiki_le_Kid,RaphaelC,Louane.d,Amaury_,Théo.lcs,Manon_Gm,Sofiane07,Jade_pl".split(",");
- /* 560 pseudos supplémentaires, générés de façon déterministe (toujours les mêmes) */
+ /* 2 945 pseudos supplémentaires, générés de façon déterministe (toujours les mêmes) */
  const F="Léo,Lucas,Hugo,Louis,Jules,Gabin,Adam,Nathan,Tom,Enzo,Noah,Liam,Ethan,Maël,Raphaël,Arthur,Paul,Victor,Axel,Kylian,Mathéo,Rayan,Ilyes,Yanis,Sacha,Timéo,Noé,Evan,Lény,Alexis,Quentin,Clément,Maxime,Antoine,Baptiste,Romain,Florian,Valentin,Dorian,Bastien,Emma,Léa,Chloé,Inès,Jade,Louise,Alice,Lina,Sarah,Manon,Camille,Lola,Zoé,Eva,Juliette,Anna,Rose,Nina,Clara,Léonie,Maëlys,Océane,Pauline,Marion,Laura,Margot,Elsa,Mila,Ambre,Lou,Yasmine,Nour,Sofia,Maya,Ayoub,Karim,Samir,Bilal,Idriss,Omar,Mehdi,Walid,Sami,Elias,Tiago,Diego,Marco,Luca,Matteo,Kevin,Dylan,Jordan,Steven,Théo,Mathis".split(",");
  const N="Loup,Panda,Dragon,Renard,Pixel,Ninja,Tigre,Faucon,Hibou,Lynx,Corbeau,Phoenix,Cobra,Koala,Yeti,Orage,Comète,Nova,Turbo,Zen,Retro,Cosmos,Lagune,Bambou,Sushi,Waffle,Crêpe,Churros,Raclette,Brioche,Baguette,Camembert,Mochi,Ramen,Gaufre,Cookie,Tonnerre,Mistral,Éclair,Volcan,Glacier,Rubis,Saphir,Onyx,Jade,Ambre,Cactus,Bison,Gecko,Albatros,Narval,Axolotl,Capybara,Mangouste,Fennec,Chouette,Marmotte,Hérisson,Pingouin".split(",");
  const A="Rapide,Sombre,Cosmic,Lunaire,Solaire,Furtif,Rusé,Sauvage,Mystic,Epic,Chill,Fou,Grand,Petit,Vieux,Neon,Glacé,Doré,Argenté,Bleu,Rouge,Noir,Blanc,Vert,Pourpre,Électrique,Magique,Secret,Royal,Lucky".split(",");
  let sd=20241007;const rnd=()=>{sd=(Math.imul(sd,1664525)+1013904223)>>>0;return sd/4294967296};
  const pick=a=>a[Math.floor(rnd()*a.length)],seen=new Set(base.map(x=>x.toLowerCase())),out=[];
  const fm=[()=>pick(F)+Math.floor(rnd()*99),()=>pick(F)+"_"+pick(N),()=>"xX"+pick(F)+"Xx",()=>pick(F)+"."+String.fromCharCode(97+Math.floor(rnd()*26)),()=>pick(N)+pick(A),()=>pick(A)+pick(N),()=>pick(N)+Math.floor(rnd()*999),()=>pick(F)+(1990+Math.floor(rnd()*16)),()=>pick(F).toLowerCase()+"_"+pick(N).toLowerCase(),()=>pick(N)+"_"+pick(F),()=>"The"+pick(N),()=>pick(F)+"Cards",()=>pick(N)+"Collect",()=>pick(F)+"_"+Math.floor(rnd()*99)];
- let g=0;while(out.length<560&&g++<20000){const x=fm[Math.floor(rnd()*fm.length)]();if(x.length>16||seen.has(x.toLowerCase()))continue;seen.add(x.toLowerCase());out.push(x)}
+ let g=0;while(out.length<2945&&g++<200000){const x=fm[Math.floor(rnd()*fm.length)]();if(x.length>16||seen.has(x.toLowerCase()))continue;seen.add(x.toLowerCase());out.push(x)}
  return base.concat(out)})();
 const hs=x=>{let n=0;for(const ch of x)n=Math.imul(n,31)+ch.charCodeAt(0)|0;return n};
 const pv=u=>.75+.5*h(hs(u)),ac=u=>.5+h(hs(u)+7); // avarice / activité de chaque joueur IA
