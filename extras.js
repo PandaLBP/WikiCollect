@@ -6,12 +6,6 @@ try{
 (()=>{
  if(window.__WCV41Integration)return;window.__WCV41Integration=true;
  const wait=fn=>setTimeout(fn,1800);
- const catalogPage=async()=>{
-  /* V4.1 reste actif pour les boosters/cases, tandis que Toutes les cartes
-     réutilise le moteur de pagination Wikipédia complet d'origine. */
-  if(window.__wcOldAll) return window.__wcOldAll();
- };
- const oldAll=all;window.__wcOldAll=oldAll;all=catalogPage;
  /* V130 : le catalogue ne propose plus un article à une rareté différente de sa rareté officielle (Johnny Depp = toujours la même). */
  {let tries=0;const tw=()=>{const w=window.wcCatalogV41;if(!w){if(tries++<60)setTimeout(tw,500);return}
   ['sample','randomSample'].forEach(fn=>{const o=w[fn];if(typeof o!=='function'||o.__wc130)return;const n=async function(){const r=await o.apply(this,arguments);return Array.isArray(r)?r.filter(c=>{const f=forcedRarity(c&&c.t);return f==null||f===+c.r}):r};n.__wc130=true;w[fn]=n})};tw()}
@@ -87,8 +81,7 @@ try{
     return `<div class="wc-feature-panel"><h3>📊 Statistiques avancées</h3><div class="wc-feature-grid"><div class="wc-stat"><b>${uniq.toLocaleString('fr-FR')}</b><span>Cartes différentes</span></div><div class="wc-stat"><b>${total.toLocaleString('fr-FR')}</b><span>Cartes possédées au total</span></div><div class="wc-stat"><b>${value.toLocaleString('fr-FR')} 🪙</b><span>Valeur estimée</span></div><div class="wc-stat"><b>${cre.toLocaleString('fr-FR')}</b><span>Créateurs dans la collection</span></div><div class="wc-stat"><b>${dupes.toLocaleString('fr-FR')}</b><span>Cartes avec doublons</span></div><div class="wc-stat"><b>${rarityName(A.length?Math.max(...A.map(c=>c.r)):-1)}</b><span>Plus haute rareté</span></div><div class="wc-stat"><b>${indexed.toLocaleString('fr-FR')}</b><span>Cartes actuellement indexées</span></div><div class="wc-stat"><b>${Object.keys(WL).length.toLocaleString('fr-FR')}</b><span>Liste de souhaits</span></div></div><div class="wc-rarity-bars">${R.map((r,i)=>{const n=counts[i]||0,p=total?Math.round(n/total*100):0;return `<div class="rb" style="--rc:${r[1]};--rw:${p}%"><b>${esc(r[0])}</b><span> ${n.toLocaleString('fr-FR')} · ${p}%</span><i></i></div>`}).join('')}</div></div><div class="wc-feature-panel"><h3>🥇 Collections / Sets</h3><div class="sub">Progression calculée sur les cartes actuellement indexées dans ton catalogue.</div><div class="wc-set-grid">${setCards.map(s=>`<div class="wc-set"><b>${s.name}</b><small>${s.owned} / ${s.total} · ${s.pct}%</small><div class="dbar"><i style="width:${s.pct}%"></i></div></div>`).join('')}</div></div><div class="wc-feature-panel"><h3>🥈 Encyclopédie</h3><div class="sub">Pas de faux objectif à 3 millions : WikiCollect suit les cartes que tu peux réellement obtenir avec image.</div><div class="wc-feature-grid"><div class="wc-stat"><b>${indexed.toLocaleString('fr-FR')}</b><span>Cartes disponibles / indexées</span></div><div class="wc-stat"><b>${uniq.toLocaleString('fr-FR')}</b><span>Déjà collectionnées</span></div><div class="wc-stat"><b>${Math.max(0,indexed-uniq).toLocaleString('fr-FR')}</b><span>Encore à découvrir</span></div><div class="wc-stat"><b>${indexed?Math.min(100,(uniq/indexed*100)).toFixed(2):'0.00'}%</b><span>Encyclopédie complétée</span></div></div></div>`;
   };
   const appendProfileFeatures=()=>{const holder=document.createElement('div');holder.id='wcProfileFeatures';holder.innerHTML='<div class="msg">Chargement des statistiques…</div>';main.appendChild(holder);statsHTML().then(x=>{if(document.getElementById('wcProfileFeatures'))holder.innerHTML=x}).catch(()=>{holder.innerHTML='<div class="msg">Statistiques momentanément indisponibles.</div>'})};
-  const _profile=profilePage;
-  profilePage=function(){main.classList.remove('wc-no-scroll-page');_profile();appendProfileFeatures();};
+  AFTER.profile.push(appendProfileFeatures);
   /* 10 — Laboratoire de cartes + bouton Découvrir dans le classeur */
   const appendLab=()=>{
     const A=Object.values(col).filter(c=>c&&c.n>0),ready=A.filter(c=>c.n>=3&&c.r<7).length;
@@ -97,8 +90,7 @@ try{
     main.insertBefore(el,main.firstChild);
     el.querySelector('#wcLabFusion').onclick=()=>openFusionPicker();
   };
-  const _collection=collection;
-  collection=function(){main.classList.remove('wc-no-scroll-page');_collection();appendLab()};
+  AFTER.collection.push(appendLab);
   const _all=all;
   all=async function(){await _all();if(window.__wcFocusCard){const c=window.__wcFocusCard;window.__wcFocusCard=null;const box=document.createElement('div');box.className='wc-feature-panel';box.innerHTML=`<div style="display:flex;gap:12px;align-items:center"><img src="${esc(c.img)}" style="width:70px;height:92px;object-fit:cover;border-radius:7px"><div><h3 style="margin:0 0 4px">🎲 Carte découverte : ${esc(c.t)}</h3><div class="mut">${esc(rarityName(c.r))} · ${Number(c.v||0).toLocaleString('fr-FR')} vues Wikipédia</div></div><button class="btn g" id="wcFocusOpen" style="margin-left:auto">Ouvrir la carte</button></div>`;main.insertBefore(box,main.firstChild);box.querySelector('#wcFocusOpen').onclick=()=>openModal(c.id)}};
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#ug');if(b){try{bumpDaily('upgrade',1)}catch(x){wcDbg(x)}}});
@@ -245,31 +237,23 @@ try{
     return res;
   };
 
-  // Enrich profile with login + milestones.
-  const oldProfile=profilePage;
-  profilePage=function(){
-    oldProfile();
-    try{
-      claimLoginIfNeeded();
-      const wrap=document.createElement("div");
-      wrap.id="wcLoginMilestones";
-      wrap.innerHTML=loginHTML()+milestonesHTML();
-      main.appendChild(wrap);
-    }catch(e){wcDbg(e)}
-  };
+  // Profil : récompenses de connexion + paliers.
+  AFTER.profile.push(()=>{
+    claimLoginIfNeeded();
+    const wrap=document.createElement("div");
+    wrap.id="wcLoginMilestones";
+    wrap.innerHTML=loginHTML()+milestonesHTML();
+    main.appendChild(wrap);
+  });
 
-  // Also check milestone rewards after collection changes.
-  const oldCollection=collection;
-  collection=function(){
-    oldCollection();
-    try{
-      claimMilestones();
-      const holder=document.createElement("div");
-      holder.id="wcMilestonesCollection";
-      holder.innerHTML=milestonesHTML();
-      main.appendChild(holder);
-    }catch(e){wcDbg(e)}
-  };
+  // Collection : vérifie les paliers atteints et les affiche.
+  AFTER.collection.push(()=>{
+    claimMilestones();
+    const holder=document.createElement("div");
+    holder.id="wcMilestonesCollection";
+    holder.innerHTML=milestonesHTML();
+    main.appendChild(holder);
+  });
 
   // Claim today's login reward as soon as the game loads, while keeping the visual on Profile.
   try{claimLoginIfNeeded()}catch(e){wcDbg(e)}

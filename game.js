@@ -188,7 +188,14 @@ function eventPage(){
   </div>`;
 }
 
-function profilePage(){
+/* ===== Points d'extension =====
+   Les modules complémentaires (extras.js) ajoutent leurs blocs APRÈS l'affichage de base de ces pages, dans l'ordre d'enregistrement,
+   au lieu de remplacer les fonctions par-dessus. */
+const AFTER={collection:[],profile:[]};
+const runAfter=k=>AFTER[k].forEach(f=>{try{f()}catch(e){wcDbg(e)}});
+function collection(){main.classList.remove("wc-no-scroll-page");collectionBase();runAfter("collection")}
+function profilePage(){main.classList.remove("wc-no-scroll-page");profilePageBase();runAfter("profile")}
+function profilePageBase(){
  const s=profileStats();
  const best=rarityName(s.best);
  const top=Object.values(col).sort((a,b)=>fair(b)*b.n-fair(a)*a.n).slice(0,10);
@@ -314,7 +321,7 @@ function rp(p){
  const cr=categoryRankRarity(p.title,s,g);
  return boost(p.title,cr==null?rarOf(s):cr);
 }
-function mk(p,rf,vf){const title=canonicalTitle(p.title),pp=title===p.title?p:{...p,title};let _or=null;try{_or=ownedRar("w"+p.pageid,title)}catch(e){wcDbg(e)}const r=_or??rf??rp(pp),pv=p.pageviews?Object.values(p.pageviews).reduce((a,b)=>a+(b||0),0):vf,c={v:pv,id:p.pageid+"-"+r,pid:"w"+p.pageid,t:title,d:p.description||"",img:p.thumbnail.source,r,src:"wiki",nsfw:SEX.test(title)||ADULT.has(nz2(title))||/pornograph|érotique|hentai|sexuel/i.test(p.description||"")};if(nz2(title)==="sweetie fox"){c.img=SPECIAL_ADULT_CARD.img;c.d="Créatrice de contenu et modèle connue sous le nom Sweetie Fox";c.r=7;c.id=String(c.id).replace(/-\d+$/,"-7")}store[c.id]=c;return c}
+function mk(p,rf,vf){const title=canonicalTitle(p.title),pp=title===p.title?p:{...p,title};const r=rf??rp(pp),pv=p.pageviews?Object.values(p.pageviews).reduce((a,b)=>a+(b||0),0):vf,c={v:pv,id:p.pageid+"-"+r,pid:"w"+p.pageid,t:title,d:p.description||"",img:p.thumbnail.source,r,src:"wiki",nsfw:SEX.test(title)||ADULT.has(nz2(title))||/pornograph|érotique|hentai|sexuel/i.test(p.description||"")};if(nz2(title)==="sweetie fox"){c.img=SPECIAL_ADULT_CARD.img;c.d="Créatrice de contenu et modèle connue sous le nom Sweetie Fox";c.r=7;c.id=String(c.id).replace(/-\d+$/,"-7")}store[c.id]=c;return c}
 function card(c){const [n,cl]=R[c.r];
 return `<div class="card r${c.r} ${c.nsfw?"nsfw":""} ${c.src=="film"?"film-art":""}" style="--c:${cl}" data-id="${c.id}"><div class="in"><span class="bd">${SYM[c.r]}</span>${c.n>1?`<span class="cnt">×${c.n}</span>`:""}<img class="${c.src=="cr"?"creator-art":c.src=="film"?"film-art":""}" src="${c.img}" referrerpolicy="no-referrer" alt="${(c.t||"").replace(/"/g,"&quot;")}"><div class="nm"><span class="t">${c.t}</span><small>${SYM[c.r]} ${n}${c.src=="film"?`<span class="film-badge">🎬 FILM</span>`:""}</small></div></div><i class="foil"></i><i class="tex"></i><i class="glare"></i><i class="spk"></i><i class="gl a"></i><i class="gl b"></i></div>`}
 const ph=t=>"data:image/svg+xml;utf8,"+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'><rect width='4' height='4' fill='#6b21a8'/><text x='2' y='2.9' font-size='2.4' text-anchor='middle' fill='#e9d5ff' font-family='sans-serif'>${(t||"?")[0]}</text></svg>`);
@@ -340,7 +347,7 @@ async function creatorWikiImage(c){
  }catch(e){wcDbg(e)}
  return null
 }
-function bind(root,rm=true){root.querySelectorAll(".card").forEach(e=>{const c=store[e.dataset.id],img=e.querySelector("img");
+function bindCards(root,rm=true){root.querySelectorAll(".card").forEach(e=>{const c=store[e.dataset.id],img=e.querySelector("img");
  if(!c||!img)return;
  if(c.src=="cr"){const k=CRE.find(x=>x.pid==c.pid);if(k&&k.lock){c.img=k.img;c.imgs=k.imgs;c.realImg=k.realImg;if(img.src!==k.img)img.src=k.img}else if(k&&!c.imgs)c.imgs=k.imgs}
  const L=(c.imgs&&c.imgs.length?c.imgs:[c.img]).filter(Boolean);let i=0,n=0,dead=false;
@@ -1094,18 +1101,8 @@ function ownMap(){const now=Date.now();if(_own.m&&now-_own.t<1500)return _own.m;
 function ownN(c){if(!c)return 0;const m=ownMap();return Math.max(m.get(c.id)||0,c.pid?m.get(c.pid)||0:0,c.t?m.get("t:"+String(c.t).toLowerCase())||0:0)}
 function markOwned(root){if(!root)return;_own.t=0;root.querySelectorAll(".card").forEach(e=>{if(e.classList.contains("isown"))return;const c=store[e.dataset.id],n=ownN(c);if(!n)return;
  e.classList.add("isown");const inn=e.querySelector(".in");if(inn&&!inn.querySelector(".ownb")){const b=document.createElement("span");b.className="ownb";b.textContent="✓ POSSÉDÉE"+(n>1?" ×"+n:"");inn.appendChild(b)}})}
-{const _bind=bind;bind=function(root,rm){const r=_bind.apply(this,arguments);try{if(root&&((root.id=="g"&&tab==1)||(root.id=="ah"&&tab==3)))markOwned(root)}catch(e){wcDbg(e)}return r}}
-/* V122 : une seule carte par article. Même article = même rareté (celle que tu possèdes déjà), et les doubles existants sont fusionnés. */
-const dkey=c=>nz2(c&&c.t).replace(/\bier\b/g,"1er").replace(/\bpremier\b/g,"1er");
-let _orr={t:0,m:null};
-function ownedRar(pid,title){return null; /* V125 : désactivé (les doublons sont voulus) */ const now=Date.now();if(!_orr.m||now-_orr.t>1500){const m=new Map();Object.values(col).forEach(c=>{if(!c||!(c.n>0)||c.src==="film"||c.src==="cr")return;const r=+c.r;[c.pid,"t:"+dkey(c)].forEach(k=>{if(k&&!(m.get(k)>=r))m.set(k,r)})});_orr={t:now,m}}
- const a=_orr.m.get(pid),b=_orr.m.get("t:"+dkey({t:title}));return a!=null?a:b}
-function dedupCol(){return 0; /* V125 : désactivé (les doublons sont voulus) */ let ch=0;const g=new Map();
- Object.values(col).forEach(c=>{if(!c||!(c.n>0)||c.src==="film"||c.src==="cr")return;const k=dkey(c);if(!k)return;if(!g.has(k))g.set(k,[]);g.get(k).push(c)});
- g.forEach(a=>{if(a.length<2)return;a.sort((x,y)=>(+y.r-+x.r)||(y.n-x.n));const keep=a[0];
-  a.slice(1).forEach(o=>{keep.n+=o.n;const t=[...new Set([...(keep.tags||[]),...(o.tags||[])])].slice(0,8);if(t.length)keep.tags=t;if(!keep.img&&o.img)keep.img=o.img;delete col[o.id];ch++})});
- if(ch){_orr.t=0;_own.t=0;try{save()}catch(e){wcDbg(e)}try{toast("🧹 "+ch+" doublon"+(ch>1?"s":"")+" de cartes fusionné"+(ch>1?"s":"")+" (une seule carte par article)")}catch(e){wcDbg(e)}}return ch}
-try{dedupCol()}catch(e){console.warn("dedupCol",e)}
+/* bind = branche les cartes (image, effets) puis repère celles que tu possèdes déjà dans « Toutes les cartes » et « Enchères ». */
+function bind(root,rm=true){bindCards(root,rm);try{if(root&&((root.id=="g"&&tab==1)||(root.id=="ah"&&tab==3)))markOwned(root)}catch(e){wcDbg(e)}}
 /* V126 : « Plus récentes d'abord » = vraiment l'ordre d'obtention. Chaque carte reçoit une date quand elle arrive (ou quand un nouvel exemplaire arrive). */
 let _ln=null;
 function stampRecent(){if(!_ln)return;const now=Date.now();let k=0;Object.keys(col).forEach(id=>{const c=col[id];if(!c)return;const n=c.n||0,p=_ln[id];if(p===undefined||n>p)c.addedAt=now+(k++);_ln[id]=n});Object.keys(_ln).forEach(id=>{if(!col[id])delete _ln[id]})}
@@ -1114,7 +1111,6 @@ try{stampInit()}catch(e){console.warn("stampInit",e)}
 /* V129 : copie complète de la collection dans IndexedDB. Si le stockage normal du navigateur était plein, on récupère cette copie au démarrage. */
 (async()=>{try{const W=window.WCSAVE;if(!W){window.__colChecked=true;return}const r=await W.get("col");const lt=window.__LT0||0;
  if(r&&r.ls===false&&r.col&&lt>0&&r.t>lt+1500){const n=Object.keys(r.col).length;if(n>=Object.keys(col).length){col=r.col;try{hyd()}catch(e){wcDbg(e)}try{stampInit()}catch(e){wcDbg(e)}save();try{render()}catch(e){wcDbg(e)}try{toast("♻️ Collection récupérée depuis la copie de secours ("+n.toLocaleString("fr-FR")+" cartes)")}catch(e){wcDbg(e)}}}}catch(e){console.warn("récup collection",e)}window.__colChecked=true})();
-{const _col=collection;collection=function(){try{dedupCol()}catch(e){wcDbg(e)}return _col.apply(this,arguments)}}
 let filling=false;
 async function refill(){
  if(filling)return;
@@ -1841,7 +1837,7 @@ function sqMatch(c,q){const h=sqHay(c)+" "+sqNorm((c.tags||[]).join(" "));
  const th=t=>t&&((t.src&&c.src===t.src)||t.re.test(h));
  if(q.themePhrase&&th(q.themePhrase))return true;
  return q.words.every((w,i)=>h.includes(" "+w)||th(q.perWord[i]))}
-function collection(){
+function collectionBase(){
  try{const s=SAVEFAIL?null:JSON.parse(localStorage.getItem("wc_col")||"null");if(s){col=s;hyd()}}catch(e){wcDbg(e)}
  colSelected=new Set([...colSelected].map(selKey));
  Object.values(col).forEach(c=>{c.tags=Array.isArray(c.tags)?c.tags.filter(Boolean).slice(0,8):[];store[c.id]=c});
