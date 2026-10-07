@@ -415,6 +415,16 @@ try{
  document.addEventListener("visibilitychange",()=>{if(document.hidden)autosave()});addEventListener("pagehide",autosave);
  const hw=document.getElementById("hw");
  if(hw&&!document.getElementById("svb")){hw.insertAdjacentHTML("afterend",'<button id="svb">💾 Sauvegarde</button>');document.getElementById("svb").onclick=openSave}
+
+ /* V143 : sauvegarde automatique dans un fichier choisi une fois (Chrome / Edge sur ordinateur). Ailleurs : export manuel + rappel. */
+ const FS={ok:typeof window.showSaveFilePicker==="function",h:null,state:"none",last:0,err:""};
+ const fsWrite=async()=>{if(!FS.h)return false;try{if((await FS.h.queryPermission({mode:"readwrite"}))!=="granted"){FS.state="perm";return false}
+  tryf(()=>save());const w=await FS.h.createWritable();await w.write(JSON.stringify(W.snap()));await w.close();FS.last=Date.now();FS.state="ok";FS.err="";tryf(()=>localStorage.setItem("wc_lastexport",String(FS.last)));return true}catch(x){FS.err=String(x&&x.message||x);FS.state="err";wcDbg(x);return false}};
+ let fsT=0;const fsTick=()=>{const t=+localStorage.getItem("wc_col_t")||0;if(FS.h&&t!==fsT){fsT=t;fsWrite()}};
+ if(FS.ok){W.get("fsh").then(h=>{if(h&&h.queryPermission){FS.h=h;FS.state="perm";fsWrite()}});setInterval(fsTick,180000);document.addEventListener("visibilitychange",()=>{if(document.hidden)fsTick()})}
+ const fsPick=async()=>{const h=await showSaveFilePicker({suggestedName:"wikicollect-auto.json",types:[{description:"Sauvegarde WikiCollect",accept:{"application/json":[".json"]}}]});FS.h=h;await W.put("fsh",h);if(await h.requestPermission({mode:"readwrite"})==="granted")return fsWrite();FS.state="perm";return false};
+ const fsResume=async()=>{if(!FS.h)return false;if(await FS.h.requestPermission({mode:"readwrite"})==="granted")return fsWrite();return false};
+ const fsLabel=()=>!FS.ok?"Non disponible sur ce navigateur (utilise Chrome ou Edge sur ordinateur) — export manuel ci-dessous.":FS.state==="ok"?"✅ Active — dernier enregistrement à "+new Date(FS.last).toLocaleTimeString("fr-FR"):FS.state==="perm"?"⏸ En pause : clique sur « Réactiver » (le navigateur redemande l'autorisation après un redémarrage).":FS.state==="err"?"❌ "+FS.err:"Pas encore activée.";
  function openSave(){
   autosave();
   let nCards=0,nDiff=0;tryf(()=>{const c=Object.values(col);nDiff=c.length;nCards=c.reduce((s,x)=>s+(x.n||0),0)});
@@ -423,8 +433,12 @@ try{
   M.innerHTML=`<div class="mbox v2" style="flex-direction:column;max-width:540px"><button class="btn g x" id="mx">✕</button><h2 style="margin:0">💾 Sauvegarde</h2>
   <div class="sub">Ta progression (cartes, pièces, succès, missions, enchères…) est enregistrée automatiquement toutes les 15 secondes dans ce navigateur, avec une copie de secours. Pour la mettre à l'abri ou la changer d'appareil, exporte-la dans un fichier.</div>
   <div class="row"><span>Cartes différentes</span><b>${nDiff.toLocaleString("fr-FR")}</b></div><div class="row"><span>Cartes au total</span><b>${nCards.toLocaleString("fr-FR")}</b></div><div class="row"><span>Pièces</span><b>${(typeof money!=="undefined"?money:0).toLocaleString("fr-FR")} 🪙</b></div><div class="row"><span>Dernière copie de secours</span><b>${t}</b></div><div class="row"><span>Dernier export en fichier</span><b>${les}</b></div>
+  <div class="row" style="flex-direction:column;align-items:flex-start;gap:6px"><span><b>📁 Sauvegarde automatique dans un fichier</b></span><span class="sub" id="fsl">${fsLabel()}</span>${FS.ok?`<span class="bar"><button class="btn g" id="fsp">${FS.h?"📁 Changer de fichier":"📁 Choisir le fichier"}</button>${FS.state==="perm"?`<button class="btn" id="fsr">▶️ Réactiver</button>`:""}</span>`:""}</div>
   <div class="bar" style="margin-top:14px"><button class="btn" id="svx">⬇️ Exporter ma sauvegarde</button><label class="btn g" style="cursor:pointer">⬆️ Importer<input id="svi" type="file" accept=".json,application/json" hidden></label></div><div id="svm" class="sub"></div></div>`;
   document.getElementById("mx").onclick=closeModal;
+  const fsu=()=>{const l=document.getElementById("fsl");if(l)l.textContent=fsLabel()};
+  const fp=document.getElementById("fsp");if(fp)fp.onclick=async()=>{try{await fsPick()}catch(x){if(x&&x.name!=="AbortError"){FS.state="err";FS.err=String(x.message||x)}}fsu()};
+  const fr=document.getElementById("fsr");if(fr)fr.onclick=async()=>{try{await fsResume()}catch(x){FS.state="err";FS.err=String(x.message||x)}fsu()};
   document.getElementById("svx").onclick=()=>{autosave();const d=W.snap();const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d)],{type:"application/json"}));a.download="wikicollect-sauvegarde-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},600);tryf(()=>{localStorage.setItem("wc_lastexport",Date.now());localStorage.removeItem("wc_remind_snooze")});document.getElementById("svm").textContent="✅ Sauvegarde exportée ("+Object.keys(d.d).length+" éléments)."};
   document.getElementById("svi").onchange=async e=>{const f=e.target.files[0];if(!f)return;const m=document.getElementById("svm");
    try{const j=JSON.parse(await f.text());if(!j||!j.d||typeof j.d!=="object"||!Object.keys(j.d).some(k=>k.startsWith("wc_")))throw 0;
@@ -450,8 +464,9 @@ try{
    let le=0,sn=0;tryf(()=>{le=+localStorage.getItem("wc_lastexport")||0;sn=+localStorage.getItem("wc_remind_snooze")||0});
    const n=prog(),age=le?(Date.now()-le)/864e5:Infinity;
    if(Date.now()<sn)return;
-   if(le?age<DAYS:n<10)return;   // jamais exporté : on attend 10 cartes différentes ; sinon, rappel après 7 jours
-   const txt=le?"Ta dernière sauvegarde en fichier date de <b>"+Math.floor(age)+" jours</b>. Ta progression ne vit que dans ce navigateur : exporte-la pour ne rien perdre.":"Tu as déjà <b>"+n+" cartes différentes</b> mais aucune sauvegarde en fichier. Si tu vides ton navigateur ou changes d'adresse, tout disparaît.";
+   const paused=FS.h&&FS.state==="perm";
+   if(!paused&&(le?age<DAYS:n<10))return;   // jamais exporté : on attend 10 cartes différentes ; sinon, rappel après 7 jours
+   const txt=paused?"La <b>sauvegarde automatique en fichier est en pause</b> (le navigateur a redemandé l'autorisation). Ouvre la sauvegarde et clique sur « Réactiver ».":le?"Ta dernière sauvegarde en fichier date de <b>"+Math.floor(age)+" jours</b>. Ta progression ne vit que dans ce navigateur : exporte-la pour ne rien perdre.":"Tu as déjà <b>"+n+" cartes différentes</b> mais aucune sauvegarde en fichier. Si tu vides ton navigateur ou changes d'adresse, tout disparaît.";
    const d=document.createElement("div");d.id="bkRemind";d.innerHTML='<span>💾 '+txt+'</span><span class="bkrb"><button class="btn" id="bkrGo">Sauvegarder</button><button class="btn g" id="bkrLater">Plus tard</button></span>';
    document.body.appendChild(d);
    document.getElementById("bkrGo").onclick=()=>{d.remove();openSave()};
