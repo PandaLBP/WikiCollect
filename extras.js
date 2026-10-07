@@ -166,6 +166,14 @@ try{
     el.querySelector('#wcRarUndo').onclick=async()=>{const ok=await undoRar();if(ok){try{localStorage.setItem('wc_rar_day',new Date().toISOString().slice(0,10))}catch(e){}try{toast('↩ Raretés rétablies (pas de nouveau calcul automatique avant demain).')}catch(e){}}else out.innerHTML='<div class="sub">Rien à annuler.</div>'};
   };
   AFTER.profile.push(appendRarityPanel);
+  /* V141 — jauge du stockage du navigateur */
+  const appendStoragePanel=()=>{
+    const el=document.createElement('div');el.className='wc-feature-panel';
+    let tot=0;const parts=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i),n=k.length+(localStorage.getItem(k)||'').length;tot+=n;parts.push([k,n])}}catch(e){}
+    parts.sort((a,b)=>b[1]-a[1]);const LIM=5242880,pct=Math.min(100,Math.round(tot/LIM*100)),col2=pct>90?'#ff7676':pct>70?'#ffae5c':'#7ee29a';
+    el.innerHTML=`<h3>💾 Stockage du navigateur</h3><div class="sub">${(typeof IDBONLY!=='undefined'&&IDBONLY)?'Ta collection est dans la mémoire étendue du navigateur (IndexedDB) : plus de limite de 5 Mo. Le reste (≈ 5 Mo) ne contient que les réglages.':'Ta collection est enregistrée dans le navigateur (≈ 5 Mo). Si c\'est plein, elle passe toute seule dans la mémoire étendue (sans limite pratique).'}</div><div style="height:10px;background:#1b1626;border-radius:6px;overflow:hidden;margin:10px 0"><i style="display:block;height:100%;width:${pct}%;background:${col2}"></i></div><div class="sub"><b>${(tot/1048576).toFixed(2).replace('.',',')} Mo</b> utilisés sur ≈ 5 Mo (${pct} %)${pct>90?' — presque plein : exporte une sauvegarde.':''}</div><div class="sub" style="font-size:11px">Plus gros éléments : ${parts.slice(0,3).map(x=>x[0]+' '+(x[1]/1024).toFixed(0)+' Ko').join(' · ')}</div>`;
+    main.appendChild(el)};
+  AFTER.profile.push(appendStoragePanel);
   /* 10 — Laboratoire de cartes + bouton Découvrir dans le classeur */
   const appendLab=()=>{
     const A=Object.values(col).filter(c=>c&&c.n>0),ready=A.filter(c=>c.n>=3&&c.r<7).length;
@@ -423,8 +431,10 @@ try{
     const n=Object.keys(JSON.parse(j.d.wc_col||"{}")).length;
     if(!confirm("Remplacer ta progression actuelle par cette sauvegarde ("+n+" cartes différentes, "+(+j.d.wc_money||0)+" pièces) ?\n(Ta progression actuelle est gardée en copie de secours.)"))return;
     W.block=true;try{await W.put("before-import",W.snap())}catch(x){wcDbg(x)}try{await W.put("col",null)}catch(x){wcDbg(x)}
-    W.keys().forEach(k=>localStorage.removeItem(k));
-    Object.keys(j.d).forEach(k=>{if(typeof j.d[k]==="string")localStorage.setItem(k,j.d[k])});
+    W.keys().forEach(k=>localStorage.removeItem(k));localStorage.removeItem("wc_col_idb");
+    let big=false;
+    Object.keys(j.d).forEach(k=>{if(k==="wc_col_idb"||typeof j.d[k]!=="string")return;try{localStorage.setItem(k,j.d[k])}catch(x){if(k==="wc_col")big=true;else wcDbg(x)}});
+    if(big){const ok=await W.put("col",{t:Date.now(),ls:false,col:JSON.parse(j.d.wc_col)});if(!ok){m.textContent="❌ Import impossible : le navigateur n'a plus de place.";return}localStorage.setItem("wc_col_idb","1");localStorage.setItem("wc_col_t",String(Date.now()))}
     localStorage.setItem("ACCOUNT_RESET_V105_GUARD","1");sessionStorage.setItem("wc_restored","1");location.reload()}
    catch(err){m.textContent="❌ Fichier invalide : choisis un fichier .json exporté depuis WikiCollect."}}
  }

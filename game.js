@@ -236,12 +236,23 @@ if(false){
     localStorage.setItem("ACCOUNT_RESET_V105_GUARD","1");
   }catch(e){wcDbg(e)}
 }
-let SAVEFAIL=false;
-let _mt=0;function mirrorCol(){clearTimeout(_mt);_mt=setTimeout(()=>{if(!window.__colChecked)return mirrorCol();try{if(window.WCSAVE)window.WCSAVE.put("col",{t:Date.now(),ls:!SAVEFAIL,col})}catch(e){wcDbg(e)}},500)}
+let SAVEFAIL=false,IDBONLY=false;try{IDBONLY=localStorage.getItem("wc_col_idb")==="1"}catch(e){wcDbg(e)}
+let _mt=0,_sw=false;
+/* V142 : si le navigateur (≈ 5 Mo) est plein, la collection vit dans IndexedDB (des centaines de Mo) — plus de limite pratique. */
+function warnFull(){if(!SAVEFAIL){SAVEFAIL=true;try{toast("⚠️ Stockage du navigateur plein et copie de secours impossible : exporte ta sauvegarde (Profil → Sauvegarde) et libère de la place.")}catch(x){wcDbg(x)}}}
+function toIdb(){if(!window.__colChecked)return void setTimeout(toIdb,300);if(_sw||!window.WCSAVE)return;_sw=true;window.WCSAVE.put("col",{t:Date.now(),ls:false,col}).then(ok=>{_sw=false;if(!ok){warnFull();return}try{localStorage.setItem("wc_col_idb","1");localStorage.removeItem("wc_col")}catch(e){wcDbg(e)}const first=!IDBONLY;IDBONLY=true;SAVEFAIL=false;if(first){try{toast("💾 Collection déplacée dans la mémoire étendue du navigateur : plus de limite de 5 Mo.")}catch(x){wcDbg(x)}}})}
+function mirrorCol(){clearTimeout(_mt);_mt=setTimeout(()=>{if(!window.__colChecked)return mirrorCol();try{if(window.WCSAVE)window.WCSAVE.put("col",{t:Date.now(),ls:!(SAVEFAIL||IDBONLY),col}).then(ok=>{if(!ok&&IDBONLY)warnFull()})}catch(e){wcDbg(e)}},IDBONLY?150:500)}
+try{if(window.WCSAVE)window.WCSAVE.colJson=()=>JSON.stringify(col,function(k,v){if(k==="d"&&this&&(this.src==="wiki"||this.src===undefined))return undefined;return typeof v=="string"&&v.startsWith("data:image/jpeg")?undefined:v})}catch(e){wcDbg(e)}
+/* V141 : le stockage du navigateur (≈ 5 Mo) était saturé. Les descriptions des cartes Wikipédia ne sont plus sauvegardées (elles se rechargent à l'ouverture de la fiche), les gros caches (classement, films) vivent dans IndexedDB, et le jeu libère lui-même de la place si besoin. */
+function freeSpace(){try{["wc_rank6","wc_rank7","wc_films_1000_v1","wc_wish_log"].forEach(k=>localStorage.removeItem(k))}catch(e){wcDbg(e)}try{saveMk()}catch(e){wcDbg(e)}}
+try{["wc_rank6","wc_rank7","wc_films_1000_v1"].forEach(k=>localStorage.removeItem(k))}catch(e){wcDbg(e)}
 const save=()=>{try{try{stampRecent()}catch(e){wcDbg(e)}localStorage.setItem("wc_rarity_schema","v92");
  const strip=(k,v)=>typeof v=="string"&&v.startsWith("data:image/jpeg")?undefined:v,slim=(k,v)=>k==="d"?undefined:strip(k,v);
- try{localStorage.setItem("wc_col",JSON.stringify(col,strip));localStorage.setItem("wc_col_t",String(Date.now()));SAVEFAIL=false}
- catch(e){try{localStorage.setItem("wc_col",JSON.stringify(col,slim));localStorage.setItem("wc_col_t",String(Date.now()));SAVEFAIL=false}catch(e2){if(!SAVEFAIL){SAVEFAIL=true;try{toast("⚠️ Stockage du navigateur plein : tes nouvelles cartes ne sont PAS sauvegardées. Exporte ta sauvegarde (Profil) et libère de la place.")}catch(x){wcDbg(x)}}}}
+ const compact=function(k,v){if(k==="d"&&this&&(this.src==="wiki"||this.src===undefined))return undefined;return strip(k,v)};
+ const put=rep=>{localStorage.setItem("wc_col",JSON.stringify(col,rep));localStorage.setItem("wc_col_t",String(Date.now()));SAVEFAIL=false};
+ if(IDBONLY){localStorage.setItem("wc_col_t",String(Date.now()))}
+ else try{put(compact)}
+ catch(e){try{freeSpace();put(compact)}catch(e2){try{put(slim)}catch(e3){toIdb()}}}
  localStorage.setItem("wc_stock",stock);localStorage.setItem("wc_t0",t0);localStorage.setItem("wc_money",money);saveBoosterCooldowns()}catch(e){wcDbg(e)}try{mirrorCol()}catch(e){wcDbg(e)}};
 // V87 : Kameto canonique = créateur Twitch @kamet0 avec sa vraie photo de profil.
 // L'ancienne carte Wikipédia « Kameto » est la mauvaise variante pour ce jeu : on la retire du catalogue et de la collection,
@@ -645,7 +656,7 @@ async function loadFilms(){
  if(FILMS_LOADING)return FILMS_LOADING;
  FILMS_LOADING=(async()=>{
    try{
-     let cached=null;try{cached=JSON.parse(localStorage.getItem(FILM_CACHE_KEY)||"null")}catch(e){wcDbg(e)}
+     let cached=null;try{cached=window.WCSAVE?await window.WCSAVE.get("films"):null}catch(e){wcDbg(e)}
      if(cached&&Array.isArray(cached)&&cached.length===1000){FILMS=cached;FILMS_READY=true;return FILMS}
      let payload=null;
      try{
@@ -676,7 +687,7 @@ async function loadFilms(){
      if(selected.length<1000)throw new Error(`Seulement ${selected.length} films avec affiche disponibles`);
      selected.sort((a,b)=>b.__score-a.__score||(+b.votes||0)-(+a.votes||0));
      FILMS=selected.slice(0,1000).map((m,i)=>makeFilm(m,filmRarity(i)));
-     try{localStorage.setItem(FILM_CACHE_KEY,JSON.stringify(FILMS))}catch(e){wcDbg(e)}
+     try{if(window.WCSAVE)window.WCSAVE.put("films",FILMS)}catch(e){wcDbg(e)}
      FILMS_READY=true;return FILMS;
    }catch(e){
      console.warn("Catalogue films indisponible",e);FILMS=[];FILMS_READY=true;return FILMS;
@@ -817,7 +828,7 @@ async function wq(u){const pages={},rd={};let cont={},gen=null;
 async function loadRank(){if(RANK.length)return;
  const filmPromise=loadFilms();
  const today=new Date().toISOString().slice(0,10);let W=null;
- try{const s=JSON.parse(localStorage.getItem("wc_rank7")||"null");if(s&&s.day==today)W=s.l}catch(e){wcDbg(e)}
+ try{const s=window.WCSAVE?await window.WCSAVE.get("rank7"):null;if(s&&s.day==today)W=s.l}catch(e){wcDbg(e)}
  if(!W){const d=new Date(),ms=Array.from({length:18},(_,i)=>i+1).map(n=>{const x=new Date(d.getFullYear(),d.getMonth()-n,1);return[x.getFullYear(),x.getMonth()+1]});
   const js=await Promise.all(ms.map(([y,m])=>fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/top/fr.wikipedia/all-access/${y}/${p2(m)}/all-days`).then(r=>r.json()).catch(()=>null)));
   const sum={},nm={},pk={};
@@ -831,7 +842,7 @@ async function loadRank(){if(RANK.length)return;
 Object.keys(OVR).forEach(t=>{if(sum[t]==null&&dd[t]==null)sum[t]=0});
 EXTRA.forEach(t=>{sum[t]=Math.max(sum[t]||0,2e5)});
   W=[...new Set([...Object.keys(sum),...Object.keys(dd),...Object.keys(pk)])].filter(t=>!isRemovedTitle(t)).map(t=>{const a=Math.round(Math.max(sum[t]!==undefined?sum[t]/(nm[t]||1):0,dd[t]||0,(pk[t]||0)*.4));return[t,OVR[t]??boost(t,rarOf(a)),a]});
-  try{localStorage.setItem("wc_rank7",JSON.stringify({day:today,l:W}))}catch(e){wcDbg(e)}}
+  try{if(window.WCSAVE)window.WCSAVE.put("rank7",{day:today,l:W})}catch(e){wcDbg(e)}}
  const films=await filmPromise;
  const cn=new Set(CRE.map(c=>c.t));
  RANK=withVip([...W.filter(x=>!cn.has(x[0])).map(x=>({t:x[0],r:x[1],v:x[2],src:"wiki"})),...CRE.map(c=>({t:c.t,r:c.r,v:1e11,cr:c})),...films]).sort((a,b)=>b.r-a.r||(b.o||0)-(a.o||0)||b.v-a.v||String(a.t).localeCompare(String(b.t)));
@@ -1031,7 +1042,9 @@ try{
  MK.A=(MK.A||[]).map(a=>({...a,c:normMkCard(a.c)}));MK.H=(MK.H||[]).map(a=>({...a,c:normMkCard(a.c)}));MK.W=(MK.W||[]).map(a=>({...a,c:normMkCard(a.c)}));
  MK.PX={};
 }catch(e){wcDbg(e)}
-const saveMk=()=>{try{/* annonces des bots : description raccourcie pour ménager le stockage */const o={...MK,A:MK.A.map(a=>a.c&&a.c.d&&a.c.d.length>160&&a.s!=ME&&!a.mine&&a.w!=ME?{...a,c:{...a.c,d:a.c.d.slice(0,160)}}:a)};localStorage.setItem("wc_mk3",JSON.stringify(o))}catch(e){wcDbg(e)}};
+const saveMk=()=>{try{/* on ne garde que tes enchères, tes mises, l'historique et les stats : les annonces des bots se régénèrent toutes seules */const sl=c=>{if(!c)return c;const x={...c};delete x.d;delete x.cats;return x};
+ const o={...MK,A:MK.A.filter(a=>a.s==ME||a.mine||a.w==ME).map(a=>({...a,c:sl(a.c)})),H:(MK.H||[]).slice(0,60).map(x=>({...x,c:sl(x.c)})),W:(MK.W||[]).map(x=>({...x,c:sl(x.c)})),BI:(MK.BI||[]).map(x=>({...x,c:sl(x.c)}))};
+ localStorage.setItem("wc_mk3",JSON.stringify(o))}catch(e){wcDbg(e)}};
 // V74 : purge des anciennes annonces Zbb dans les enchères sauvegardées.
 try{
  const isZbb=x=>x&&x.c&&["zbb","amine"].includes(String(x.c.t||"").trim().toLowerCase());
@@ -1259,7 +1272,7 @@ function stampInit(){const ids=Object.keys(col),base=Date.now()-1e9;_ln={};ids.f
 try{stampInit()}catch(e){console.warn("stampInit",e)}
 /* V129 : copie complète de la collection dans IndexedDB. Si le stockage normal du navigateur était plein, on récupère cette copie au démarrage. */
 (async()=>{try{const W=window.WCSAVE;if(!W){window.__colChecked=true;return}const r=await W.get("col");const lt=window.__LT0||0;
- if(r&&r.ls===false&&r.col&&lt>0&&r.t>lt+1500){const n=Object.keys(r.col).length;if(n>=Object.keys(col).length){col=r.col;try{hyd()}catch(e){wcDbg(e)}try{stampInit()}catch(e){wcDbg(e)}save();try{render()}catch(e){wcDbg(e)}try{toast("♻️ Collection récupérée depuis la copie de secours ("+n.toLocaleString("fr-FR")+" cartes)")}catch(e){wcDbg(e)}}}}catch(e){console.warn("récup collection",e)}window.__colChecked=true})();
+ if(r&&r.col&&((IDBONLY&&Object.keys(r.col).length>0)||(r.ls===false&&lt>0&&r.t>lt+1500))){const n=Object.keys(r.col).length;if(n>=Object.keys(col).length){col=r.col;try{hyd()}catch(e){wcDbg(e)}try{stampInit()}catch(e){wcDbg(e)}save();try{render()}catch(e){wcDbg(e)}if(!IDBONLY)try{toast("♻️ Collection récupérée depuis la copie de secours ("+n.toLocaleString("fr-FR")+" cartes)")}catch(e){wcDbg(e)}}}}catch(e){console.warn("récup collection",e)}window.__colChecked=true})();
 let filling=false;
 async function refill(){
  if(filling)return;
@@ -1997,7 +2010,7 @@ function sqMatch(c,q){const h=sqHay(c)+" "+sqNorm((c.tags||[]).join(" "));
  if(q.themePhrase&&th(q.themePhrase))return true;
  return q.words.every((w,i)=>h.includes(" "+w)||th(q.perWord[i]))}
 function collectionBase(){
- try{const s=SAVEFAIL?null:JSON.parse(localStorage.getItem("wc_col")||"null");if(s){col=s;hyd()}}catch(e){wcDbg(e)}
+ try{const s=(SAVEFAIL||IDBONLY)?null:JSON.parse(localStorage.getItem("wc_col")||"null");if(s){col=s;hyd()}}catch(e){wcDbg(e)}
  colSelected=new Set([...colSelected].map(selKey));
  Object.values(col).forEach(c=>{c.tags=Array.isArray(c.tags)?c.tags.filter(Boolean).slice(0,8):[];store[c.id]=c});
  const A=Object.values(col).filter(c=>c&&c.n>0);
