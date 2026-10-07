@@ -127,7 +127,7 @@
     const rows=[];
     for(const p of pages){
       const t=title(p.title),k=norm(t);
-      if(!p.thumbnail?.source||!k||bad.test(t)||p.missing)continue;
+      if(!p.thumbnail?.source||!k||bad.test(t)||p.missing)continue;try{learnImg(p);if(badImg(p.thumbnail.source))continue}catch(e){}
       const old=await get(k);
       if(old?.img&&!refresh)continue;
       const pv=p.pageviews?Object.values(p.pageviews).reduce((a,b)=>a+(Number(b)||0),0):0;
@@ -262,6 +262,14 @@
     }));
   }
 
-  window.wcCatalogV41={start:run,count,progress:async()=>console.table(await metaGet('state')||{}),sample,randomSample,queryPage,resetProgress:async()=>{await metaSet('state',{seed:0,added:0,processed:0,catQueue:[],doneCats:{},globalCursor:''});console.log('Progression remise à zéro — catalogue conservé.')}};
+  /* V139 : repérage et suppression des images par défaut (fichier partagé par de nombreux articles) */
+  const scanImages=async(minShared=15)=>{const cnt=new Map();
+   await tx(STORE,'readonly',s=>new Promise((res,rej)=>{const q=s.openCursor();q.onsuccess=e=>{const c=e.target.result;if(!c){res();return}const f=imgFile(c.value&&c.value.img);if(f)cnt.set(f,(cnt.get(f)||0)+1);c.continue()};q.onerror=()=>rej(q.error)}));
+   return [...cnt].filter(([f,n])=>n>=minShared).map(([f])=>f)};
+  const purgeImages=async()=>{const removed=[];
+   await tx(STORE,'readwrite',s=>new Promise((res,rej)=>{const q=s.openCursor();q.onsuccess=e=>{const c=e.target.result;if(!c){res();return}if(c.value&&badImg(c.value.img)){removed.push(c.value.title);c.delete()}c.continue()};q.onerror=()=>rej(q.error)}));
+   return removed};
+  const countByRarity=async()=>{const o={};for(let r=0;r<8;r++)o[r]=await tx(STORE,'readonly',s=>new Promise((res,rej)=>{const q=s.index('r').count(IDBKeyRange.only(r));q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)}));return o};
+  window.wcCatalogV41={countByRarity,scanImages,purgeImages,start:run,count,progress:async()=>console.table(await metaGet('state')||{}),sample,randomSample,queryPage,resetProgress:async()=>{await metaSet('state',{seed:0,added:0,processed:0,catQueue:[],doneCats:{},globalCursor:''});console.log('Progression remise à zéro — catalogue conservé.')}};
   db().catch(()=>{});setTimeout(run,1200);
 })();

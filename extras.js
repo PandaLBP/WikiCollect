@@ -82,6 +82,43 @@ try{
   };
   const appendProfileFeatures=()=>{const holder=document.createElement('div');holder.id='wcProfileFeatures';holder.innerHTML='<div class="msg">Chargement des statistiques…</div>';main.appendChild(holder);statsHTML().then(x=>{if(document.getElementById('wcProfileFeatures'))holder.innerHTML=x}).catch(()=>{holder.innerHTML='<div class="msg">Statistiques momentanément indisponibles.</div>'})};
   AFTER.profile.push(appendProfileFeatures);
+  /* V139 — nettoyage des images par défaut : on cherche une vraie image (Wikidata, puis Wikipédia en anglais), sinon la carte est retirée (10 🪙 par exemplaire pour tes cartes) */
+  const WD='https://www.wikidata.org/w/api.php?format=json&origin=*&';
+  const findImages=async titles=>{const res={};
+    for(let i=0;i<titles.length;i+=40){const part=titles.slice(i,i+40);
+      try{const j=await (await fetch(WD+'action=wbgetentities&sites=frwiki&normalize=1&props=claims|sitelinks&sitefilter=frwiki|enwiki&titles='+encodeURIComponent(part.join('|')))).json();
+        const need=[];
+        Object.values(j.entities||{}).forEach(en=>{const fr=en&&en.sitelinks&&en.sitelinks.frwiki;const t=en&&en.sitelinks&&(en.sitelinks.frwiki||{}).title;
+          const orig=part.find(x=>x.toLowerCase()===String(t||'').toLowerCase())||t;if(!orig)return;
+          const p18=en.claims&&en.claims.P18&&en.claims.P18[0]&&en.claims.P18[0].mainsnak&&en.claims.P18[0].mainsnak.datavalue&&en.claims.P18[0].mainsnak.datavalue.value;
+          if(p18){res[orig]='https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(String(p18).replace(/ /g,'_'))+'?width=500';return}
+          const en2=en.sitelinks&&en.sitelinks.enwiki&&en.sitelinks.enwiki.title;if(en2)need.push([orig,en2])});
+        for(let k=0;k<need.length;k+=40){const pp=need.slice(k,k+40);
+          const e=await (await fetch('https://en.wikipedia.org/w/api.php?format=json&origin=*&action=query&prop=pageimages&piprop=thumbnail&pithumbsize=500&redirects=1&formatversion=2&titles='+encodeURIComponent(pp.map(x=>x[1]).join('|')))).json();
+          (e.query&&e.query.pages||[]).forEach(pg=>{const src=pg.thumbnail&&pg.thumbnail.source;if(!src||badImg(src))return;const pair=pp.find(x=>x[1].toLowerCase()===pg.title.toLowerCase())||pp.find(x=>(e.query.redirects||[]).some(r=>r.to===pg.title&&r.from===x[1]));if(pair)res[pair[0]]=src})}
+      }catch(e){wcDbg(e)}}
+    return res};
+  const cleanImages=async()=>{
+    try{
+      const last=+localStorage.getItem('wc_img_scan')||0;if(Date.now()-last<3*864e5)return;
+      const C=window.wcCatalogV41;let learned=0,removedCat=0;
+      if(C&&C.scanImages){learned=addBadImg(await C.scanImages(15))}
+      /* cartes déjà possédées / en vente avec une image par défaut */
+      const owned=Object.values(col).filter(c=>c&&c.n>0&&c.src!=='cr'&&c.src!=='film'&&badImg(c.img));
+      let fixed=0,removed=0,gained=0;
+      if(owned.length){
+        const found=await findImages([...new Set(owned.map(c=>c.t))]);
+        owned.forEach(c=>{const u=found[c.t];if(u&&!badImg(u)){c.img=u;if(store[c.id])store[c.id].img=u;fixed++}else{gained+=10*(c.n||1);removed+=c.n||1;delete col[c.id]}});
+        if(gained)money+=gained;save();try{upM()}catch(e){}
+      }
+      try{MK.A=MK.A.filter(a=>!(a.s!==ME&&!a.mine&&a.w!==ME&&badImg(a.c&&a.c.img)));saveMk()}catch(e){wcDbg(e)}
+      try{Object.keys(store).forEach(k=>{if(badImg(store[k]&&store[k].img))delete store[k]})}catch(e){wcDbg(e)}
+      if(C&&C.purgeImages){removedCat=(await C.purgeImages()).length}
+      localStorage.setItem('wc_img_scan',String(Date.now()));
+      if(learned||removedCat||fixed||removed){try{toast('🖼 Images par défaut nettoyées : '+removedCat.toLocaleString('fr-FR')+' carte(s) du catalogue retirée(s)'+(fixed?' · '+fixed+' de tes cartes ont reçu une vraie image':'')+(removed?' · '+removed+' exemplaire(s) retiré(s) (+'+gained+' 🪙)':''))}catch(e){}}
+      try{if(tab===1||tab===2||tab===3)render()}catch(e){}
+    }catch(e){wcDbg(e)}};
+  setTimeout(cleanImages,15000);
   /* V138 — raretés de la collection recalculées automatiquement (1×/jour, après le classement Wikipédia) + panneau Profil pour voir / annuler */
   let RUNDO=null,RLAST=null;
   const regroup=()=>{const N={};Object.values(col).forEach(c=>{if(!c)return;if(N[c.id]){N[c.id].n+=c.n}else N[c.id]=c});col=N};
@@ -116,8 +153,9 @@ try{
   setTimeout(autoRar,7000);setInterval(autoRar,3600000);
   const appendRarityPanel=()=>{
     const el=document.createElement('div');el.className='wc-feature-panel';el.id='wcRarPanel';
-    el.innerHTML='<h3>⚖️ Raretés de ma collection</h3><div class="sub">Mises à jour <b>automatiquement chaque jour</b> avec le dernier calcul (vues sur 18 mois + notoriété). Tu peux aussi lancer le calcul toi-même ou annuler la dernière mise à jour.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn" id="wcRarGo">⚖️ Recalculer maintenant</button><button class="btn g" id="wcRarUndo">↩ Annuler la dernière mise à jour</button></div><div id="wcRarOut" style="margin-top:12px"></div>';
+    el.innerHTML='<h3>⚖️ Raretés de ma collection</h3><div class="sub">Mises à jour <b>automatiquement chaque jour</b> avec le dernier calcul (vues sur 18 mois + notoriété). Tu peux aussi lancer le calcul toi-même ou annuler la dernière mise à jour.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn" id="wcRarGo">⚖️ Recalculer maintenant</button><button class="btn g" id="wcRarUndo">↩ Annuler la dernière mise à jour</button></div><div id="wcRarOut" style="margin-top:12px"></div><div id="wcRarUni" style="margin-top:14px"></div>';
     main.appendChild(el);
+    (async()=>{try{const C=window.wcCatalogV41;if(!C||!C.countByRarity)return;const tot=await C.countByRarity(),own={};Object.values(col).forEach(c=>{if(c&&c.n>0)own[c.r]=(own[c.r]||0)+1});const u=el.querySelector('#wcRarUni');if(!u)return;u.innerHTML='<label class="lab">CARTES DIFFÉRENTES PAR RARETÉ (catalogue exploré)</label><div class="sub" style="margin:2px 0 6px">Plus il y a de cartes différentes dans une rareté, moins tu tombes sur des doublons. Le robot continue d\'en ajouter.</div>'+R.map((r,i)=>`<div class="off"><b style="color:${r[1]}">${r[0]}</b> <span style="margin-left:auto">${(own[i]||0).toLocaleString('fr-FR')} possédées · ${(tot[i]||0).toLocaleString('fr-FR')} dans le catalogue</span></div>`).join('')}catch(e){wcDbg(e)}})();
     const out=el.querySelector('#wcRarOut');
     el.querySelector('#wcRarGo').onclick=async()=>{
       out.innerHTML='<div class="sub">Calcul en cours…</div>';

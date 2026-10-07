@@ -310,7 +310,16 @@ const canonicalTitle=t=>CANONICAL_TITLES[String(t||"")]||t;
 const SPECIAL_ADULT_CARD={id:"special-sweetie-fox-7",pid:"special-sweetie-fox",t:"Sweetie Fox",d:"Créatrice de contenu et modèle connue sous le nom Sweetie Fox",img:SPECIAL_ADULT_IMG,r:7,src:"wiki",nsfw:true,v:900000};
 try{store[SPECIAL_ADULT_CARD.id]=SPECIAL_ADULT_CARD}catch(e){wcDbg(e)}
 const isSweetie=t=>String(t||"").normalize("NFD").replace(/[^a-zA-Z0-9]/g,"").toLowerCase()==="sweetiefox";
-const ok=p=>p.thumbnail&&!noImageTitle(p.title)&&!/homonymie/i.test(p.description||"")&&!isRemovedTitle(p.title);
+/* V139 : images « par défaut » de Wikipédia (silhouette « Vous possédez une image… »). Reconnues par leur nom de fichier : liste apprise (partagée par des centaines d'articles) + motifs connus. */
+let BADIMG=new Set();try{BADIMG=new Set(JSON.parse(localStorage.getItem("wc_badimg")||"[]"))}catch(e){wcDbg(e)}
+const BADIMG_RE=/manquant|missing[ _-]?(image|photo|portrait)|image[ _-]manquante|replace[ _-]this[ _-]image|placeholder|no[ _-]?(image|photo)[ _-]?(available|found)?\b|image[ _-]non[ _-]disponible|photo[ _-]non[ _-]disponible|portrait[ _-]manquant/i;
+function imgFile(u){try{const a=String(u||"").split("?")[0].split("/");let f=a[a.length-1];if(/^\d+px-/.test(f)&&a.length>1)f=a[a.length-2];return decodeURIComponent(f)}catch(e){return""}}
+const _seenImg=new Map();
+function badImg(u){if(!u||typeof u!=="string"||u.startsWith("data:"))return false;const f=imgFile(u);return !!f&&(BADIMG.has(f)||BADIMG_RE.test(f))}
+function addBadImg(files){let ch=0;files.forEach(f=>{if(f&&!BADIMG.has(f)){BADIMG.add(f);ch++}});if(ch)try{localStorage.setItem("wc_badimg",JSON.stringify([...BADIMG].slice(-300)))}catch(e){wcDbg(e)}return ch}
+/* apprentissage en direct : un même fichier vu sur 6 articles différents pendant la session = image par défaut */
+function learnImg(p){try{const u=p.thumbnail&&p.thumbnail.source;if(!u)return;const f=imgFile(u);if(!f||BADIMG.has(f))return;let s=_seenImg.get(f);if(!s){s=new Set();_seenImg.set(f,s);if(_seenImg.size>3000)_seenImg.clear()}s.add(p.title);if(s.size>=6)addBadImg([f])}catch(e){wcDbg(e)}}
+const ok=p=>{learnImg(p);return !!(p.thumbnail&&!badImg(p.thumbnail.source))&&ok0(p)};const ok0=p=>p.thumbnail&&!noImageTitle(p.title)&&!/homonymie/i.test(p.description||"")&&!isRemovedTitle(p.title);
 function rp(p){
  if(OVR[p.title]!=null)return OVR[p.title];
  const k=nz2(p.title);
@@ -463,7 +472,13 @@ function recordPulled(cs){try{cs.forEach(c=>{const k=tkey(c);if(k)RECENT.push(k)
 /* V117 : tirage purement aléatoire. La rareté suit les % du jeu, puis la carte est tirée UNIFORMÉMENT parmi toutes les cartes candidates de cette rareté
    (pages Wikipédia au hasard + tout le catalogue + cartes VIP). Aucune catégorie, aucun thème, aucune préférence. Seule règle : ne pas redonner
    une carte tirée dans les 150 dernières. */
-function pickSmart(cs){const a=cs.filter(c=>!isRecent(c));if(a.length)cs=a;return cs[Math.floor(Math.random()*cs.length)]}
+/* V140 : un booster privilégie d'abord les cartes que tu n'as JAMAIS eues, puis celles que tu as le moins, puis celles pas tirées récemment */
+function pickSmart(cs){
+ const n=c=>{try{return ownN(c)}catch(e){return 0}};
+ let a=cs.filter(c=>!n(c));
+ if(!a.length){const m=Math.min(...cs.map(n));a=cs.filter(c=>n(c)===m)}
+ const b=a.filter(c=>!isRecent(c));if(b.length)a=b;
+ return a[Math.floor(Math.random()*a.length)]}
 const CRATE=.03; // chance qu'une carte d'un booster soit un créateur (≈ 26 % des boosters en contiennent un)
 async function buildPack(minRarity=null){
  const rollCount=minRarity!=null?9:10; const rolls=Array.from({length:rollCount},()=>pick(Math.random())).sort((a,b)=>a-b); // 10 cartes au total, dont 1 garantie pour les boosters spéciaux
@@ -485,12 +500,12 @@ async function buildPack(minRarity=null){
   });
  }
  try{
-  const vt=[],dr=new Set(rolls.filter(r=>r>=1)),vper=Math.max(5,Math.min(16,Math.floor(48/Math.max(1,dr.size))));dr.forEach(r=>vt.push(...VIPT.filter(v=>v.r==r&&(v.g!=="adult"||Math.random()<.2)).sort(()=>Math.random()-.5).slice(0,vper)));
+  const vt=[],dr=new Set(rolls.filter(r=>r>=1)),vper=Math.max(8,Math.min(30,Math.floor(48/Math.max(1,dr.size))));dr.forEach(r=>vt.push(...VIPT.filter(v=>v.r==r&&(v.g!=="adult"||Math.random()<.2)).sort(()=>Math.random()-.5).slice(0,vper)));
   if(vt.length){const {pages,rd}=await wq(APIB+"redirects=1&titles="+encodeURIComponent(vt.slice(0,50).map(v=>v.t).join("|")));const forced={};vt.forEach(v=>{const a=rd[v.t]||v.t;forced[nz2(rd[a]||a)]=v.r});
    Object.values(pages).filter(ok).forEach(p=>{if(isExcludedTitle(p.title)||seen.has(p.pageid))return;seen.add(p.pageid);const c=mk(p,forced[nz2(p.title)]);SRC.set(c,"vip");pool.push(c)})}
   if(vt.some(v=>isSweetie(v.t))&&!pool.some(c=>c.pid===SPECIAL_ADULT_CARD.pid)){const c={...SPECIAL_ADULT_CARD};SRC.set(c,"vip");pool.push(c)}
  }catch(e){wcDbg(e)}
- try{if(window.wcCatalogV41&&window.wcCatalogV41.randomSample){const need={};rolls.forEach(r=>{need[r]=(need[r]||0)+1});const counts={};Object.keys(need).forEach(r=>{counts[r]=Math.max(12,need[r]*10)});
+ try{if(window.wcCatalogV41&&window.wcCatalogV41.randomSample){const need={};rolls.forEach(r=>{need[r]=(need[r]||0)+1});const counts={};Object.keys(need).forEach(r=>{counts[r]=Math.max(40,need[r]*20)});
   const extra=await window.wcCatalogV41.randomSample(counts);extra.forEach(c=>{if(!seen.has(c.pid)&&!isExcludedTitle(c.t)){seen.add(c.pid);SRC.set(c,"cat");store[c.id]=c;pool.push(c)}})}}catch(e){wcDbg(e)}
  if(rolls.some(r=>r>=2)&&top.length){ // articles très consultés (top mensuel) pour les rangs hauts
   const T=[],rr=[...new Set(rolls.filter(r=>r>=1))],tper=Math.max(5,Math.min(14,Math.floor(48/Math.max(1,rr.length))));rr.forEach(r=>T.push(...top.filter(x=>x.r==r).sort(()=>Math.random()-.5).slice(0,tper)));
@@ -498,21 +513,21 @@ async function buildPack(minRarity=null){
  const used=new Set(),res=[];
  if(minRarity!=null){
   const creatorCand=CRE.filter(c=>c.r>=minRarity);
-  let guaranteed=creatorCand.length?creatorCand[Math.floor(Math.random()*creatorCand.length)]:null;
-  if(!guaranteed){const wc=pool.filter(c=>c.r>=minRarity&&!used.has(c.pid));if(wc.length)guaranteed=wc[Math.floor(Math.random()*wc.length)];}
-  if(!guaranteed&&top.length){const TT=top.filter(x=>x.r>=minRarity).sort(()=>Math.random()-.5).slice(0,12);if(TT.length)try{const jj=await (await fetch(API+"titles="+encodeURIComponent(TT.map(x=>x.t).join("|")))).json();add(jj,"top");const wc=pool.filter(c=>c.r>=minRarity&&!used.has(c.pid));if(wc.length)guaranteed=wc[Math.floor(Math.random()*wc.length)];}catch(e){wcDbg(e)}}
+  let guaranteed=creatorCand.length?pickSmart(creatorCand):null;
+  if(!guaranteed){const wc=pool.filter(c=>c.r>=minRarity&&!used.has(c.pid));if(wc.length)guaranteed=pickSmart(wc);}
+  if(!guaranteed&&top.length){const TT=top.filter(x=>x.r>=minRarity).sort(()=>Math.random()-.5).slice(0,12);if(TT.length)try{const jj=await (await fetch(API+"titles="+encodeURIComponent(TT.map(x=>x.t).join("|")))).json();add(jj,"top");const wc=pool.filter(c=>c.r>=minRarity&&!used.has(c.pid));if(wc.length)guaranteed=pickSmart(wc);}catch(e){wcDbg(e)}}
   if(guaranteed){
    // Dans le Booster Légendaire, l'emplacement garanti peut devenir un Légendaire holo full art.
    if(minRarity===6 && Math.random()<LEGEND_HFA_BOOSTER_CHANCE){
     const graal=creatorCand.filter(c=>c.r>=7).concat(pool.filter(c=>c.r===7&&!used.has(c.pid)));
-    if(graal.length) guaranteed=graal[Math.floor(Math.random()*graal.length)];
+    if(graal.length) guaranteed=pickSmart(graal);
     else if(top.length){
      const TG=top.filter(x=>x.r===7).sort(()=>Math.random()-.5).slice(0,12);
      if(TG.length)try{
       const jj=await (await fetch(API+"titles="+encodeURIComponent(TG.map(x=>x.t).join("|")))).json();
       add(jj,"top");
       const wc=pool.filter(c=>c.r===7&&!used.has(c.pid));
-      if(wc.length) guaranteed=wc[Math.floor(Math.random()*wc.length)];
+      if(wc.length) guaranteed=pickSmart(wc);
      }catch(e){wcDbg(e)}
     }
    }
@@ -523,7 +538,7 @@ async function buildPack(minRarity=null){
  [...rolls].reverse().forEach(rt=>{
   if(Math.random()<CRATE){let cs=CRE.filter(c=>!used.has(c.pid)&&!usedT.has(tkey(c)));const fresh=cs.filter(c=>!isRecent(c));if(fresh.length)cs=fresh;
    if(cs.length){const dm=Math.min(...cs.map(c=>Math.abs(c.r-rt))),cc=cs.filter(c=>Math.abs(c.r-rt)==dm);
-    if(cc.length){const c=cc[Math.floor(Math.random()*cc.length)];used.add(c.pid);usedT.add(tkey(c));res.push(c);return}}}
+    if(cc.length){const c=pickSmart(cc);used.add(c.pid);usedT.add(tkey(c));res.push(c);return}}}
   const order=[];for(let i=rt;i>=0;i--)order.push(i);for(let i=rt+1;i<=7;i++)order.push(i);
   for(const r of order){const cs=pool.filter(c=>c.r==r&&!used.has(c.pid)&&!usedT.has(tkey(c)));if(cs.length){const c=pickSmart(cs);used.add(c.pid);usedT.add(tkey(c));res.push(c);break}}});
  if(res.length<10)throw 0;
