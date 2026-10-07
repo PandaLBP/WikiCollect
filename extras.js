@@ -82,6 +82,52 @@ try{
   };
   const appendProfileFeatures=()=>{const holder=document.createElement('div');holder.id='wcProfileFeatures';holder.innerHTML='<div class="msg">Chargement des statistiques…</div>';main.appendChild(holder);statsHTML().then(x=>{if(document.getElementById('wcProfileFeatures'))holder.innerHTML=x}).catch(()=>{holder.innerHTML='<div class="msg">Statistiques momentanément indisponibles.</div>'})};
   AFTER.profile.push(appendProfileFeatures);
+  /* V138 — raretés de la collection recalculées automatiquement (1×/jour, après le classement Wikipédia) + panneau Profil pour voir / annuler */
+  let RUNDO=null,RLAST=null;
+  const regroup=()=>{const N={};Object.values(col).forEach(c=>{if(!c)return;if(N[c.id]){N[c.id].n+=c.n}else N[c.id]=c});col=N};
+  const scanRar=async()=>{
+    await loadRank();
+    const mp=new Map();RANK.forEach(e=>{if(e.src==='film'||e.cr)return;const k=nz2(e.t);if(k&&!mp.has(k))mp.set(k,e.r)});
+    const ch=[];Object.values(col).forEach(c=>{if(!c||!(c.n>0)||c.src==='cr'||c.src==='film')return;const f=forcedRarity(c.t),nr=f!=null?f:mp.get(nz2(c.t));if(nr==null||nr===+c.r)return;ch.push({c,from:+c.r,to:nr})});
+    return ch};
+  const applyRar=async ch=>{
+    const snap=Object.values(col).filter(Boolean).map(c=>({c,id:c.id,r:c.r,n:c.n}));
+    try{if(window.WCSAVE)await window.WCSAVE.put('colbak',{t:Date.now(),col:JSON.parse(JSON.stringify(col))})}catch(e){}   // copie de sécurité (IndexedDB) pour pouvoir annuler même après rechargement
+    ch.forEach(x=>{x.c.r=x.to;if(/^\d+-\d+$/.test(String(x.c.id)))x.c.id=String(x.c.id).replace(/-\d+$/,'-'+x.to)});
+    RUNDO=snap;regroup();save();try{stampRecent()}catch(e){}
+    RLAST={n:ch.length,up:ch.filter(x=>x.to>x.from).length,t:Date.now()};
+    return RLAST};
+  const undoRar=async()=>{
+    if(RUNDO){const N={};RUNDO.forEach(x=>{x.c.id=x.id;x.c.r=x.r;x.c.n=x.n;N[x.id]=x.c});col=N;RUNDO=null}
+    else if(window.WCSAVE){const b=await window.WCSAVE.get('colbak');if(!b||!b.col)return false;col=b.col}
+    else return false;
+    save();try{render()}catch(e){}return true};
+  const autoRar=async()=>{
+    try{
+      const today=new Date().toISOString().slice(0,10);
+      if(localStorage.getItem('wc_rar_day')===today||SAVEFAIL)return;
+      const ch=await scanRar();
+      localStorage.setItem('wc_rar_day',today);
+      if(!ch.length)return;
+      const r=await applyRar(ch);
+      try{toast('⚖️ Raretés mises à jour automatiquement : '+r.n.toLocaleString('fr-FR')+' carte(s) (▲ '+r.up.toLocaleString('fr-FR')+' · ▼ '+(r.n-r.up).toLocaleString('fr-FR')+') — annulable dans Profil')}catch(e){}
+      try{if(tab===2||tab===7)render()}catch(e){}
+    }catch(e){wcDbg(e)}};
+  setTimeout(autoRar,7000);setInterval(autoRar,3600000);
+  const appendRarityPanel=()=>{
+    const el=document.createElement('div');el.className='wc-feature-panel';el.id='wcRarPanel';
+    el.innerHTML='<h3>⚖️ Raretés de ma collection</h3><div class="sub">Mises à jour <b>automatiquement chaque jour</b> avec le dernier calcul (vues sur 18 mois + notoriété). Tu peux aussi lancer le calcul toi-même ou annuler la dernière mise à jour.</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn" id="wcRarGo">⚖️ Recalculer maintenant</button><button class="btn g" id="wcRarUndo">↩ Annuler la dernière mise à jour</button></div><div id="wcRarOut" style="margin-top:12px"></div>';
+    main.appendChild(el);
+    const out=el.querySelector('#wcRarOut');
+    el.querySelector('#wcRarGo').onclick=async()=>{
+      out.innerHTML='<div class="sub">Calcul en cours…</div>';
+      try{const ch=await scanRar();
+        if(!ch.length){out.innerHTML='<div class="sub">✅ Toutes tes cartes ont déjà la bonne rareté.</div>';return}
+        const r=await applyRar(ch);out.innerHTML=`<div class="sub" style="color:#7ee29a">✅ ${r.n.toLocaleString('fr-FR')} carte(s) mise(s) à jour (▲ ${r.up.toLocaleString('fr-FR')} · ▼ ${(r.n-r.up).toLocaleString('fr-FR')}).</div>`;try{render()}catch(e){}
+      }catch(e){out.innerHTML='<div class="sub">Classement Wikipédia indisponible pour le moment, réessaie plus tard.</div>'}};
+    el.querySelector('#wcRarUndo').onclick=async()=>{const ok=await undoRar();if(ok){try{localStorage.setItem('wc_rar_day',new Date().toISOString().slice(0,10))}catch(e){}try{toast('↩ Raretés rétablies (pas de nouveau calcul automatique avant demain).')}catch(e){}}else out.innerHTML='<div class="sub">Rien à annuler.</div>'};
+  };
+  AFTER.profile.push(appendRarityPanel);
   /* 10 — Laboratoire de cartes + bouton Découvrir dans le classeur */
   const appendLab=()=>{
     const A=Object.values(col).filter(c=>c&&c.n>0),ready=A.filter(c=>c.n>=3&&c.r<7).length;

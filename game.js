@@ -257,7 +257,7 @@ const EXCLUDED_TITLES=new Set(["lizzie","catherine ringer","traci lords"]);
 const isExcludedTitle=t=>EXCLUDED_TITLES.has(String(t||"").trim().toLowerCase());
 const isRemovedTitle=t=>isExcludedTitle(t)||DUPLICATE_TITLES.has(String(t||"").trim().toLowerCase());
 // V86 : force le recalcul du classement pour faire apparaître les nouvelles cartes sélectionnées.
-try{if(localStorage.getItem("wc_v86_rank_refresh")!=="1"){localStorage.removeItem("wc_rank6");localStorage.setItem("wc_v86_rank_refresh","1")}}catch(e){wcDbg(e)}
+try{if(localStorage.getItem("wc_v86_rank_refresh")!=="1"){localStorage.removeItem("wc_rank7");localStorage.removeItem("wc_rank6");localStorage.setItem("wc_v86_rank_refresh","1")}}catch(e){wcDbg(e)}
 function hyd(){const N={};Object.values(col).forEach(c=>{
  if(c&&String(c.t||"").trim().toLowerCase()==="sophie reine")c.t="Sophie Rain";
  if(c.src=="cr"){const k=CRE.find(x=>x.pid==c.pid);if(k){c.r=k.r;c.id=k.id;c.url=k.url;if(k.lock){c.img=k.img;c.imgs=k.imgs;c.realImg=k.realImg}}}
@@ -399,7 +399,7 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
  if(c.src=="wiki"){try{const j=await(await fetch("https://fr.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(c.t))).json();if(M.style.display=="flex"&&j.extract&&store[id]===c){desc=j.extract;draw()}}catch(e){wcDbg(e)}}}
 function render(){clearInterval(timer);closeModal();try{SFX.stopAll()}catch(e){wcDbg(e)}try{simulate()}catch(e){wcDbg(e)}
  [0,1,2,3,4,5,6,7,8].forEach(i=>{const e=$("t"+i);if(e)e.className=tab==i?"on":""});
- try{([packs,all,collection,market,casino,missionsPage,eventPage,profilePage,succesPage][tab]||packs)()}
+ try{([packs,all,collection,market,casino,(typeof missionsPage=="function"?missionsPage:packs),eventPage,profilePage,succesPage][tab]||packs)()}
  catch(e){console.error(e);main.innerHTML=`<div class="msg">Oups, une erreur est survenue.<br><br><button class="btn" onclick="render()">Réessayer</button></div>`}}
 /* ===== PAQUETS ===== */
 const SPECIALS=[
@@ -802,11 +802,12 @@ async function wq(u){const pages={},rd={};let cont={},gen=null;
 async function loadRank(){if(RANK.length)return;
  const filmPromise=loadFilms();
  const today=new Date().toISOString().slice(0,10);let W=null;
- try{const s=JSON.parse(localStorage.getItem("wc_rank6")||"null");if(s&&s.day==today)W=s.l}catch(e){wcDbg(e)}
- if(!W){const d=new Date(),ms=[1,2,3,4,5,6].map(n=>{const x=new Date(d.getFullYear(),d.getMonth()-n,1);return[x.getFullYear(),x.getMonth()+1]});
+ try{const s=JSON.parse(localStorage.getItem("wc_rank7")||"null");if(s&&s.day==today)W=s.l}catch(e){wcDbg(e)}
+ if(!W){const d=new Date(),ms=Array.from({length:18},(_,i)=>i+1).map(n=>{const x=new Date(d.getFullYear(),d.getMonth()-n,1);return[x.getFullYear(),x.getMonth()+1]});
   const js=await Promise.all(ms.map(([y,m])=>fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/top/fr.wikipedia/all-access/${y}/${p2(m)}/all-days`).then(r=>r.json()).catch(()=>null)));
-  const sum={},nm={};
-  js.forEach(j=>(j&&j.items?j.items[0].articles:[]).forEach(a=>{if(/:/.test(a.article)||a.article=="Accueil")return;const t=a.article.replace(/_/g," ");sum[t]=(sum[t]||0)+a.views;nm[t]=(nm[t]||0)+1}));
+  const sum={},nm={},pk={};
+  /* V138 : on regarde 18 mois. Les 6 derniers donnent le niveau actuel ; le meilleur mois sur 18 donne la notoriété « historique » (un événement majeur ne doit pas être oublié au bout de 6 mois). */
+  js.forEach((j,ji)=>(j&&j.items?j.items[0].articles:[]).forEach(a=>{if(/:/.test(a.article)||a.article=="Accueil")return;const t=a.article.replace(/_/g," ");pk[t]=Math.max(pk[t]||0,a.views);if(ji<6){sum[t]=(sum[t]||0)+a.views;nm[t]=(nm[t]||0)+1}}));
   const dd={},days=Array.from({length:30},(_,k)=>{const x=new Date(Date.now()-(k+2)*864e5);return x.getFullYear()+"/"+p2(x.getMonth()+1)+"/"+p2(x.getDate())});
   for(let k=0;k<days.length;k+=30){const dj=await Promise.all(days.slice(k,k+30).map(u=>fetch("https://wikimedia.org/api/rest_v1/metrics/pageviews/top/fr.wikipedia/all-access/"+u).then(r=>r.json()).catch(()=>null)));
    dj.forEach(j=>(j&&j.items?j.items[0].articles:[]).forEach(a=>{if(/:/.test(a.article)||a.article=="Accueil")return;const t=a.article.replace(/_/g," ");dd[t]=(dd[t]||0)+a.views}))}
@@ -814,8 +815,8 @@ async function loadRank(){if(RANK.length)return;
 // La rareté est forcée par OVR ; les vues affichées restent celles réellement récupérées, ou « — » si absentes.
 Object.keys(OVR).forEach(t=>{if(sum[t]==null&&dd[t]==null)sum[t]=0});
 EXTRA.forEach(t=>{sum[t]=Math.max(sum[t]||0,2e5)});
-  W=[...new Set([...Object.keys(sum),...Object.keys(dd)])].filter(t=>!isRemovedTitle(t)).map(t=>{const a=Math.round(sum[t]!==undefined?Math.max(sum[t]/(nm[t]||1),dd[t]||0):dd[t]);return[t,OVR[t]??boost(t,rarOf(a)),a]});
-  try{localStorage.setItem("wc_rank6",JSON.stringify({day:today,l:W}))}catch(e){wcDbg(e)}}
+  W=[...new Set([...Object.keys(sum),...Object.keys(dd),...Object.keys(pk)])].filter(t=>!isRemovedTitle(t)).map(t=>{const a=Math.round(Math.max(sum[t]!==undefined?sum[t]/(nm[t]||1):0,dd[t]||0,(pk[t]||0)*.4));return[t,OVR[t]??boost(t,rarOf(a)),a]});
+  try{localStorage.setItem("wc_rank7",JSON.stringify({day:today,l:W}))}catch(e){wcDbg(e)}}
  const films=await filmPromise;
  const cn=new Set(CRE.map(c=>c.t));
  RANK=withVip([...W.filter(x=>!cn.has(x[0])).map(x=>({t:x[0],r:x[1],v:x[2],src:"wiki"})),...CRE.map(c=>({t:c.t,r:c.r,v:1e11,cr:c})),...films]).sort((a,b)=>b.r-a.r||(b.o||0)-(a.o||0)||b.v-a.v||String(a.t).localeCompare(String(b.t)));
@@ -983,6 +984,7 @@ const pv=u=>.75+.5*h(hs(u)),ac=u=>.5+h(hs(u)+7); // avarice / activité de chaqu
 const BOT_STYLE={
  Willkoursk:{m:1.14,a:1.25,s:0.82}, floreal:{m:1.08,a:1.10,s:0.55}, yvan28:{m:1.22,a:0.92,s:0.45}, babarceleste:{m:1.35,a:0.78,s:0.28}, tibiz:{m:1.16,a:1.35,s:0.72}, jeunepousse2kk:{m:1.28,a:0.62,s:0.18}, sorrenuwu:{m:1.12,a:1.45,s:0.90}, Lavrano:{m:1.20,a:1.05,s:0.40}, M4rcelin:{m:1.32,a:0.70,s:0.20}, Ninon_b:{m:1.10,a:1.20,s:0.62}, Kevinou75:{m:1.18,a:1.02,s:0.38}, Pixelle:{m:1.26,a:0.88,s:0.36}, TheoBg:{m:1.09,a:1.28,s:0.68}, hugo_w:{m:1.16,a:1.16,s:0.52}, "Camille.R":{m:1.24,a:0.96,s:0.44}, Le_Gaulois:{m:1.38,a:0.70,s:0.16}, DarkNono:{m:1.20,a:1.30,s:0.58}, zoe_cards:{m:1.30,a:1.00,s:0.34}, Bastos:{m:1.15,a:1.34,s:0.64}, Nadjib:{m:1.27,a:0.83,s:0.31}
 };
+const AUC_TARGET=240,AUC_PAGE=48;
 let MK={A:[],H:[],W:[],PX:{},n:5,BB:{},BI:[],TR:{},TRt:0,ST:{}};
 try{const x=JSON.parse(localStorage.getItem("wc_mk3")||"null");if(x&&x.A)MK={...MK,...x};
  else{const o=JSON.parse(localStorage.getItem("wc_mk2")||"null");if(o&&o.A){o.A.forEach(a=>{if(a.s==-1){if(a.w==-1)money+=a.b;const c={...a.c};col[c.id]=col[c.id]?{...col[c.id],n:col[c.id].n+1}:{...c,n:1}}else if(a.w==-1)money+=a.b});localStorage.removeItem("wc_mk2");save()}}}catch(e){wcDbg(e)}
@@ -1014,7 +1016,7 @@ try{
  MK.A=(MK.A||[]).map(a=>({...a,c:normMkCard(a.c)}));MK.H=(MK.H||[]).map(a=>({...a,c:normMkCard(a.c)}));MK.W=(MK.W||[]).map(a=>({...a,c:normMkCard(a.c)}));
  MK.PX={};
 }catch(e){wcDbg(e)}
-const saveMk=()=>{try{localStorage.setItem("wc_mk3",JSON.stringify(MK))}catch(e){wcDbg(e)}};
+const saveMk=()=>{try{/* annonces des bots : description raccourcie pour ménager le stockage */const o={...MK,A:MK.A.map(a=>a.c&&a.c.d&&a.c.d.length>160&&a.s!=ME&&!a.mine&&a.w!=ME?{...a,c:{...a.c,d:a.c.d.slice(0,160)}}:a)};localStorage.setItem("wc_mk3",JSON.stringify(o))}catch(e){wcDbg(e)}};
 // V74 : purge des anciennes annonces Zbb dans les enchères sauvegardées.
 try{
  const isZbb=x=>x&&x.c&&["zbb","amine"].includes(String(x.c.t||"").trim().toLowerCase());
@@ -1151,7 +1153,7 @@ function simulate(){
 /* revente : un acheteur qui a gagné une carte peut la remettre en vente plus tard, souvent plus cher */
 function botResell(){
  const now=Date.now();if(!MK.BI.length)return;
- if(MK.A.filter(a=>!a.done&&a.s!=ME).length>=Math.max(48,(MK.n||5)*8)+25)return;
+ if(MK.A.filter(a=>!a.done&&a.s!=ME).length>=AUC_TARGET+25)return;
  let n=0;
  for(let i=MK.BI.length-1;i>=0&&n<2;i--){const b=MK.BI[i],p=botProfile(b.u);if(now-b.ts<36e4)continue;
   const pr=p.type=="flipper"?.25:p.type=="whale"?.04:p.type=="collector"?.03:.08;if(Math.random()>pr)continue;
@@ -1246,18 +1248,21 @@ try{stampInit()}catch(e){console.warn("stampInit",e)}
 let filling=false;
 async function refill(){
  if(filling)return;
- const target=Math.max(48,(MK.n||5)*8),bots=MK.A.filter(a=>a.s!=ME).length;
+ const target=AUC_TARGET,bots=MK.A.filter(a=>a.s!=ME).length;
  if(bots>=target)return;
  filling=true;
  try{
-  const seen=new Set(MK.A.map(a=>a.c.pid)),need=target-bots,all=[],got=[];
+  const seen=new Set(MK.A.map(a=>a.c.pid)),need=Math.min(target-bots,70),all=[],got=[];
   const addPool=c=>{
    if(c&&c.img&&!seen.has(c.pid)&&!all.some(x=>x.pid==c.pid))all.push(c)
   };
   Object.values(store).forEach(addPool);
   Object.values(col).forEach(addPool);
+  /* V137 : source locale rapide = le catalogue exploré par le robot (aucune requête réseau) */
+  try{if(window.wcCatalogV41&&window.wcCatalogV41.randomSample){const W=[44,26,15,8,4,2,.8,.2],tw=W.reduce((x,y)=>x+y,0),counts={};W.forEach((w,r)=>{counts[r]=Math.max(r>=5?3:6,Math.ceil(need*2.5*w/tw))});
+   (await window.wcCatalogV41.randomSample(counts)).forEach(c=>{if(c&&c.img&&!isExcludedTitle(c.t)&&!noImageTitle(c.t)){store[c.id]=c;addPool(c)}})}}catch(e){wcDbg(e)}
 
-  for(let k=0;k<4&&all.length<need*2;k++){
+  for(let k=0;k<2&&all.length<need*1.5;k++){
    const bs=(await Promise.all(
     Array.from({length:Math.max(1,Math.ceil((need*2-all.length)/8))},
      ()=>buildPack().catch(()=>[]))
@@ -1271,7 +1276,7 @@ async function refill(){
 
   // Répartition volontairement très variée : beaucoup de Communes/Peu communes,
   // quelques cartes premium, et seulement une poignée de Légendaires.
-  const RW=[50.794,27.988,12.439,6.219,1.555,.777,.207,.021];
+  const RW=[44,26,15,8,4,2,.8,.2]; // le marché montre plus de cartes intéressantes que les boosters
   const totalW=RW.reduce((a,b)=>a+b,0);
   const weightedR=()=>{
    let x=Math.random()*totalW;
@@ -1298,7 +1303,7 @@ async function refill(){
   const now=Date.now();
   got.slice(0,need).forEach(c=>{
    const s=PSEUDOS[Math.floor(Math.random()*PSEUDOS.length)],f=fair(c);
-   const dModes=[60000,90000,120000,150000,180000,240000,300000,420000,600000,900000];
+   const dModes=[60000,90000,120000,150000,180000,240000,300000,420000,600000,900000,1200000,1800000,2700000,3600000,7200000];
    const d=dModes[Math.floor(Math.random()*dModes.length)];
 
    // Prix de départ : parfois très intéressant, parfois normal,
@@ -1331,7 +1336,7 @@ async function refill(){
    MK.A.push(a);try{wlOnListed(a)}catch(e){wcDbg(e)}
   });
   saveMk()
- }catch(e){console.error(e)}finally{filling=false}
+ }catch(e){console.error(e)}finally{filling=false;try{const nb=MK.A.filter(a=>a.s!=ME).length;if(tab==3&&nb<AUC_TARGET&&nb>bots){clearTimeout(refill._t);refill._t=setTimeout(()=>{if(tab==3)refill().then(()=>paintMk(true)).catch(()=>{})},2500)}}catch(e){wcDbg(e)}}
 }
 const STP=v=>`<div class="stp"><button class="btn g" id="mi">−</button><span>🪙 <input id="sv" type="number" min="1" value="${v}"></span><button class="btn g" id="pl">+</button></div>`;
 const wireStp=(min,step)=>{$("mi").onclick=()=>{$("sv").value=Math.max(min,(+$("sv").value||min)-step)};$("pl").onclick=()=>{$("sv").value=(+$("sv").value||min)+step}};
@@ -1351,11 +1356,11 @@ function pickSell(){M.style.display="flex";const L=Object.values(col).sort((a,b)
  M.innerHTML=`<div class="mbox v2 auc"><button class="btn g x" id="mx">✕</button><h2 style="margin:0">Choisis une carte à vendre</h2><div class="grid lg" id="pk" style="--n:4">${L.length?L.map(card).join(""):'<div class="msg">Ta collection est vide.</div>'}</div></div>`;$("mx").onclick=closeModal;
  bind($("pk"),false);$("pk").querySelectorAll(".card").forEach(e=>e.onclick=()=>{closeModal();openAuction(e.dataset.id)})}
 // ---- page Enchères ----
-let AV={tab:"b",q:"",sort:"new",fr:new Set(),d:null,hideOwn:false};
+let AV={tab:"b",q:"",sort:"new",fr:new Set(),d:null,hideOwn:false,page:0};
 const tile=a=>{store[a.c.id]=a.c;const cur=a.w==null?a.st:a.b;
  return `<div class="at" data-id="${a.id}" data-auid="${a.id}">${WL[a.c.pid]?'<div class="wst" title="Dans ta liste de souhaits">⭐</div>':""}${card(a.c)}<div class="ar"><div><small data-au-label="price-label">${a.w==null?"MISE DE DÉPART":"MISE ACTUELLE"}</small><b data-au-price>🪙 ${cur}</b></div><div style="text-align:right"><small>⏱ DURÉE</small><b class="cd" data-e="${a.end}"></b></div></div><div class="as"><span data-au-status>${a.s==ME?"Ta vente":"Vendu par "+a.s+(a.resale?" ♻ revente":"")}${a.w?` · ${a.w==ME?"<b style='color:#7ee29a'>tu mènes</b>":"👑 "+a.w}`:""}${a.mine&&a.w!=ME?" · <b style='color:#ff9a7a'>surenchéri</b>":""}</span></div></div>`};
 const SORTS={new:["Récemment listées",(x,y)=>y.ts-x.ts],end:["Se termine bientôt",(x,y)=>x.end-y.end],pa:["Prix croissant",(x,y)=>(x.w==null?x.st:x.b)-(y.w==null?y.st:y.b)],pd:["Prix décroissant",(x,y)=>(y.w==null?y.st:y.b)-(x.w==null?x.st:x.b)],rar:["Rareté",(x,y)=>y.c.r-x.c.r]};
-const aucViewSig=()=>WLV+"|"+(AV.hideOwn?1:0)+"|"+AV.tab+"|"+AV.d+"|"+AV.q+"|"+AV.sort+"|"+[...AV.fr].join(",");
+const aucViewSig=()=>AV.page+"|"+WLV+"|"+(AV.hideOwn?1:0)+"|"+AV.tab+"|"+AV.d+"|"+AV.q+"|"+AV.sort+"|"+[...AV.fr].join(",");
 let mkViewSig="";
 function paintMk(force){if(!$("ah"))return;const viewSig=aucViewSig();
  if(force||viewSig!==mkViewSig){mkViewSig=viewSig;if(AV.d){detailPage()}else listPage()}
@@ -1380,10 +1385,12 @@ function listPage(){
  const tabs=[["b","Parcourir"],["v",`Mes ventes (${mineS.length}/${MAXS})`],["e","Mes enchères"],["g",`Gagnées (${MK.W.length})`],["h",`Historique (${myH.length})`],["w",`⭐ Souhaits (${Object.keys(WL).length})`],["m","📈 Cours"]];
  let body="";
  if(AV.tab=="b"){let L=A.filter(a=>a.s!=ME&&(!AV.q||a.c.t.toLowerCase().includes(AV.q.toLowerCase()))&&(!AV.fr.size||AV.fr.has(a.c.r))&&(!AV.hideOwn||!ownN(a.c))).sort(SORTS[AV.sort][1]);
+  const NP=Math.max(1,Math.ceil(L.length/AUC_PAGE));if(AV.page>NP-1)AV.page=NP-1;if(AV.page<0)AV.page=0;const PL=L.slice(AV.page*AUC_PAGE,(AV.page+1)*AUC_PAGE);
   body=`<div class="bar"><input id="aq" placeholder="Rechercher une carte…" value="${AV.q}"><button class="btn" id="ago">🔍 Rechercher</button><button class="btn g ${AV.hideOwn?"on":""}" id="aown" title="Cache les cartes que tu possèdes déjà">${AV.hideOwn?"✓ ":""}Masquer celles que j'ai déjà</button><select id="asr">${Object.entries(SORTS).map(([k,v])=>`<option value="${k}" ${k==AV.sort?"selected":""}>${v[0]}</option>`).join("")}</select><select id="adf" title="Difficulté du marché : plus c'est dur, moins les acheteurs paient cher">${ADIFF.map((d,i)=>`<option value="${i}" ${i==AD?"selected":""}>Marché : ${d.n}</option>`).join("")}</select></div>
   <div class="sub" style="margin:0 0 8px">${mktInfo()}</div>
   <div class="chips">${R.map((r,i)=>HID.has(i)?"":`<button class="chip ${AV.fr.has(i)?"on":""}" style="background:${r[1]}" data-r="${i}">${SYM[i]} ${r[0]}</button>`).join("")}</div>
-  <div class="grid mg">${L.length?L.map(tile).join(""):'<div class="msg">Aucune enchère ne correspond.</div>'}</div>
+  <div class="sub" style="margin:0 0 8px"><b>${L.length.toLocaleString("fr-FR")}</b> enchère${L.length>1?"s":""} en cours${NP>1?` · page ${AV.page+1} / ${NP}`:""}</div><div class="grid mg">${L.length?PL.map(tile).join(""):'<div class="msg">Aucune enchère ne correspond.</div>'}</div>
+  ${NP>1?`<div class="pag"><button class="btn g" id="apv" ${AV.page<1?"disabled":""}>← Précédent</button><span id="apn">Page ${AV.page+1} / ${NP}</span><button class="btn g" id="anx" ${AV.page>=NP-1?"disabled":""}>Suivant →</button></div>`:""}
   <h3 style="margin-top:26px">Dernières ventes</h3>${MK.H.filter(x=>x.u).slice(0,10).map(x=>`<div class="off">${x.c.t} · <b style="color:${R[x.r][1]}">${R[x.r][0]}</b> · <b>${x.p} 🪙</b> · ${nm(x.u)} <span class="sub" style="margin:0">(vendeur : ${nm(x.s)} · ${ago(x.ts)})</span></div>`).join("")||'<div class="sub">Aucune vente pour le moment.</div>'}`}
  else if(AV.tab=="v")body=`<div class="bar"><button class="btn" id="sell">➕ Mettre une carte aux enchères</button><span class="sub" style="align-self:center;margin:0">Frais de vente 5 % · ${MAXS} ventes max en même temps</span></div><div class="grid mg">${mineS.sort((x,y)=>x.end-y.end).map(a=>tile(a)+"").join("")||'<div class="msg">Aucune vente en cours. Mets une carte de ta collection aux enchères.</div>'}</div>`;
  else if(AV.tab=="e")body=`<div class="grid mg">${mineB.sort((x,y)=>x.end-y.end).map(tile).join("")||'<div class="msg">Tu n\'as misé sur aucune enchère.</div>'}</div>`;
@@ -1392,9 +1399,9 @@ function listPage(){
  else if(AV.tab=="w"){body=wishTab();if(WLU){WLU=0;saveWL();wlBadge()}}
  else body=myH.map(x=>`<div class="off">${x.s==ME?(x.u?`💰 Vendue à <b>${x.u}</b> pour <b>${x.p} 🪙</b>`:"↩ Invendue"):`🛒 Achetée à <b>${nm(x.s)}</b> pour <b>${x.p} 🪙</b>`} · « ${x.c.t} » <b style="color:${R[x.r][1]}">${R[x.r][0]}</b> <span class="sub" style="margin:0">${ago(x.ts)}</span></div>`).join("")||'<div class="sub">Aucun historique.</div>';
  $("ah").innerHTML=`<div class="tabs2">${tabs.map(t=>`<button class="${AV.tab==t[0]?"on":""}" data-t="${t[0]}">${t[1]}</button>`).join("")}</div>${body}`;
- $("ah").querySelectorAll(".tabs2 button").forEach(b=>b.onclick=()=>{AV.tab=b.dataset.t;paintMk(true)});
- if($("aq")){const go=()=>{AV.q=$("aq").value.trim();paintMk(true)};$("aq").onkeydown=e=>{if(e.key=="Enter")go()};$("ago").onclick=go;$("aown").onclick=()=>{AV.hideOwn=!AV.hideOwn;paintMk(true)};$("asr").onchange=e=>{AV.sort=e.target.value;paintMk(true)};$("adf").onchange=e=>{AD=+e.target.value;try{localStorage.setItem("wc_aucdiff",String(AD))}catch(x){wcDbg(x)}paintMk(true)};
-  $("ah").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;AV.fr.has(i)?AV.fr.delete(i):AV.fr.add(i);paintMk(true)})}
+ $("ah").querySelectorAll(".tabs2 button").forEach(b=>b.onclick=()=>{AV.tab=b.dataset.t;AV.page=0;paintMk(true)});
+ if($("aq")){const go=()=>{AV.q=$("aq").value.trim();AV.page=0;paintMk(true)};$("aq").onkeydown=e=>{if(e.key=="Enter")go()};$("ago").onclick=go;$("aown").onclick=()=>{AV.hideOwn=!AV.hideOwn;AV.page=0;paintMk(true)};$("asr").onchange=e=>{AV.sort=e.target.value;AV.page=0;paintMk(true)};if($("apv"))$("apv").onclick=()=>{AV.page--;paintMk(true);main.scrollTo(0,0)};if($("anx"))$("anx").onclick=()=>{AV.page++;paintMk(true);main.scrollTo(0,0)};$("adf").onchange=e=>{AD=+e.target.value;try{localStorage.setItem("wc_aucdiff",String(AD))}catch(x){wcDbg(x)}paintMk(true)};
+  $("ah").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const i=+b.dataset.r;AV.fr.has(i)?AV.fr.delete(i):AV.fr.add(i);AV.page=0;paintMk(true)})}
  if($("sell"))$("sell").onclick=pickSell;
  $("ah").querySelectorAll(".wlrm").forEach(b=>b.onclick=e=>{e.stopPropagation();const p=b.dataset.p;if(WL[p]){delete WL[p]}else{const k=Object.keys(WL).find(x=>String(x)==p);if(k)delete WL[k]}WLV++;saveWL();paintMk(true)});
  $("ah").querySelectorAll("[data-oc]").forEach(e=>e.onclick=()=>openModal(e.dataset.oc));
