@@ -419,7 +419,7 @@ async function openModal(id){const c=store[id];if(!c)return;const [n,cl]=R[c.r];
  if(c.src=="wiki"){try{const j=await(await fetch("https://fr.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(c.t))).json();if(M.style.display=="flex"&&j.extract&&store[id]===c){desc=j.extract;draw()}}catch(e){wcDbg(e)}}}
 function render(){clearInterval(timer);closeModal();try{SFX.stopAll()}catch(e){wcDbg(e)}try{simulate()}catch(e){wcDbg(e)}
  [0,1,2,3,4,5,6,7,8].forEach(i=>{const e=$("t"+i);if(e)e.className=tab==i?"on":""});
- try{([packs,all,collection,market,casino,(typeof missionsPage=="function"?missionsPage:packs),eventPage,profilePage,succesPage][tab]||packs)()}
+ try{const pg=["packs","all","collection","market","casino","missionsPage","eventPage","profilePage","succesPage"][tab]||"packs";let fn;try{fn=eval(pg)}catch(e){fn=null}(typeof fn=="function"?fn:packs)()}
  catch(e){console.error(e);main.innerHTML=`<div class="msg">Oups, une erreur est survenue.<br><br><button class="btn" onclick="render()">Réessayer</button></div>`}}
 /* ===== PAQUETS ===== */
 const SPECIALS=[
@@ -1878,15 +1878,13 @@ function slotsBase(){
     if(free>0)setTimeout(()=>{if(alive("sr"))spin()},3200);else if(isF){$("sm").innerHTML+=` · <b>Fin des tours gratuits : ${fw} 🪙</b>`;fw=0}}},50)};
  $("sp").onclick=()=>{SFX.slots();spin()}}
 
+/* V144 : esc() n'existait que dans le Casino ; la fusion plantait donc et faisait perdre les 3 cartes */
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 async function fusionSame(c){
  if(!c||c.n<3||c.r>=7)return;
  SFX.fusionStart();
  const source={...c};
  const targetR=Math.min(7,source.r+1);
- c.n-=3;
- if(c.n<=0)delete col[c.id];
- save();
-
  const result={...source,r:targetR,n:1};
  result.id=source.id;
  result.pid=source.pid||source.id;
@@ -1910,6 +1908,9 @@ async function fusionSame(c){
   <div class="fusionDone" id="fusionDone"></div>
  </div>`;
  document.body.appendChild(overlay);
+ c.n-=3;
+ if(c.n<=0)delete col[c.id];
+ save();
  const stage=$("fusionStage");
  requestAnimationFrame(()=>stage.classList.add("active"));
 
@@ -1930,7 +1931,7 @@ async function fusionSame(c){
   },3600);
  }catch(e){
   SFX.fusionFail();
-  addCard({...source,n:1});
+  col[source.id]={...source};
   save();
   overlay.remove();
   collection();
